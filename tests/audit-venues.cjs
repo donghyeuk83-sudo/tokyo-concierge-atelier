@@ -23,6 +23,7 @@ const esc=s=>'"'+String(s??'').replace(/"/g,'""')+'"';
 const header=['id','category','name_en','name_ja','area','type','venue_reference_url','photo_status','image_url','image_source_url','photographer','license','license_url','venue_official_site_review','image_venue_match_review','reuse_rights_review'];
 const missingVenueReferences=entries.filter(e=>!e[6]).map(e=>({id:e[0],name:e[2]}));
 console.log('VENUES_WITHOUT_REFERENCE_URL',JSON.stringify(missingVenueReferences));
+assert.equal(missingVenueReferences.length,0,'Venue reference URLs missing: '+JSON.stringify(missingVenueReferences));
 const rows=entries.map(([id,category,name,nameJa,area,type,url])=>{
  const p=photos.get(id);
  return [id,category,name,nameJa,area,type,url,p?'PHOTO_REGISTERED':'PHOTO_NOT_YET_VERIFIED',p?.url||'',p?.source||'',p?.credit||'',p?.license||'',p?.licenseUrl||'','NEEDS_MANUAL_REVIEW',p?'REGISTERED_IMAGE_NEEDS_VISUAL_REVIEW':'NOT_REVIEWED',p?'CC_LICENSE_RECORDED':'NOT_REVIEWED'].map(esc).join(',');
