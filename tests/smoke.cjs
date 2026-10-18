@@ -82,6 +82,26 @@ const assert=require('assert');
    }
  }
  assert.deepEqual(failedPhotos,[],'Venue images failed to load');
+ // View every photo without cropping; check mobile modal, attribution and native keyboard close.
+ await page.locator('#tabs [data-cat="attraction"]').click();
+ for(const language of ['en','ja','ko']){
+   await page.locator('#language').selectOption(language);
+   const trigger=page.locator('[data-view-photo="a01"]');await trigger.click();
+   assert(await page.locator('#photoDialog').evaluate(el=>el.open),'Photo viewer opens: '+language);
+   assert.equal(await page.locator('#photoAttribution a').count(),2,'Enlarged photo retains attribution');
+   assert((await page.locator('#photoTitle').textContent()).trim(),'Enlarged photo has a title');
+   assert((await page.locator('#photoDialog').boundingBox()).width<=390,'Photo viewer fits mobile');
+   assert.equal(await page.locator('#photoLarge').evaluate(el=>getComputedStyle(el).objectFit),'contain','Enlarged photo keeps full frame');
+   if(language==='ja')await page.locator('#photoClose').click();else await page.keyboard.press('Escape');
+   assert(!await page.locator('#photoDialog').evaluate(el=>el.open),'Photo viewer closes: '+language);
+   assert(await trigger.evaluate(el=>el===document.activeElement),'Focus returns to photo button');
+ }
+ await page.locator('[data-view-photo="a01"]').click();
+ await page.locator('#photoLarge').evaluate(el=>el.dispatchEvent(new Event('error')));
+ assert(await page.locator('#photoLarge').evaluate(el=>el.hidden),'Failed enlarged photo is hidden');
+ assert((await page.locator('#photoStatus').textContent()).includes('사진'),'Photo viewer gives a localized loading error');
+ await page.locator('#photoClose').click();
+
  await page.locator('#tabs [data-cat="attraction"]').click();
  // Exercise the broken-image replacement path, not just the happy-path photo loader.
  const broken=page.locator('img[data-venue-photo="a01"]');
