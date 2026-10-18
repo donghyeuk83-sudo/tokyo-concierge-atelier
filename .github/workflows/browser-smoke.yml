@@ -30,14 +30,14 @@ jobs:
           LIVE_URL: https://donghyeuk83-sudo.github.io/tokyo-concierge-atelier/
         run: |
           for attempt in $(seq 1 36); do
-            if curl -fsSL --max-time 15 "$LIVE_URL" -o /tmp/atelier-live.html && grep -Fq 'Tokyo_Metropolitan_Government_Building_2024.jpg' /tmp/atelier-live.html; then
-              echo 'Public site has current 10-photo revision'
+            if curl -fsSL --max-time 15 "$LIVE_URL" -o /tmp/atelier-live.html && cmp -s index.html /tmp/atelier-live.html; then
+              echo 'Public site has exact checked-out revision'
               exit 0
             fi
             echo "Waiting for Pages deployment: $attempt/36"
             sleep 10
           done
-          echo 'Public Pages did not expose current 10-photo revision within 6 minutes'
+          echo 'Public Pages did not expose exact checked-out revision within 6 minutes'
           exit 1
       - name: Test deployed GitHub Pages in Chromium
         env:
