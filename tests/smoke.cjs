@@ -87,6 +87,8 @@ const assert=require('assert');
  await broken.evaluate(el=>el.dispatchEvent(new Event('error')));
  const brokenCard=page.locator('.card').filter({has:page.locator('img[data-venue-photo="a01"]')});
  assert.equal(await brokenCard.locator('.card-art').count(),1,'Photo failure shows one illustration');
+ await broken.evaluate(el=>{el.dispatchEvent(new Event('error'));el.dispatchEvent(new Event('error'))});
+ assert.equal(await brokenCard.locator('.card-art').count(),1,'Repeated photo errors never duplicate the fallback');
  assert.equal(await brokenCard.locator('.card-photo').evaluate(el=>getComputedStyle(el).display),'none','Broken photo is hidden');
 
  assert.equal(errors.length,0,'JS errors: '+errors.join('; '));
