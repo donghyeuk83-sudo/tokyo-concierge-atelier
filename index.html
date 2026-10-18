@@ -630,6 +630,11 @@ Object.assign(VERIFIED_SOURCES,{
 s01:{url:"https://www.ginza6.tokyo/hours/",checked:"2026-10-18",en:"Official GINZA SIX hours: shops/cafes 10:30-20:30, restaurants 11:00-23:00, rooftop garden 07:00-23:00. Individual shops differ; rooftop garden can close due to weather/events.",ja:"公式営業時間：ショップ・カフェ10:30～20:30、レストラン11:00～23:00、屋上庭園7:00～23:00。店舗差異・天候等による庭園閉鎖に注意。",ko:"공식 운영시간: 쇼핑·카페 10:30~20:30, 레스토랑 11:00~23:00, 옥상정원 07:00~23:00. 개별 매장 및 기상·행사에 따른 변경 주의."},
 s02:{url:"https://www.mistore.jp/store/shinjuku/access.html",checked:"2026-10-18",en:"Official Isetan Shinjuku access page: main store normally 10:00-20:00; main building 7F restaurant area 11:00-22:00. Approximately one minute on foot from Shinjuku-sanchome Marunouchi Line Isetan-side gate. Check floor-specific exceptions.",ja:"伊勢丹新宿店公式：通常10:00～20:00、本館7階レストラン街11:00～22:00。新宿三丁目駅丸ノ内線伊勢丹方面改札から徒歩約1分。フロア別の変更要確認。",ko:"이세탄 신주쿠 공식: 통상 10:00~20:00, 본관 7층 레스토랑가 11:00~22:00. 신주쿠산초메 마루노우치선 이세탄 방면 개찰구에서 도보 약 1분. 층별 예외 확인."}
 });
+/* Official access and operating source review 2026-10-18; event exceptions require recheck. */
+Object.assign(VERIFIED_SOURCES,{
+a04:{url:"https://www.senso-ji.jp/access/",checked:"2026-10-18",en:"Senso-ji official: main hall 06:00-17:00 (06:30 opening October-March). About 5 minutes' walk from Asakusa stations on Ginza, Asakusa, Tobu or Tsukuba Express lines. No temple parking; other halls differ.",ja:"浅草寺公式：本堂6:00～17:00（10～3月は6:30開堂）。各線浅草駅から徒歩約5分。寺の駐車場なし。他の諸堂は別途確認。",ko:"센소지 공식: 본당 06:00~17:00(10~3월 06:30 개당). 각 아사쿠사역에서 도보 약 5분. 절 전용 주차장 없음. 다른 전각은 별도 확인."},
+a07:{url:"https://www.tokyo-park.or.jp/park/ueno/index.html",checked:"2026-10-18",en:"Official Tokyo Metropolitan Parks page lists Ueno Park as open year-round. Individual museums, zoo, shops and facilities have separate hours and closures; confirm each independently.",ja:"東京都公園協会公式：上野恩賜公園は常時開園。博物館・動物園・店舗等の開館時間と休業日は施設別に確認。",ko:"도쿄도 공원협회 공식: 우에노 공원은 상시 개방. 박물관·동물원·상점 등 개별 시설 운영시간은 별도 확인."}
+});
 /* Explicit audit queue; not official venue verification. */
 const PENDING_OFFICIAL_REVIEW={"r52":{"name":"Nagatacho Ohka","ja":"永田町 瓢華","area":"Nagatacho","reason":"EXACT_RESTAURANT_IDENTITY_UNCONFIRMED_POSSIBLE_CONFUSION_WITH_HYOKI"}};
 Object.assign(VERIFIED_SOURCES,{
