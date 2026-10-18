@@ -635,6 +635,11 @@ Object.assign(VERIFIED_SOURCES,{
 a04:{url:"https://www.senso-ji.jp/access/",checked:"2026-10-18",en:"Senso-ji official: main hall 06:00-17:00 (06:30 opening October-March). About 5 minutes' walk from Asakusa stations on Ginza, Asakusa, Tobu or Tsukuba Express lines. No temple parking; other halls differ.",ja:"浅草寺公式：本堂6:00～17:00（10～3月は6:30開堂）。各線浅草駅から徒歩約5分。寺の駐車場なし。他の諸堂は別途確認。",ko:"센소지 공식: 본당 06:00~17:00(10~3월 06:30 개당). 각 아사쿠사역에서 도보 약 5분. 절 전용 주차장 없음. 다른 전각은 별도 확인."},
 a07:{url:"https://www.tokyo-park.or.jp/park/ueno/index.html",checked:"2026-10-18",en:"Official Tokyo Metropolitan Parks page lists Ueno Park as open year-round. Individual museums, zoo, shops and facilities have separate hours and closures; confirm each independently.",ja:"東京都公園協会公式：上野恩賜公園は常時開園。博物館・動物園・店舗等の開館時間と休業日は施設別に確認。",ko:"도쿄도 공원협회 공식: 우에노 공원은 상시 개방. 박물관·동물원·상점 등 개별 시설 운영시간은 별도 확인."}
 });
+/* Official airport access checks 2026-10-18; schedules and flight terminal assignments require recheck. */
+Object.assign(VERIFIED_SOURCES,{
+t03:{url:"https://tokyo-haneda.com/en/access/travel_between_terminals/index.html",checked:"2026-10-18",en:"Official Haneda airport: T1/T2/T3 linked by free terminal shuttle; T1-T2 underground passage is affected by construction. Check current terminal, shuttle timetable and airline before directing guests. Do not infer flight terminal from airline alone.",ja:"羽田空港公式：T1/T2/T3間は無料連絡バスあり。T1-T2地下連絡通路は工事の影響あり。利用ターミナル・バス時刻・航空便は当日確認。",ko:"하네다공항 공식: T1·T2·T3 무료 터미널 셔틀 운행. T1~T2 지하 연결통로 공사 영향. 항공편 터미널·셔틀 시간은 당일 확인."},
+t04:{url:"https://www.narita-airport.jp/en/access/",checked:"2026-10-18",en:"Official Narita airport access covers JR, Keisei, buses, taxis and terminal shuttle. T1 rail station serves T1; Airport Terminal 2-3 Station serves T2/T3. Free shuttle connects terminals; T2-T3 walking corridor also available. Confirm flight terminal and train timetable.",ja:"成田空港公式：JR・京成・バス・タクシー・無料ターミナル連絡バスを案内。鉄道駅はT1用とT2/T3用に分かれ、T2-T3は徒歩連絡も可能。便のターミナル・時刻表は要確認。",ko:"나리타공항 공식: JR·게이세이·버스·택시·무료 터미널 셔틀. 철도역은 T1용과 T2·T3용으로 구분, T2~T3 도보 연결 가능. 항공편 터미널·열차 시간 재확인."}
+});
 /* Explicit audit queue; not official venue verification. */
 const PENDING_OFFICIAL_REVIEW={"r52":{"name":"Nagatacho Ohka","ja":"永田町 瓢華","area":"Nagatacho","reason":"EXACT_RESTAURANT_IDENTITY_UNCONFIRMED_POSSIBLE_CONFUSION_WITH_HYOKI"}};
 Object.assign(VERIFIED_SOURCES,{
