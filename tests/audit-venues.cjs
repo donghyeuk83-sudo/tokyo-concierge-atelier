@@ -24,6 +24,9 @@ for(const p of licensed){
  const sourceName=decodeURIComponent(p.source.split('/wiki/File:')[1]||'').replace(/_/g,' ');
  assert(imageName&&sourceName&&imageName===sourceName,'Photo filename differs from credited Commons file: '+p.id);
 }
+// Ensure failures hide the broken photo and insert a visible venue illustration.
+assert(html.includes("photo.style.display='none'"),'Broken photos must be hidden');
+assert(html.includes("photo.insertAdjacentElement('afterend',fallback.firstElementChild)"),'Fallback illustration must be inserted');
 const photos=new Map(licensed.map(p=>[p.id,p]));
 const knownCategories=new Set(['restaurant','attraction','shopping','wellness','transport']);
 for(const e of entries)assert(knownCategories.has(e[1]),'Unknown venue category: '+e[0]);
