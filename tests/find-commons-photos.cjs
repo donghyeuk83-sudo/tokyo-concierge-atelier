@@ -18,7 +18,8 @@ async function search(v){
  try{
   const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),20000);
   let response;try{response=await fetch(api,{signal:controller.signal,headers:{'user-agent':'TokyoConciergeAtelierPhotoResearch/1.0 (github.com/donghyeuk83-sudo/tokyo-concierge-atelier)'}})}finally{clearTimeout(timer)}
-  if(response.status===429){await sleep(12000);return{id,name,area,status:'RATE_LIMITED_RETRY_LATER',candidate_count:0}}\n  if(!response.ok)return{id,name,area,status:'API_HTTP_'+response.status,candidate_count:0};
+  if(response.status===429){await sleep(12000);return{id,name,area,status:'RATE_LIMITED_RETRY_LATER',candidate_count:0}}
+  if(!response.ok)return{id,name,area,status:'API_HTTP_'+response.status,candidate_count:0};
   const json=await response.json();
   const pages=Object.values(json.query?.pages||{});
   const candidates=pages.map(p=>{const i=p.imageinfo?.[0]||{},m=i.extmetadata||{};return{file:p.title,source:i.descriptionurl||'',thumb:i.thumburl||'',license:m.LicenseShortName?.value||'',license_url:m.LicenseUrl?.value||'',artist_html:m.Artist?.value||'',restrictions:m.Restrictions?.value||''}})
