@@ -42,20 +42,28 @@ const assert=require('assert');
  const registry=html.split('const LICENSED_VENUE_PHOTOS={')[1]?.split('};')[0]||'';
  const expectedPhotos=[...registry.matchAll(/^([a-z]\d+):\{/gm)].map(m=>m[1]);
  assert(expectedPhotos.length>=24,'Photo registry unexpectedly shrank');
+ const catalog=html.split('const DATA=[')[1]?.split('].map(')[0]||'';
+ const categoryById=new Map([...catalog.matchAll(/^\["([a-z]\d+)","(restaurant|attraction|shopping|wellness|transport)"/gm)].map(m=>[m[1],m[2]]));
  const failedPhotos=[];
- for(const id of expectedPhotos){
-   const img=page.locator('img[data-venue-photo="'+id+'"]');
-   assert.equal(await img.count(),1,'Photo element present: '+id);
-   await img.scrollIntoViewIfNeeded();
-   await img.evaluate(el=>{el.loading='eager';el.decoding='sync'});
-   await img.evaluate(el=>new Promise(resolve=>{if(el.complete)return resolve();el.addEventListener('load',resolve,{once:true});el.addEventListener('error',resolve,{once:true});setTimeout(resolve,12000)}));
-   const status=await img.evaluate(el=>({complete:el.complete,width:el.naturalWidth,src:el.currentSrc}));
-   console.log('VENUE_PHOTO_STATUS',id,JSON.stringify(status));
-   if(status.width===0)failedPhotos.push(id+' '+status.src);
-   const card=img.locator('xpath=ancestor::article');
-   assert.equal(await card.locator('.photo-credit a').count(),2,'Photo source and license links: '+id);
+ // The catalogue renders only one category at a time. Visit each category before asserting its photos.
+ for(const cat of [...new Set(expectedPhotos.map(id=>categoryById.get(id)))]){
+   assert(cat,'Photo references unknown catalogue venue');
+   await page.locator('#tabs [data-cat="'+cat+'"]').click();
+   for(const id of expectedPhotos.filter(id=>categoryById.get(id)===cat)){
+     const img=page.locator('img[data-venue-photo="'+id+'"]');
+     assert.equal(await img.count(),1,'Photo element present in '+cat+': '+id);
+     await img.scrollIntoViewIfNeeded();
+     await img.evaluate(el=>{el.loading='eager';el.decoding='sync'});
+     await img.evaluate(el=>new Promise(resolve=>{if(el.complete)return resolve();el.addEventListener('load',resolve,{once:true});el.addEventListener('error',resolve,{once:true});setTimeout(resolve,12000)}));
+     const status=await img.evaluate(el=>({complete:el.complete,width:el.naturalWidth,src:el.currentSrc}));
+     console.log('VENUE_PHOTO_STATUS',id,JSON.stringify(status));
+     if(status.width===0)failedPhotos.push(id+' '+status.src);
+     const card=img.locator('xpath=ancestor::article');
+     assert.equal(await card.locator('.photo-credit a').count(),2,'Photo source and license links: '+id);
+   }
  }
  assert.deepEqual(failedPhotos,[],'Venue images failed to load');
+ await page.locator('#tabs [data-cat="attraction"]').click();
  // Exercise the broken-image replacement path, not just the happy-path photo loader.
  const broken=page.locator('img[data-venue-photo="a01"]');
  await broken.evaluate(el=>el.dispatchEvent(new Event('error')));
