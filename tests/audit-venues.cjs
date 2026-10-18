@@ -7,6 +7,7 @@ assert(dataSection,'DATA catalog section missing');
 const entries=[...dataSection.matchAll(/^\[("(?:[^"\\]|\\.)*"(?:,\s*"(?:[^"\\]|\\.)*"){6})\],?$/gm)]
  .map(m=>JSON.parse('['+m[1]+']'));
 assert.equal(entries.length,131,'Expected exactly 131 venue records');
+for(const e of entries){assert.equal(e.length,7,'Venue must have seven fields');assert(e[0]&&e[1]&&e[2]&&e[3]&&e[4]&&e[5],'Venue missing required identity fields: '+e[0]);assert(/^https:\/\//.test(e[6]),'Venue reference URL missing HTTPS: '+e[0]);}
 const ids=entries.map(x=>x[0]);
 assert.equal(new Set(ids).size,131,'Duplicate venue ID');
 const licensedSection=html.split('const LICENSED_VENUE_PHOTOS={')[1]?.split('};')[0];
@@ -16,6 +17,8 @@ const licensed=[...licensedSection.matchAll(/^([a-z]\d+):\{url:"([^"]+)",source:
 assert.equal(new Set(licensed.map(x=>x.id)).size,licensed.length,'Duplicate licensed image ID');
 for(const p of licensed){assert(ids.includes(p.id),'Unknown image ID: '+p.id);assert(p.url.startsWith('https://'),'Image URL not HTTPS');assert(p.source.startsWith('https://'),'Source URL not HTTPS');assert(p.credit.trim(),'Missing photographer');assert(p.licenseUrl.startsWith('https://creativecommons.org/'),'Missing CC license');}
 const photos=new Map(licensed.map(p=>[p.id,p]));
+const knownCategories=new Set(['restaurant','attraction','shopping','wellness','transport']);
+for(const e of entries)assert(knownCategories.has(e[1]),'Unknown venue category: '+e[0]);
 const esc=s=>'"'+String(s??'').replace(/"/g,'""')+'"';
 const header=['id','category','name_en','name_ja','area','type','venue_reference_url','photo_status','image_url','image_source_url','photographer','license','license_url','venue_official_site_review','image_venue_match_review','reuse_rights_review'];
 const rows=entries.map(([id,category,name,nameJa,area,type,url])=>{
