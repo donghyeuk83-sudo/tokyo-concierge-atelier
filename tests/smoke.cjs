@@ -12,6 +12,7 @@ const assert=require('assert');
  await page.locator('#query').fill('Udatsu');
  assert((await page.locator('.card').count())>=1,'search returns results');
  await page.locator('#query').fill('NO_SUCH_VENUE_123');
+ await page.waitForTimeout(180);
  assert.equal(await page.locator('.card').count(),0,'empty search');
  await page.locator('#query').fill('');
  for(const l of ['ja','ko','en']){await page.locator('#language').selectOption(l);assert.equal(await page.locator('html').getAttribute('lang'),l,'language '+l)}
