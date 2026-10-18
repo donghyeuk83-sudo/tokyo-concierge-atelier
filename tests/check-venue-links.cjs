@@ -38,8 +38,10 @@ async function worker(){while(cursor<venues.length){const i=cursor++;results[i]=
  const cols=['id','name','category','area','url','http_status','result','final_url','note'];
  fs.mkdirSync('audits',{recursive:true});
  fs.writeFileSync('audits/venue-link-check.csv',[cols.map(q).join(','),...results.map(r=>cols.map(k=>q(r[k])).join(','))].join('\n')+'\n');
+ if(results.length!==venues.length||results.some(r=>!r||!r.id||!r.result))throw Error('Incomplete venue link audit');
  const counts={};for(const r of results)counts[r.result]=(counts[r.result]||0)+1;
  const review=results.filter(r=>r.result!=='HTTP_OK').map(r=>({id:r.id,name:r.name,result:r.result,http_status:r.http_status,url:r.url,note:r.note,priority:r.result==='HTTP_ERROR'?'HIGH':'MANUAL_REVIEW'}));
+ if(Object.values(counts).reduce((a,b)=>a+b,0)!==venues.length||review.length!==venues.length-(counts.HTTP_OK||0))throw Error('Venue audit counts inconsistent');
  fs.writeFileSync('audits/venue-links-needing-review.json',JSON.stringify({total:review.length,items:review},null,2)+'\n');
  fs.writeFileSync('audits/venue-link-check-summary.json',JSON.stringify({total:results.length,counts,checked_at:new Date().toISOString(),disclaimer:'HTTP success is not proof of venue identity, business operation, prices or hours. HTTP errors are not proof of closure.'},null,2)+'\n');
  console.log('LINK_AUDIT_SUMMARY',JSON.stringify(counts));
