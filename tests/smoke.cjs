@@ -70,7 +70,7 @@ const assert=require('assert');
    for(const id of expectedPhotos.filter(id=>categoryById.get(id)===cat)){
      const img=page.locator('img[data-venue-photo="'+id+'"]');
      assert.equal(await img.count(),1,'Photo element present in '+cat+': '+id);
-     await img.scrollIntoViewIfNeeded();
+     await img.locator('xpath=ancestor::article').scrollIntoViewIfNeeded();
      await img.evaluate(el=>{el.loading='eager';el.decoding='sync'});
      await img.evaluate(el=>new Promise(resolve=>{if(el.complete)return resolve();el.addEventListener('load',resolve,{once:true});el.addEventListener('error',resolve,{once:true});setTimeout(resolve,12000)}));
      const status=await img.evaluate(el=>({complete:el.complete,width:el.naturalWidth,src:el.currentSrc}));
