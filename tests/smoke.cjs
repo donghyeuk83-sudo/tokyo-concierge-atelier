@@ -42,6 +42,24 @@ const assert=require('assert');
  const registry=html.split('const LICENSED_VENUE_PHOTOS={')[1]?.split('};')[0]||'';
  const expectedPhotos=[...registry.matchAll(/^([a-z]\d+):\{/gm)].map(m=>m[1]);
  assert(expectedPhotos.length>=24,'Photo registry unexpectedly shrank');
+
+ // Structural metadata checks catch mismatched Wikimedia filenames and missing attribution.
+ const entries=[...registry.matchAll(/^([a-z]\\d+):\\{([^\\n]+)\\},?$/gm)];
+ assert.equal(entries.length,expectedPhotos.length,'Every photo registry entry parses');
+ const seenSources=new Set();
+ for(const [,id,fields] of entries){
+   const pick=name=>fields.match(new RegExp('(?:^|,)'+name+':"([^"]*)"'))?.[1];
+   const url=pick('url'),source=pick('source'),credit=pick('credit'),license=pick('license'),licenseUrl=pick('licenseUrl');
+   assert(url&&source&&credit&&license&&licenseUrl,'Photo attribution fields present: '+id);
+   const srcName=decodeURIComponent(new URL(source).pathname.split('/').pop()).replace(/_/g,' ');
+   const imgName=decodeURIComponent(new URL(url).pathname.split('/').pop()).replace(/_/g,' ');
+   assert.equal(imgName,srcName,'Photo image and source filename match: '+id);
+   assert(!seenSources.has(source),'Photo source reused across venues: '+id);
+   seenSources.add(source);
+   assert.equal(new URL(source).hostname,'commons.wikimedia.org','Photo source must be Commons: '+id);
+   assert.equal(new URL(licenseUrl).hostname,'creativecommons.org','License must link to Creative Commons: '+id);
+ }
+
  const catalog=html.split('const DATA=[')[1]?.split('].map(')[0]||'';
  const categoryById=new Map([...catalog.matchAll(/^\["([a-z]\d+)","(restaurant|attraction|shopping|wellness|transport)"/gm)].map(m=>[m[1],m[2]]));
  const failedPhotos=[];
