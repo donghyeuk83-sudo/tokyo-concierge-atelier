@@ -27,20 +27,32 @@ for(const p of licensed){
 // Ensure failures hide the broken photo and insert a visible venue illustration.
 assert(html.includes("photo.style.display='none'"),'Broken photos must be hidden');
 assert(html.includes("photo.insertAdjacentElement('afterend',fallback.firstElementChild)"),'Fallback illustration must be inserted');
+// Evidence-backed manual checks; all other images remain unverified.
+// This records source-page metadata, not blanket permission for every downstream use.
+const manuallyChecked=new Map([
+ ['a11',{source:'https://commons.wikimedia.org/wiki/File:Mori_Art_Museum_entrance.jpg',author:'Syced',license:'CC BY-SA 3.0',subject:'Mori Art Museum',checked:'2026-10-18'}]
+]);
+for(const [id,review] of manuallyChecked){
+ const p=licensed.find(x=>x.id===id);
+ assert(p,'Manual review references missing photo: '+id);
+ assert.equal(p.source,review.source,'Source changed since manual review: '+id);
+ assert.equal(p.credit,review.author,'Author changed since manual review: '+id);
+ assert.equal(p.license,review.license,'License changed since manual review: '+id);
+}
 const photos=new Map(licensed.map(p=>[p.id,p]));
 const knownCategories=new Set(['restaurant','attraction','shopping','wellness','transport']);
 for(const e of entries)assert(knownCategories.has(e[1]),'Unknown venue category: '+e[0]);
 const esc=s=>'"'+String(s??'').replace(/"/g,'""')+'"';
-const header=['id','category','name_en','name_ja','area','type','venue_reference_url','photo_status','image_url','image_source_url','photographer','license','license_url','venue_official_site_review','image_venue_match_review','reuse_rights_review'];
+const header=['id','category','name_en','name_ja','area','type','venue_reference_url','photo_status','image_url','image_source_url','photographer','license','license_url','venue_official_site_review','image_venue_match_review','reuse_rights_review','source_metadata_review','source_review_date','source_review_evidence'];
 const missingVenueReferences=entries.filter(e=>!e[6]).map(e=>({id:e[0],name:e[2]}));
 console.log('VENUES_WITHOUT_REFERENCE_URL',JSON.stringify(missingVenueReferences));
 assert.equal(missingVenueReferences.length,0,'Venue reference URLs missing: '+JSON.stringify(missingVenueReferences));
 const rows=entries.map(([id,category,name,nameJa,area,type,url])=>{
- const p=photos.get(id);
- return [id,category,name,nameJa,area,type,url,p?'PHOTO_REGISTERED':'PHOTO_NOT_YET_VERIFIED',p?.url||'',p?.source||'',p?.credit||'',p?.license||'',p?.licenseUrl||'','NEEDS_MANUAL_REVIEW',p?'REGISTERED_IMAGE_NEEDS_VISUAL_REVIEW':'NOT_REVIEWED',p?'CC_LICENSE_RECORDED':'NOT_REVIEWED'].map(esc).join(',');
+ const p=photos.get(id); const checked=manuallyChecked.get(id);
+ return [id,category,name,nameJa,area,type,url,p?'PHOTO_REGISTERED':'PHOTO_NOT_YET_VERIFIED',p?.url||'',p?.source||'',p?.credit||'',p?.license||'',p?.licenseUrl||'','NEEDS_MANUAL_REVIEW',p?'REGISTERED_IMAGE_NEEDS_VISUAL_REVIEW':'NOT_REVIEWED',p?'CC_LICENSE_RECORDED':'NOT_REVIEWED',checked?'SOURCE_METADATA_CHECKED':'NEEDS_MANUAL_REVIEW',checked?.checked||'',checked?.source||''].map(esc).join(',');
 });
 fs.mkdirSync('audits',{recursive:true});
 fs.writeFileSync('audits/venue-photo-audit.csv',[header.map(esc).join(','),...rows].join('\n')+'\n');
-const summary={venues:entries.length,photos_registered:licensed.length,photos_pending:entries.length-licensed.length,venue_reference_urls_missing:missingVenueReferences.length,venue_official_sites_manually_reviewed_in_this_audit:0,photo_license_records:licensed.length,generated_at:new Date().toISOString()};
+const summary={venues:entries.length,photos_registered:licensed.length,photos_pending:entries.length-licensed.length,venue_reference_urls_missing:missingVenueReferences.length,venue_official_sites_manually_reviewed_in_this_audit:0,photo_license_records:licensed.length,source_metadata_manually_checked:manuallyChecked.size,generated_at:new Date().toISOString()};
 fs.writeFileSync('audits/venue-photo-summary.json',JSON.stringify(summary,null,2)+'\n');
 console.log(JSON.stringify(summary));
