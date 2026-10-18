@@ -15,7 +15,7 @@ assert(licensedSection,'Licensed photos registry missing');
 const licensed=[...licensedSection.matchAll(/^([a-z]\d+):\{url:"([^"]+)",source:"([^"]+)",credit:"([^"]+)",license:"([^"]+)",licenseUrl:"([^"]+)"\}/gm)]
  .map(m=>({id:m[1],url:m[2],source:m[3],credit:m[4],license:m[5],licenseUrl:m[6]}));
 assert.equal(new Set(licensed.map(x=>x.id)).size,licensed.length,'Duplicate licensed image ID');
-assert.equal(licensed.length,[...licensedSection.matchAll(/^([a-z]\\d+):\\{/gm)].length,'Photo registry contains unparsed entries');
+assert.equal(licensed.length,licensedSection.split('\n').filter(line=>/^[a-z][0-9]+:\{/.test(line)).length,'Photo registry contains unparsed entries');
 for(const p of licensed){assert(ids.includes(p.id),'Unknown image ID: '+p.id);assert(p.url.startsWith('https://'),'Image URL not HTTPS');assert(p.source.startsWith('https://'),'Source URL not HTTPS');assert(p.credit.trim(),'Missing photographer');assert(p.licenseUrl.startsWith('https://creativecommons.org/'),'Missing CC license');}
 // Regression checks: every venue remains visually represented, including image-load failures.
 assert(html.includes('licensedPhoto|| illustration(r)'),'Missing illustration fallback for venues without photos');
