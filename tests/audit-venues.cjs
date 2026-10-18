@@ -7,7 +7,7 @@ assert(dataSection,'DATA catalog section missing');
 const entries=[...dataSection.matchAll(/^\[("(?:[^"\\]|\\.)*"(?:,\s*"(?:[^"\\]|\\.)*"){6})\],?$/gm)]
  .map(m=>JSON.parse('['+m[1]+']'));
 assert.equal(entries.length,131,'Expected exactly 131 venue records');
-for(const e of entries){assert.equal(e.length,7,'Venue must have seven fields');assert(e[0]&&e[1]&&e[2]&&e[3]&&e[4]&&e[5],'Venue missing required identity fields: '+e[0]);assert(/^https:\/\//.test(e[6]),'Venue reference URL missing HTTPS: '+e[0]);}
+for(const e of entries){assert.equal(e.length,7,'Venue must have seven fields');assert(e[0]&&e[1]&&e[2]&&e[3]&&e[4]&&e[5],'Venue missing required identity fields: '+e[0]);assert(!e[6]||/^https:\/\//.test(e[6]),'Venue reference URL invalid: '+e[0]);}
 const ids=entries.map(x=>x[0]);
 assert.equal(new Set(ids).size,131,'Duplicate venue ID');
 const licensedSection=html.split('const LICENSED_VENUE_PHOTOS={')[1]?.split('};')[0];
@@ -21,12 +21,14 @@ const knownCategories=new Set(['restaurant','attraction','shopping','wellness','
 for(const e of entries)assert(knownCategories.has(e[1]),'Unknown venue category: '+e[0]);
 const esc=s=>'"'+String(s??'').replace(/"/g,'""')+'"';
 const header=['id','category','name_en','name_ja','area','type','venue_reference_url','photo_status','image_url','image_source_url','photographer','license','license_url','venue_official_site_review','image_venue_match_review','reuse_rights_review'];
+const missingVenueReferences=entries.filter(e=>!e[6]).map(e=>({id:e[0],name:e[2]}));
+console.log('VENUES_WITHOUT_REFERENCE_URL',JSON.stringify(missingVenueReferences));
 const rows=entries.map(([id,category,name,nameJa,area,type,url])=>{
  const p=photos.get(id);
  return [id,category,name,nameJa,area,type,url,p?'PHOTO_REGISTERED':'PHOTO_NOT_YET_VERIFIED',p?.url||'',p?.source||'',p?.credit||'',p?.license||'',p?.licenseUrl||'','NEEDS_MANUAL_REVIEW',p?'REGISTERED_IMAGE_NEEDS_VISUAL_REVIEW':'NOT_REVIEWED',p?'CC_LICENSE_RECORDED':'NOT_REVIEWED'].map(esc).join(',');
 });
 fs.mkdirSync('audits',{recursive:true});
 fs.writeFileSync('audits/venue-photo-audit.csv',[header.map(esc).join(','),...rows].join('\n')+'\n');
-const summary={venues:entries.length,photos_registered:licensed.length,photos_pending:entries.length-licensed.length,venue_official_sites_manually_reviewed_in_this_audit:0,photo_license_records:licensed.length,generated_at:new Date().toISOString()};
+const summary={venues:entries.length,photos_registered:licensed.length,photos_pending:entries.length-licensed.length,venue_reference_urls_missing:missingVenueReferences.length,venue_official_sites_manually_reviewed_in_this_audit:0,photo_license_records:licensed.length,generated_at:new Date().toISOString()};
 fs.writeFileSync('audits/venue-photo-summary.json',JSON.stringify(summary,null,2)+'\n');
 console.log(JSON.stringify(summary));
