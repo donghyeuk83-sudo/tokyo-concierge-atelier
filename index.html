@@ -793,7 +793,45 @@ if(c==="restaurant")key=t.includes("sushi")?"sushi":t.includes("tempura")?"tempu
 if(c==="attraction")key=n.includes("skytree")?"skytree":n.includes("tokyo tower")?"tower":n.includes("shibuya sky")?"shibuya":n.includes("teamlab")?"teamlab":t.includes("shrine")?"shrine":t.includes("temple")?"temple":t.includes("park")||t.includes("garden")?"nature":"city";
 const variants={sushi:["#e9a6a0","#f8d2ac"],tempura:["#efc083","#f9e2b0"],pizza:["#e9ad8f","#f8d9b0"],fine:["#b7b6d8","#ead2d0"],tower:["#82c5c6","#d7e4c5"],skytree:["#a7d7df","#d8d5e9"],shibuya:["#f0c5a5","#b9d7d2"],teamlab:["#b4a4d9","#f2b9cc"],shrine:["#a8d2b7","#e9ddae"],temple:["#e8baaa","#f6dcb7"],nature:["#a8d8bf","#e6e7b7"],city:["#9dc4dd","#d2cbe8"],shopping:["#d9b6d8","#f4d9c2"],wellness:["#9bcdbb","#e5e6c4"],transport:["#9fc8e1","#d6d3e7"]};
 const p=variants[key]||variants.city;
-const serial=Number(String(r.id).replace(/\D/g,''))||0;const identity=[...String(r.id+'|'+r.name+'|'+r.area)].reduce((h,ch)=>((h*33)^ch.charCodeAt(0))>>>0,5381);const n1=identity%157,n2=(identity>>>8)%153,n3=(identity>>>16)%91;const accents=['#fff8dc','#fbe4e6','#e2f6f2','#e8e5fb'];const sparkle='<circle cx="'+(18+n1)+'" cy="'+(15+n3)+'" r="'+(4+identity%7)+'" fill="'+accents[identity%4]+'" opacity=".7"/><path d="M'+(18+n2)+' 15v18m-9-9h18" stroke="'+accents[(identity+1)%4]+'" stroke-width="3" opacity=".65"/>';return '<div class="card-art art-'+key+'" style="background:linear-gradient('+(110+identity%100)+'deg,'+p[identity%2]+','+p[(identity+1)%2]+')" role="img" aria-label="'+esc(r.name)+' — illustrative artwork, not a photograph"><svg viewBox="0 0 200 125" xmlns="http://www.w3.org/2000/svg">'+sparkle+art[key]+'</svg><span class="art-caption">'+esc(r.name)+' · '+esc(r.area)+'</span><span class="card-photo-label">'+({en:'VENUE ILLUSTRATION',ja:'施設イメージイラスト',ko:'장소별 제작 일러스트'}[lang])+'</span></div>'
+const serial=Number(String(r.id).replace(/\D/g,''))||0;const identity=[...String(r.id+'|'+r.name+'|'+r.area)].reduce((h,ch)=>((h*33)^ch.charCodeAt(0))>>>0,5381);const n1=identity%157,n2=(identity>>>8)%153,n3=(identity>>>16)%91;const accents=['#fff8dc','#fbe4e6','#e2f6f2','#e8e5fb'];const motifIndex=(identity>>>4)%5;
+const motifSet={
+restaurant:[
+'<path d="M10 118q40-20 80 0t100 0" stroke="#fff6e4" stroke-width="3" fill="none" opacity=".7"/>',
+'<g fill="#fff5dd" opacity=".7"><circle cx="26" cy="28" r="5"/><circle cx="174" cy="31" r="5"/><circle cx="163" cy="96" r="3"/></g>',
+'<path d="M17 16l15 13m0-13L17 29M169 97l15 13m0-13l-15 13" stroke="#fff8ec" stroke-width="3" opacity=".7"/>',
+'<ellipse cx="100" cy="118" rx="91" ry="8" fill="#fff8eb" opacity=".23"/>',
+'<path d="M12 105q24-15 48 0m80 0q24-15 48 0" stroke="#fff8e5" stroke-width="5" fill="none" opacity=".6"/>'
+],
+attraction:[
+'<path d="M0 116h200" stroke="#fff7e8" stroke-width="4" opacity=".7"/>',
+'<g fill="#fff8ea" opacity=".75"><circle cx="29" cy="25" r="5"/><circle cx="173" cy="21" r="7"/></g>',
+'<path d="M12 16h32M28 1v30M160 16h28M174 2v28" stroke="#fff8ea" stroke-width="3" opacity=".6"/>',
+'<path d="M0 115q35-21 70 0t70 0t60 0" stroke="#fdf5e3" stroke-width="4" fill="none" opacity=".55"/>',
+'<circle cx="161" cy="24" r="17" stroke="#fff7e8" stroke-width="3" fill="none" opacity=".65"/>'
+],
+shopping:[
+'<path d="M16 22l8 12 8-12-8-12Zm154 66 7 10 7-10-7-10Z" fill="#fff6e8" opacity=".8"/>',
+'<circle cx="34" cy="36" r="18" stroke="#fff9e9" stroke-width="3" fill="none" opacity=".6"/>',
+'<path d="M20 105h160" stroke="#fff6e8" stroke-width="5" opacity=".6"/>',
+'<path d="M27 20h25m-13-12v25M157 24h23m-12-12v24" stroke="#fff6e8" stroke-width="3" opacity=".7"/>',
+'<g fill="#fff9eb"><circle cx="22" cy="91" r="4"/><circle cx="175" cy="30" r="5"/></g>'
+],
+wellness:[
+'<path d="M15 111q28-20 56 0t56 0t58 0" stroke="#fff9e9" stroke-width="4" fill="none" opacity=".65"/>',
+'<g fill="#fff9e9" opacity=".7"><circle cx="24" cy="20" r="6"/><circle cx="171" cy="35" r="9"/></g>',
+'<path d="M20 60q14-20 28 0m105 0q14-20 28 0" stroke="#fff9e9" stroke-width="4" fill="none" opacity=".7"/>',
+'<ellipse cx="100" cy="114" rx="88" ry="8" fill="#fff8e8" opacity=".22"/>',
+'<path d="M19 20h28M33 6v28M161 19h22M172 8v22" stroke="#fff9e9" stroke-width="3" opacity=".65"/>'
+],
+transport:[
+'<path d="M0 117h200" stroke="#fff9e9" stroke-width="5" opacity=".7"/>',
+'<path d="M18 25h36M146 25h36" stroke="#fff9e9" stroke-width="5" opacity=".6"/>',
+'<g fill="#fff8ea"><circle cx="25" cy="96" r="5"/><circle cx="174" cy="96" r="5"/></g>',
+'<path d="M20 15l18 15-18 15m160-30-18 15 18 15" stroke="#fff8ea" stroke-width="4" fill="none" opacity=".6"/>',
+'<path d="M12 114l24-15m152 15-24-15" stroke="#fff8ea" stroke-width="4" opacity=".7"/>'
+]};
+const motif=(motifSet[c]||motifSet.attraction)[motifIndex];
+const sparkle='<circle cx="'+(18+n1)+'" cy="'+(15+n3)+'" r="'+(4+identity%7)+'" fill="'+accents[identity%4]+'" opacity=".7"/><path d="M'+(18+n2)+' 15v18m-9-9h18" stroke="'+accents[(identity+1)%4]+'" stroke-width="3" opacity=".65"/>';return '<div class="card-art art-'+key+'" style="background:linear-gradient('+(110+identity%100)+'deg,'+p[identity%2]+','+p[(identity+1)%2]+')" role="img" aria-label="'+esc(r.name)+' — illustrative artwork, not a photograph"><svg viewBox="0 0 200 125" xmlns="http://www.w3.org/2000/svg">'+motif+sparkle+art[key]+'</svg><span class="art-caption">'+esc(r.name)+' · '+esc(r.area)+'</span><span class="card-photo-label">'+({en:'VENUE ILLUSTRATION',ja:'施設イメージイラスト',ko:'장소별 제작 일러스트'}[lang])+'</span></div>'
 }
 function hotelDirections(r,mode){return "https://www.google.com/maps/dir/?api=1&origin="+encodeURIComponent("The Westin Tokyo, 1-4-1 Mita, Meguro City, Tokyo")+"&destination="+encodeURIComponent(r.ja+" "+r.area+" Tokyo")+"&travelmode="+encodeURIComponent(mode)}
 const VENUE_ALERTS={
