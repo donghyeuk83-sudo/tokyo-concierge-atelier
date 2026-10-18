@@ -15,6 +15,7 @@ assert(licensedSection,'Licensed photos registry missing');
 const licensed=[...licensedSection.matchAll(/^([a-z]\d+):\{url:"([^"]+)",source:"([^"]+)",credit:"([^"]+)",license:"([^"]+)",licenseUrl:"([^"]+)"\}/gm)]
  .map(m=>({id:m[1],url:m[2],source:m[3],credit:m[4],license:m[5],licenseUrl:m[6]}));
 assert.equal(new Set(licensed.map(x=>x.id)).size,licensed.length,'Duplicate licensed image ID');
+assert.equal(licensed.length,[...licensedSection.matchAll(/^([a-z]\\d+):\\{/gm)].length,'Photo registry contains unparsed entries');
 for(const p of licensed){assert(ids.includes(p.id),'Unknown image ID: '+p.id);assert(p.url.startsWith('https://'),'Image URL not HTTPS');assert(p.source.startsWith('https://'),'Source URL not HTTPS');assert(p.credit.trim(),'Missing photographer');assert(p.licenseUrl.startsWith('https://creativecommons.org/'),'Missing CC license');}
 // Regression checks: every venue remains visually represented, including image-load failures.
 assert(html.includes('licensedPhoto|| illustration(r)'),'Missing illustration fallback for venues without photos');
@@ -47,12 +48,14 @@ const header=['id','category','name_en','name_ja','area','type','venue_reference
 const missingVenueReferences=entries.filter(e=>!e[6]).map(e=>({id:e[0],name:e[2]}));
 console.log('VENUES_WITHOUT_REFERENCE_URL',JSON.stringify(missingVenueReferences));
 assert.equal(missingVenueReferences.length,0,'Venue reference URLs missing: '+JSON.stringify(missingVenueReferences));
+assert.equal(header.length,19,'Audit CSV schema changed unexpectedly');
 const rows=entries.map(([id,category,name,nameJa,area,type,url])=>{
  const p=photos.get(id); const checked=manuallyChecked.get(id);
  return [id,category,name,nameJa,area,type,url,p?'PHOTO_REGISTERED':'PHOTO_NOT_YET_VERIFIED',p?.url||'',p?.source||'',p?.credit||'',p?.license||'',p?.licenseUrl||'','NEEDS_MANUAL_REVIEW',p?'REGISTERED_IMAGE_NEEDS_VISUAL_REVIEW':'NOT_REVIEWED',p?'LICENSE_CLAIM_RECORDED_RIGHTS_UNVERIFIED':'NOT_REVIEWED',checked?'SOURCE_METADATA_CHECKED':'NEEDS_MANUAL_REVIEW',checked?.checked||'',checked?.source||''].map(esc).join(',');
 });
 fs.mkdirSync('audits',{recursive:true});
 fs.writeFileSync('audits/venue-photo-audit.csv',[header.map(esc).join(','),...rows].join('\n')+'\n');
+assert.equal(rows.length,entries.length,'Audit row count must match catalogue');
 const summary={venues:entries.length,photos_registered:licensed.length,photos_pending:entries.length-licensed.length,venue_reference_urls_missing:missingVenueReferences.length,venue_official_sites_manually_reviewed_in_this_audit:0,photo_license_claims_recorded:licensed.length,reuse_rights_independently_verified:0,source_metadata_manually_checked:manuallyChecked.size,generated_at:new Date().toISOString()};
 fs.writeFileSync('audits/venue-photo-summary.json',JSON.stringify(summary,null,2)+'\n');
 console.log(JSON.stringify(summary));
