@@ -39,13 +39,55 @@ header .toolbar{position:relative;z-index:3}
 @media(max-width:800px){.hero-art{opacity:.35;right:-15%;width:75%}header{min-height:295px}header h1,header p{max-width:500px}}
 @media(max-width:600px){.hero-art{width:110%;right:-45%;bottom:-10px;opacity:.24}.card-art{height:120px}header{min-height:280px}}
 @media print{.hero-art,.card-art{display:none!important}.card{box-shadow:none}}
+
+/* Editorial redesign 3.0 */
+:root{--deep:#143d3e;--leaf:#2e786a;--gold:#e4b36a;--paper:#fbf7ee}
+body{background:#f9f7f0}
+header{min-height:420px;background:linear-gradient(112deg,#133c43 0%,#17655f 58%,#368e7c 100%);padding-top:40px;padding-bottom:100px}
+header h1{font-size:clamp(44px,6vw,78px);max-width:640px;margin-top:22px}
+header p{font-size:19px;line-height:1.75}
+.hero-art{width:min(54%,680px);height:340px;right:-1%;bottom:18px;opacity:.85}
+.hero-kicker{background:#f9e9c725;border-color:#e8d5ac88}
+.magazine-intro{max-width:1180px;margin:-52px auto 30px;position:relative;z-index:5;padding:0 16px}
+.magazine-strip{background:#fffdf8;display:grid;grid-template-columns:1.25fr repeat(3,1fr);gap:0;overflow:hidden;border-radius:18px;box-shadow:0 18px 45px #173c352b;border:1px solid #e7e4d7}
+.magazine-lead{padding:26px;background:#f6ebd5}
+.magazine-lead strong{font-family:Georgia,serif;font-size:27px;font-weight:400;display:block}
+.magazine-lead p{font-size:13px;color:#66756c;line-height:1.5}
+.magazine-tile{border:0;border-left:1px solid #e9e5d8;padding:20px 14px;background:#fffdf8;cursor:pointer;display:flex;align-items:center;gap:12px;text-align:left;color:#27483e;transition:background .2s}
+.magazine-tile:hover{background:#e9f4eb}
+.magazine-tile .emoji{font-size:32px}
+.magazine-tile b{font-size:14px}
+.magazine-tile small{font-size:12px;color:#708077;display:block;margin-top:4px}
+main{margin-top:0}
+#catalogPanel{background:transparent;border:0;box-shadow:none;padding:8px 0 22px}
+#catalogPanel h2{font-size:38px;margin:6px 0}
+.filters{background:white;border:1px solid #eae5d8;border-radius:13px;padding:12px;box-shadow:0 5px 20px #2d544510}
+.cards{gap:20px}
+.card{border:1px solid #eee8dd;box-shadow:0 10px 25px #2c5b4b12;border-radius:19px;padding:0 18px 19px;gap:10px}
+.card-art{height:172px;margin:0 -18px 10px}
+.card-art svg{height:148px;max-width:250px}
+.card h3{font-size:23px}
+.card .muted{line-height:1.5}
+.card .actions{margin-top:8px}
+#tabs{padding:0 0 6px}
+.tab{font-size:14px}
+.section-eyebrow{letter-spacing:.16em;font-size:11px;font-weight:700;color:#a67c42;text-transform:uppercase}
+.card-art.restaurant{background:radial-gradient(circle at 70% 20%,#ffe4ab 0,transparent 45%),linear-gradient(135deg,#f7c4b0,#f3d2b6)}
+.card-art.attraction{background:radial-gradient(circle at 75% 30%,#fff3bc 0,transparent 45%),linear-gradient(135deg,#a6d7d2,#b5c5e6)}
+.card-art.shopping{background:radial-gradient(circle at 80% 20%,#fff4d6 0,transparent 45%),linear-gradient(135deg,#eac0d0,#f1dbbb)}
+.card-art.wellness{background:linear-gradient(135deg,#b5d7c4,#f1e8bf)}
+.card-art.transport{background:linear-gradient(135deg,#b4d7ed,#d8d2ed)}
+@media(max-width:900px){.magazine-strip{grid-template-columns:1fr 1fr}.magazine-lead{grid-column:1/-1}.hero-art{opacity:.35;right:-12%}}
+@media(max-width:600px){header{min-height:350px;padding-bottom:75px}header h1{font-size:47px}.magazine-intro{margin-top:-45px}.magazine-strip{grid-template-columns:1fr 1fr}.magazine-tile{padding:13px 10px;gap:6px}.magazine-tile .emoji{font-size:25px}.magazine-tile b{font-size:12px}.magazine-tile small{font-size:10px}#catalogPanel h2{font-size:30px}.card-art{height:160px}}
+@media print{.magazine-intro{display:none!important}}
 </style></head><body>
-<header><div class="toolbar"><small>THE WESTIN TOKYO · CONCIERGE OPERATIONS</small><div class="right"><label for="language">Language</label><select id="language"><option value="en">English</option><option value="ja">日本語</option><option value="ko">한국어</option></select></div></div><div class="hero-kicker">TOKYO CITY GUIDE · DESIGN 2.1</div><h1>Tokyo Concierge Atelier</h1><div class="hero-art" aria-hidden="true"><svg viewBox="0 0 560 250" xmlns="http://www.w3.org/2000/svg"><circle cx="440" cy="52" r="42" fill="#ffd78d" opacity=".95"/><path d="M0 230 Q110 195 200 229 T390 224 T560 230V250H0Z" fill="#0c514d"/><g fill="#d7efe0"><rect x="14" y="130" width="66" height="100" rx="4"/><rect x="86" y="112" width="58" height="118" rx="4"/><rect x="150" y="148" width="49" height="82" rx="4"/><rect x="355" y="135" width="80" height="95" rx="5"/><rect x="443" y="155" width="52" height="75" rx="5"/><rect x="505" y="125" width="46" height="105" rx="5"/></g><g fill="#78b7a5"><rect x="26" y="145" width="8" height="11"/><rect x="47" y="145" width="8" height="11"/><rect x="26" y="170" width="8" height="11"/><rect x="47" y="170" width="8" height="11"/><rect x="99" y="130" width="10" height="12"/><rect x="120" y="130" width="10" height="12"/><rect x="99" y="155" width="10" height="12"/><rect x="120" y="155" width="10" height="12"/><rect x="372" y="154" width="11" height="11"/><rect x="396" y="154" width="11" height="11"/><rect x="372" y="181" width="11" height="11"/><rect x="396" y="181" width="11" height="11"/></g><path d="M258 230V68l-12 0 12-28 12 28h-12M226 230l32-162 32 162M239 158h38M232 194h52M249 40l9-22 9 22" fill="none" stroke="#f6c478" stroke-width="8" stroke-linejoin="round"/><path d="M205 230h106M217 215h83" stroke="#f6c478" stroke-width="10"/><path d="M328 230V92l-13-12 13-10 13 10-13 12M305 230l23-138 23 138M313 166h31M318 126h21" stroke="#a6d8c9" fill="none" stroke-width="7"/><path d="M0 225 Q100 205 200 225 T400 220 T560 225" fill="none" stroke="#f6c478" stroke-width="5"/></svg></div><p id="subtitle">A practical Tokyo discovery and guest recommendation workspace.</p></header>
+<header><div class="toolbar"><small>THE WESTIN TOKYO · CONCIERGE OPERATIONS</small><div class="right"><label for="language">Language</label><select id="language"><option value="en">English</option><option value="ja">日本語</option><option value="ko">한국어</option></select></div></div><div class="hero-kicker">TOKYO CITY GUIDE · DESIGN 3.0</div><h1>Tokyo Concierge Atelier</h1><div class="hero-art" aria-hidden="true"><svg viewBox="0 0 560 250" xmlns="http://www.w3.org/2000/svg"><circle cx="440" cy="52" r="42" fill="#ffd78d" opacity=".95"/><path d="M0 230 Q110 195 200 229 T390 224 T560 230V250H0Z" fill="#0c514d"/><g fill="#d7efe0"><rect x="14" y="130" width="66" height="100" rx="4"/><rect x="86" y="112" width="58" height="118" rx="4"/><rect x="150" y="148" width="49" height="82" rx="4"/><rect x="355" y="135" width="80" height="95" rx="5"/><rect x="443" y="155" width="52" height="75" rx="5"/><rect x="505" y="125" width="46" height="105" rx="5"/></g><g fill="#78b7a5"><rect x="26" y="145" width="8" height="11"/><rect x="47" y="145" width="8" height="11"/><rect x="26" y="170" width="8" height="11"/><rect x="47" y="170" width="8" height="11"/><rect x="99" y="130" width="10" height="12"/><rect x="120" y="130" width="10" height="12"/><rect x="99" y="155" width="10" height="12"/><rect x="120" y="155" width="10" height="12"/><rect x="372" y="154" width="11" height="11"/><rect x="396" y="154" width="11" height="11"/><rect x="372" y="181" width="11" height="11"/><rect x="396" y="181" width="11" height="11"/></g><path d="M258 230V68l-12 0 12-28 12 28h-12M226 230l32-162 32 162M239 158h38M232 194h52M249 40l9-22 9 22" fill="none" stroke="#f6c478" stroke-width="8" stroke-linejoin="round"/><path d="M205 230h106M217 215h83" stroke="#f6c478" stroke-width="10"/><path d="M328 230V92l-13-12 13-10 13 10-13 12M305 230l23-138 23 138M313 166h31M318 126h21" stroke="#a6d8c9" fill="none" stroke-width="7"/><path d="M0 225 Q100 205 200 225 T400 220 T560 225" fill="none" stroke="#f6c478" stroke-width="5"/></svg></div><p id="subtitle">A practical Tokyo discovery and guest recommendation workspace.</p></header>
+<section class="magazine-intro no-print" aria-label="Featured experiences"><div class="magazine-strip"><div class="magazine-lead"><span class="section-eyebrow">The city, curated</span><strong>Discover your Tokyo.</strong><p>Culture, cuisine and hidden corners — a concierge's selection.</p></div><button class="magazine-tile" data-cat="restaurant"><span class="emoji">🍣</span><span><b>Fine Dining</b><small>Sushi &amp; beyond</small></span></button><button class="magazine-tile" data-cat="attraction"><span class="emoji">🗼</span><span><b>Iconic Tokyo</b><small>Culture &amp; views</small></span></button><button class="magazine-tile" data-cat="shopping"><span class="emoji">🛍️</span><span><b>City Shopping</b><small>Design &amp; luxury</small></span></button></div></section>
 <main><div class="tabs no-print" id="tabs"></div>
-<section class="panel" id="catalogPanel"><div class="toolbar"><div><h2 id="sectionTitle">Discover Tokyo</h2><p id="sectionDesc" class="muted"></p></div><span id="count" class="stat"></span></div><div class="filters"><input id="query" aria-label="Search" placeholder="Search by name, area or type"><select id="area" aria-label="Area"></select><select id="type" aria-label="Type"></select></div><div id="cards" class="cards"></div></section>
+<section class="panel" id="catalogPanel"><div class="toolbar"><div><span class="section-eyebrow">CURATED PLACES · TOKYO</span><h2 id="sectionTitle">Discover Tokyo</h2><p id="sectionDesc" class="muted"></p></div><span id="count" class="stat"></span></div><div class="filters"><input id="query" aria-label="Search" placeholder="Search by name, area or type"><select id="area" aria-label="Area"></select><select id="type" aria-label="Type"></select></div><div id="cards" class="cards"></div></section>
 <section class="panel"><div class="toolbar"><h2 id="shortlistTitle">Guest shortlist</h2><div class="right no-print"><button class="mini" id="print">Print guide</button><button class="mini" id="download">Export CSV</button><button class="mini" id="clear">Clear</button></div></div><p id="shortlistNote" class="muted">Only confirmed venue details should be shared as facts with guests.</p><div id="guide"></div></section>
 <section class="panel no-print"><h2 id="hotelTitle">Return to The Westin Tokyo</h2><p><strong>The Westin Tokyo</strong><br>1-4-1 Mita, Meguro-ku, Tokyo 153-8580<br>〒153-8580 東京都目黒区三田1-4-1</p><p>Taxi: <strong>ウェスティンホテル東京までお願いします。</strong></p><div class="notice" id="disclaimer">Research catalogue, not a booking system. Hours, availability, pricing, age policies, cancellations, accessibility and seasonal dates must be checked with official sources. Map links are searches, not verified directions. Do not enter guest personal or payment data.</div></section>
-</main><div class="footer">Tokyo Concierge Atelier · Concierge reference prototype · Design 2.1 · Updated 2026-10-18</div>
+</main><div class="footer">Tokyo Concierge Atelier · Concierge reference prototype · Design 3.0 · Updated 2026-10-18</div>
 <script>
 "use strict";
 const DATA=[
