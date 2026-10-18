@@ -36,7 +36,7 @@ const assert=require('assert');
  assert((await page.locator('.card').count())>=1,'Korean museum search');
  await page.locator('#query').fill('');
  await page.locator('#tabs [data-cat="attraction"]').click();
- const expectedPhotos=['a01','a02','a03','a04','a07','a08','a09'];
+ const expectedPhotos=['a01','a02','a03','a04','a05','a07','a08','a09'];
  const failedPhotos=[];
  for(const id of expectedPhotos){
    const img=page.locator('img[data-venue-photo="'+id+'"]');
