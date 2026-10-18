@@ -40,7 +40,7 @@ const assert=require('assert');
  const fs=require('node:fs');
  const html=fs.readFileSync('index.html','utf8');
  const registry=html.split('const LICENSED_VENUE_PHOTOS={')[1]?.split('};')[0]||'';
- const expectedPhotos=[...registry.matchAll(/^([a-z]\\d+):\\{/gm)].map(m=>m[1]);
+ const expectedPhotos=[...registry.matchAll(/^([a-z]\d+):\{/gm)].map(m=>m[1]);
  assert(expectedPhotos.length>=24,'Photo registry unexpectedly shrank');
  const failedPhotos=[];
  for(const id of expectedPhotos){
