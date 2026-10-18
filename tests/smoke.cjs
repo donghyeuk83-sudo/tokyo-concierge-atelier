@@ -52,6 +52,13 @@ const assert=require('assert');
    assert.equal(await card.locator('.photo-credit a').count(),2,'Photo source and license links: '+id);
  }
  assert.deepEqual(failedPhotos,[],'Venue images failed to load');
+ // Exercise the broken-image replacement path, not just the happy-path photo loader.
+ const broken=page.locator('img[data-venue-photo="a01"]');
+ await broken.evaluate(el=>el.dispatchEvent(new Event('error')));
+ const brokenCard=page.locator('.card').filter({has:page.locator('img[data-venue-photo="a01"]')});
+ assert.equal(await brokenCard.locator('.card-art').count(),1,'Photo failure shows one illustration');
+ assert.equal(await brokenCard.locator('.card-photo').evaluate(el=>getComputedStyle(el).display),'none','Broken photo is hidden');
+
  assert.equal(errors.length,0,'JS errors: '+errors.join('; '));
  console.log('PASS '+target+': render, search, no results, EN/JA/KO, shortlist, CSV, print invocation, detail, Korean search, mobile width, JS console');
  await browser.close();
