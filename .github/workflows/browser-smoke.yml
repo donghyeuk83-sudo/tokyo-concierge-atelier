@@ -16,6 +16,20 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - name: Test repository HTML in Chromium
         run: node tests/smoke.cjs
+      - name: Wait for current revision on GitHub Pages
+        env:
+          LIVE_URL: https://donghyeuk83-sudo.github.io/tokyo-concierge-atelier/
+        run: |
+          for attempt in $(seq 1 36); do
+            if curl -fsSL --max-time 15 "$LIVE_URL" | grep -Fq 'LICENSED_VENUE_PHOTOS'; then
+              echo 'Public site has venue photo feature'
+              exit 0
+            fi
+            echo "Waiting for Pages deployment: $attempt/36"
+            sleep 10
+          done
+          echo 'Public Pages did not expose venue photo feature within 6 minutes'
+          exit 1
       - name: Test deployed GitHub Pages in Chromium
         env:
           TEST_URL: https://donghyeuk83-sudo.github.io/tokyo-concierge-atelier/
