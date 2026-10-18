@@ -20,7 +20,7 @@ async function checkOne(v){
    const res=await fetch(url,{method,redirect:'follow',signal:controller.signal,headers:{'user-agent':'TokyoConciergeAtelierLinkAudit/1.0 (non-commercial verification)','accept':'text/html,*/*'}});
    record.http_status=String(res.status);record.final_url=res.url;
    if(res.ok){record.result='HTTP_OK';record.note='Link responds; venue identity and current operations NOT verified';return record}
-   if(attempt===0&&(res.status===405||res.status===403||res.status===400))continue;
+   if(attempt===0)continue; // HEAD may return misleading 4xx/5xx; verify with GET before classification.
    record.result=res.status===403||res.status===429?'ACCESS_RESTRICTED':'HTTP_ERROR';
    record.note='Manual venue review needed; not proof of closure';return record;
   }catch(e){
