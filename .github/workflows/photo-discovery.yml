@@ -1,6 +1,11 @@
 name: Venue photo discovery
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'tests/find-commons-photos.cjs'
+      - '.github/workflows/photo-discovery.yml'
   schedule:
     - cron: '25 1 * * *'
 permissions:
