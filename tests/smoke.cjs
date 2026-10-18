@@ -1,0 +1,34 @@
+const { chromium } = require('playwright');
+const fs=require('fs');
+const assert=require('assert');
+(async()=>{
+ const browser=await chromium.launch({headless:true});
+ const page=await browser.newPage({viewport:{width:1365,height:900},acceptDownloads:true});
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('file://'+process.cwd()+'/index.html');
+ await page.waitForSelector('.card',{timeout:15000});
+ assert((await page.locator('.card').count())>0,'catalogue cards render');
+ await page.locator('#query').fill('Udatsu');
+ assert((await page.locator('.card').count())>=1,'search returns results');
+ await page.locator('#query').fill('NO_SUCH_VENUE_123');
+ assert.equal(await page.locator('.card').count(),0,'empty search');
+ await page.locator('#query').fill('');
+ for(const l of ['ja','ko','en']){await page.locator('#language').selectOption(l);assert.equal(await page.locator('html').getAttribute('lang'),l,'language '+l)}
+ await page.locator('.card button[data-id]').first().click();
+ assert((await page.locator('#guide .guide-item').count())>0,'shortlist add');
+ await page.locator('#share').click();
+ const downloadPromise=page.waitForEvent('download',{timeout:10000});
+ await page.locator('#download').click();const download=await downloadPromise;
+ assert(download.suggestedFilename().endsWith('.csv'),'CSV download');
+ await page.locator('#print').evaluate(el=>{el.addEventListener('click',()=>window.__printClicked=true,{once:true})});
+ await page.locator('#print').click();
+ await page.locator('.detail-trigger').first().click();
+ assert(await page.locator('#detailDialog').evaluate(el=>el.open),'detail dialog');
+ await page.locator('#detailClose').click();
+ assert(!await page.locator('#detailDialog').evaluate(el=>el.open),'dialog close');
+ await page.setViewportSize({width:390,height:844});
+ assert((await page.locator('body').evaluate(el=>el.scrollWidth))<=405,'mobile horizontal overflow');
+ assert.equal(errors.length,0,'JS errors: '+errors.join('; '));
+ console.log('PASS: render, search, no results, EN/JA/KO, shortlist, CSV, print button, detail, mobile width, JS console');
+ await browser.close();
+})().catch(e=>{console.error(e);process.exit(1)});
