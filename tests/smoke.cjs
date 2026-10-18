@@ -44,7 +44,7 @@ const assert=require('assert');
  assert(expectedPhotos.length>=24,'Photo registry unexpectedly shrank');
 
  // Structural metadata checks catch mismatched Wikimedia filenames and missing attribution.
- const entries=[...registry.matchAll(/^([a-z]\\d+):\\{([^\\n]+)\\},?$/gm)];
+ const entries=[...registry.matchAll(/^([a-z]\d+):\{([^\n]+)\},?$/gm)];
  assert.equal(entries.length,expectedPhotos.length,'Every photo registry entry parses');
  const seenSources=new Set();
  for(const [,id,fields] of entries){
