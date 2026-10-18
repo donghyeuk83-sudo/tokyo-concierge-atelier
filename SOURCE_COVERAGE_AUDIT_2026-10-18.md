@@ -1,9 +1,22 @@
-# Source coverage audit — 2026-10-18
+# Tokyo Concierge Atelier — operational QA audit (2026-10-18)
 
-Catalogue: 131 records, 131 unique IDs. Source records: 131 of 131.
+## Static catalogue checks
 
-New official-source museums: a45 Tokyo Metropolitan Teien Art Museum; a46 Tokyo Photographic Art Museum; a47 Tokyo Metropolitan Art Museum.
+- Entries: 131
+- Unique venue IDs: 131
+- Effective source records: 130/131
+- No active source record: r42
 
-r52 Nagatacho Ouka: identity resolved via secondary listing; official reservation channel, concierge acceptance, membership requirements and cancellation terms remain unconfirmed. Do not promise availability.
+## Quality corrections
 
-Source coverage is not full operational verification. Public deployment and browser interaction remain untested. Recheck venue conditions on the guest's actual date.
+- Nagatacho Ouka (r52): secondary directory and reported member-invitation access; no official public booking channel or concierge acceptance verified. Marked as reference-only.
+- Bikkuri Sushi Ebisu (r42): source was explicitly removed in site code due to an unverified listing; marked reference-only, not official-source reviewed.
+- New museum records a45-a47: official-source notes and Japanese/Korean search aliases added; ID collision corrected.
+- s16 Hands Shibuya: official closure warning for 2026-11-15 is already in the catalogue. Recheck before any guest recommendation.
+
+## Incomplete release checks
+
+- Public GitHub Pages URL could not be reached by the available web reader; live deployment status unconfirmed.
+- Real browser search, language toggle, shortlist, links, print, download and mobile layout not yet executed.
+- Static code inspection is not a substitute for end-to-end browser QA.
+- Official source records are not guarantees of live hours, prices, booking access or availability.
