@@ -1,17 +1,20 @@
 # Tokyo Concierge Atelier — Source Coverage Audit
 
-Audit date: 2026-10-18. Source-code coverage only; not a full operational verification.
+Audit date: 2026-10-18. Code source coverage only, not proof of live venue operations or bookability.
 
 - Catalogue IDs: 128
-- Catalogue IDs with at least one official-source record: 127
-- Catalogue IDs without a source record: 1
+- Catalogue IDs with source record: 128
+- Catalogue IDs without source record: 0
 
-## Unresolved
+## r52 — identity correction completed; reservation rules still pending
 
-- r52 — Exact restaurant identity requires confirmation; do not recommend as verified.
+- Correct listing: **Nagatacho Ouka / 永田町 謳歌** (not 永田町 瓢華).
+- Secondary directory: https://tabelog.com/en/tokyo/A1308/A130802/13316045/
+- Listed address: 東京都千代田区永田町2-7-9
+- Directory indicates reservation-only. Restaurant-owned official site, authorized booking channel, introduction/membership requirements, prices, age limits, cancellation policy and concierge booking eligibility: **NEEDS CONFIRMATION**.
+- Do not conflate this restaurant with the separate brand 瓢嘻 (Hyoki): https://hyoki.jp/shop/
+- The catalogue retains a pending official-review marker for r52. Source record coverage is now complete but **official venue verification is not**.
 
-r52 (Nagatacho Ohka / 永田町 瓢華) is explicitly flagged: EXACT_RESTAURANT_IDENTITY_UNCONFIRMED_POSSIBLE_CONFUSION_WITH_HYOKI. Do not equate it with a similarly named restaurant.
+## Release quality gates
 
-## Quality and release gates
-
-Source-record presence does not confirm current availability, venue opening, prices or booking rules. Recheck time-sensitive facts on the venue's official site for each guest request. Public GitHub Pages deployment and browser interaction QA have not yet been verified. No guest personal or payment data belongs in this public repository.
+Recheck date-sensitive prices, booking terms and hours against authoritative sources before advising guests. GitHub Pages live deployment and browser QA remain unverified. Never store guest personal/payment data in this public repository.
