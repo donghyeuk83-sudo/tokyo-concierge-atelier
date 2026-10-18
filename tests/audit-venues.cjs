@@ -16,6 +16,14 @@ const licensed=[...licensedSection.matchAll(/^([a-z]\d+):\{url:"([^"]+)",source:
  .map(m=>({id:m[1],url:m[2],source:m[3],credit:m[4],license:m[5],licenseUrl:m[6]}));
 assert.equal(new Set(licensed.map(x=>x.id)).size,licensed.length,'Duplicate licensed image ID');
 for(const p of licensed){assert(ids.includes(p.id),'Unknown image ID: '+p.id);assert(p.url.startsWith('https://'),'Image URL not HTTPS');assert(p.source.startsWith('https://'),'Source URL not HTTPS');assert(p.credit.trim(),'Missing photographer');assert(p.licenseUrl.startsWith('https://creativecommons.org/'),'Missing CC license');}
+// Regression checks: every venue remains visually represented, including image-load failures.
+assert(html.includes('licensedPhoto|| illustration(r)'),'Missing illustration fallback for venues without photos');
+assert(html.includes("img.addEventListener('error'"),'Missing broken-photo fallback handler');
+for(const p of licensed){
+ const imageName=decodeURIComponent(p.url.split('/Special:FilePath/')[1]?.split('?')[0]||'').replace(/_/g,' ');
+ const sourceName=decodeURIComponent(p.source.split('/wiki/File:')[1]||'').replace(/_/g,' ');
+ assert(imageName&&sourceName&&imageName===sourceName,'Photo filename differs from credited Commons file: '+p.id);
+}
 const photos=new Map(licensed.map(p=>[p.id,p]));
 const knownCategories=new Set(['restaurant','attraction','shopping','wellness','transport']);
 for(const e of entries)assert(knownCategories.has(e[1]),'Unknown venue category: '+e[0]);
