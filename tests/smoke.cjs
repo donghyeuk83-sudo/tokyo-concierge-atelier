@@ -32,7 +32,7 @@ const assert=require('assert');
  assert((await page.locator('body').evaluate(el=>el.scrollWidth))<=405,'mobile horizontal overflow');
  await page.locator('#language').selectOption('ko');
  await page.locator('#query').fill('도쿄도 사진미술관');
- await page.locator('[data-cat="attraction"]').click();
+ await page.locator('#tabs [data-cat="attraction"]').click();
  assert((await page.locator('.card').count())>=1,'Korean museum search');
  assert.equal(errors.length,0,'JS errors: '+errors.join('; '));
  console.log('PASS '+target+': render, search, no results, EN/JA/KO, shortlist, CSV, print invocation, detail, Korean search, mobile width, JS console');
