@@ -31,6 +31,10 @@ assert(html.includes("photo.insertAdjacentElement('afterend',fallback.firstEleme
 // Evidence-backed manual checks; all other images remain unverified.
 // This records source-page metadata, not blanket permission for every downstream use.
 const manuallyChecked=new Map([
+ ['w07',{source:'https://commons.wikimedia.org/wiki/File:Westin_Hotel_Tokyo.jpg',author:'Harani0403',license:'CC BY-SA 3.0',subject:'Westin Tokyo hotel exterior, not spa interior',checked:'2026-10-18'}],
+ ['w02',{source:'https://commons.wikimedia.org/wiki/File:LaQua01s3872.jpg',author:'663highland',license:'CC BY 2.5',subject:'LaQua complex exterior',checked:'2026-10-18'}],
+ ['r30',{source:'https://commons.wikimedia.org/wiki/File:道玄坂_2024年10月12日の渋谷_202410121836_IMG_3124.jpg',author:'ウィ貴公子',license:'CC BY-SA 4.0',subject:'Dogenzaka streetscape with Kura Sushi building sign',checked:'2026-10-18'}],
+ ['r46',{source:'https://commons.wikimedia.org/wiki/File:Sumo_wrestling_in_Japan4.jpg',author:'Joli Rumi',license:'CC BY-SA 4.0',subject:'Asakusa Sumo Club demonstration',checked:'2026-10-18'}],
  ['a11',{source:'https://commons.wikimedia.org/wiki/File:Mori_Art_Museum_entrance.jpg',author:'Syced',license:'CC BY-SA 3.0',subject:'Mori Art Museum',checked:'2026-10-18'}]
 ]);
 for(const [id,review] of manuallyChecked){
