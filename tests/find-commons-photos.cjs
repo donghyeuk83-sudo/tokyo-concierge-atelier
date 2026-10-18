@@ -12,7 +12,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function search(v){
  const [id,category,name,nameJa,area]=v;
  if(registered.has(id))return {id,name,area,status:'REGISTERED',candidate_count:0};
- const query=name+' Tokyo';
+ const query=(category==='restaurant'?name+' Tokyo':name+' '+area+' Tokyo');
  const api=new URL('https://commons.wikimedia.org/w/api.php');
  for(const [k,val] of Object.entries({action:'query',generator:'search',gsrsearch:'filetype:bitmap '+query,gsrnamespace:'6',gsrlimit:'5',prop:'imageinfo',iiprop:'url|extmetadata',iiurlwidth:'900',format:'json',origin:'*'}))api.searchParams.set(k,val);
  try{
@@ -22,7 +22,7 @@ async function search(v){
   if(!response.ok)return{id,name,area,status:'API_HTTP_'+response.status,candidate_count:0};
   const json=await response.json();
   const pages=Object.values(json.query?.pages||{});
-  const candidates=pages.map(p=>{const i=p.imageinfo?.[0]||{},m=i.extmetadata||{};return{file:p.title,source:i.descriptionurl||'',thumb:i.thumburl||'',license:m.LicenseShortName?.value||'',license_url:m.LicenseUrl?.value||'',artist_html:m.Artist?.value||'',restrictions:m.Restrictions?.value||''}})
+  const candidates=pages.map(p=>{const i=p.imageinfo?.[0]||{},m=i.extmetadata||{};return{file:p.title,source:i.descriptionurl||'',thumb:i.thumburl||'',license:m.LicenseShortName?.value||'',license_url:m.LicenseUrl?.value||'',artist_html:m.Artist?.value||'',restrictions:m.Restrictions?.value||'',description_html:m.ImageDescription?.value||'',attribution_required:m.AttributionRequired?.value||''}})
     .filter(p=>p.thumb&&p.source&&/^(CC BY|CC BY-SA|CC0|Public domain)/i.test(p.license));
   return{id,name,area,status:candidates.length?'CANDIDATES_REQUIRE_REVIEW':'NO_ELIGIBLE_CANDIDATE_FOUND',candidate_count:candidates.length,candidates};
  }catch(e){return{id,name,area,status:'SEARCH_ERROR',candidate_count:0,error:String(e).slice(0,120)}}
