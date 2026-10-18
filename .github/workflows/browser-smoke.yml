@@ -14,5 +14,9 @@ jobs:
           node-version: '22'
       - run: npm install --no-save playwright
       - run: npx playwright install --with-deps chromium
-      - name: Test live HTML in Chromium
+      - name: Test repository HTML in Chromium
+        run: node tests/smoke.cjs
+      - name: Test deployed GitHub Pages in Chromium
+        env:
+          TEST_URL: https://donghyeuk83-sudo.github.io/tokyo-concierge-atelier/
         run: node tests/smoke.cjs
