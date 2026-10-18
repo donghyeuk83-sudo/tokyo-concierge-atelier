@@ -20,7 +20,7 @@ for(const p of licensed){assert(ids.includes(p.id),'Unknown image ID: '+p.id);as
 assert(html.includes('licensedPhoto|| illustration(r)'),'Missing illustration fallback for venues without photos');
 assert(html.includes("img.addEventListener('error'"),'Missing broken-photo fallback handler');
 for(const p of licensed){
- const imageName=decodeURIComponent(p.url.split('/Special:FilePath/')[1]?.split('?')[0]||'').replace(/_/g,' ');
+ const path=decodeURIComponent(new URL(p.url).pathname); const imageName=path.includes('/Special:FilePath/')?path.split('/Special:FilePath/')[1].replace(/_/g,' '):path.includes('/commons/thumb/')?path.split('/').slice(-2,-1)[0].replace(/_/g,' '):path.split('/').pop().replace(/_/g,' ');
  const sourceName=decodeURIComponent(p.source.split('/wiki/File:')[1]||'').replace(/_/g,' ');
  assert(imageName&&sourceName&&imageName===sourceName,'Photo filename differs from credited Commons file: '+p.id);
 }
