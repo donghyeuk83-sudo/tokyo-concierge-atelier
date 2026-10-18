@@ -1,17 +1,17 @@
 # Tokyo Concierge Atelier — Source Coverage Audit
 
-Audit date: 2026-10-18. Automated source-code coverage audit, not an assertion of live reservation availability or current venue operation.
+Audit date: 2026-10-18. Source-code coverage only; not a full operational verification.
 
-- Catalogue entries: 126
-- Entries with an attached source record: 126
-- Entries without an attached source record: 0
+- Catalogue IDs: 128
+- Catalogue IDs with at least one official-source record: 127
+- Catalogue IDs without a source record: 1
 
-## Unresolved source / identity review
+## Unresolved
 
+- r52 — Exact restaurant identity requires confirmation; do not recommend as verified.
 
+r52 (Nagatacho Ohka / 永田町 瓢華) is explicitly flagged: EXACT_RESTAURANT_IDENTITY_UNCONFIRMED_POSSIBLE_CONFUSION_WITH_HYOKI. Do not equate it with a similarly named restaurant.
 
-**Identity exception:** r52 (Nagatacho Ohka / 永田町 瓢華) remains in the explicit pending official review queue: EXACT_RESTAURANT_IDENTITY_UNCONFIRMED_POSSIBLE_CONFUSION_WITH_HYOKI. Do not promote to verified or recommend it until exact restaurant identity is established.
+## Quality and release gates
 
-## Interpretation and outstanding QA
-
-Source record presence is not a full audit of booking, prices, hours, branch, age restrictions or cancellation policy. For guest use, recheck time-sensitive details against the venue's official website. Browser rendering, interactive controls and public GitHub Pages deployment have not been confirmed in this audit. Preserve catalogue IDs and avoid guest personal data in this public repository.
+Source-record presence does not confirm current availability, venue opening, prices or booking rules. Recheck time-sensitive facts on the venue's official site for each guest request. Public GitHub Pages deployment and browser interaction QA have not yet been verified. No guest personal or payment data belongs in this public repository.
