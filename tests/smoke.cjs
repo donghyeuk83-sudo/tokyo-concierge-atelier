@@ -51,7 +51,7 @@ const assert=require('assert');
    const pick=name=>fields.match(new RegExp('(?:^|,)'+name+':"([^"]*)"'))?.[1];
    const url=pick('url'),source=pick('source'),credit=pick('credit'),license=pick('license'),licenseUrl=pick('licenseUrl');
    assert(url&&source&&credit&&license&&licenseUrl,'Photo attribution fields present: '+id);
-   const srcName=decodeURIComponent(new URL(source).pathname.split('/').pop()).replace(/_/g,' ');
+   const srcName=decodeURIComponent(new URL(source).pathname.split('/').pop()).replace(/^File:/,'').replace(/_/g,' ');
    const imgName=decodeURIComponent(new URL(url).pathname.split('/').pop()).replace(/_/g,' ');
    assert.equal(imgName,srcName,'Photo image and source filename match: '+id);
    assert(!seenSources.has(source),'Photo source reused across venues: '+id);
