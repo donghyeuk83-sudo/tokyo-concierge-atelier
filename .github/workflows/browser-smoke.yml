@@ -14,6 +14,13 @@ jobs:
           node-version: '22'
       - run: npm install --no-save playwright
       - run: npx playwright install --with-deps chromium
+      - name: Audit all 131 venue records and photo provenance
+        run: node tests/audit-venues.cjs
+      - name: Upload venue photo audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: venue-photo-audit-131
+          path: audits/
       - name: Test repository HTML in Chromium
         run: node tests/smoke.cjs
       - name: Wait for current revision on GitHub Pages
