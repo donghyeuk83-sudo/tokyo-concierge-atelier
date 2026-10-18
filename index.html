@@ -522,9 +522,9 @@ const DATA=[
 ["s16","shopping","Hands Shibuya","ハンズ渋谷店","Shibuya","Lifestyle","https://store.hands.net/shibuya/item/sb-closed.html"],
 ["s17","shopping","Muji Ginza","無印良品 銀座","Ginza","Lifestyle","https://www.muji.com/jp/ja/shop/detail/046604"],
 ["s18","shopping","Nihombashi Takashimaya S.C.","日本橋高島屋S.C.","Nihonbashi","Department / Luxury","https://www.takashimaya.co.jp/nihombashi/departmentstore/shop/"],
-["a25","attraction","Tokyo Metropolitan Teien Art Museum","東京都庭園美術館","Shirokanedai","Museum / Garden","https://www.teien-art-museum.ne.jp/en/visit/"],
-["a26","attraction","Tokyo Photographic Art Museum","東京都写真美術館","Ebisu","Photography museum","https://topmuseum.jp/"],
-["a27","attraction","Tokyo Metropolitan Art Museum","東京都美術館","Ueno","Art museum","https://www.tobikan.jp/en/guide/index.html"]
+["a45","attraction","Tokyo Metropolitan Teien Art Museum","東京都庭園美術館","Shirokanedai","Museum / Garden","https://www.teien-art-museum.ne.jp/en/visit/"],
+["a46","attraction","Tokyo Photographic Art Museum","東京都写真美術館","Ebisu","Photography museum","https://topmuseum.jp/"],
+["a47","attraction","Tokyo Metropolitan Art Museum","東京都美術館","Ueno","Art museum","https://www.tobikan.jp/en/guide/index.html"]
 ].map(([id,category,name,ja,area,type,url])=>({id,category,name,ja,area,type,url,status:"NEEDS_CONFIRMATION"}));
 /* Official venue pages checked 2026-10-18; live conditions still require rechecking. */
 const VERIFIED_SOURCES={
@@ -656,9 +656,9 @@ w01:{url:"https://thermae-yu.jp/user-guide/",checked:"2026-10-18",en:"Thermae-Yu
 /* r52: independently listed restaurant; no official restaurant website verified. */
 Object.assign(VERIFIED_SOURCES,{r52:{url:"https://tabelog.com/tokyo/A1308/A130802/13316045/",checked:"2026-10-18",en:"Tabelog lists Nagatacho Ouka (永田町 謳歌), Nagatacho 2-7-9, as reservation-only; no public booking phone, business hours or prices. Cards accepted, electronic money and QR payments not accepted (directory data). A September 2026 guest review describes a members-invitation-only private restaurant, but member count and concierge eligibility are not officially confirmed. Do not promise new guest reservations.",ja:"食べログ掲載：永田町 謳歌（永田町2-7-9）は完全予約制。電話番号・営業時間・価格は未掲載。カード可、電子マネー・QR決済不可（掲載情報）。2026年9月の口コミに会員招待制との報告あり。ただし会員数・コンシェルジュ予約可否は公式未確認。新規予約可能と案内しないでください。",ko:"타베로그 등록: 永田町 謳歌(나가타초 2-7-9)는 완전 예약제. 전화·영업시간·가격 미공개. 신용카드 가능, 전자화폐·QR 결제 불가(등록 정보). 2026년 9월 방문 후기는 회원 초대제라고 보고하나 회원 수·컨시어지 예약 가능 여부는 공식 미확인. 신규 예약 가능하다고 안내하지 말 것."}});
 Object.assign(VERIFIED_SOURCES,{
-a25:{url:"https://www.teien-art-museum.ne.jp/en/visit/",checked:"2026-10-18",en:"Museum 10:00-18:00; last entry 17:30. Monday closures and exhibition changeovers apply.",ja:"開館10:00～18:00、入館17:30まで。月曜休館と展示替えに注意。",ko:"10:00~18:00, 입장 17:30 마감. 월요일 휴관 및 전시 교체 확인."},
-a26:{url:"https://gardenplace.jp/service/",checked:"2026-10-18",en:"Museum 10:00-18:00; Thursday and Friday until 20:00. Monday closure and exhibition exceptions apply.",ja:"通常10:00～18:00、木金は20:00まで。月曜休館、展覧会別に確認。",ko:"통상 10:00~18:00, 목·금 20:00까지. 월요일 휴관 및 전시별 확인."},
-a27:{url:"https://www.tobikan.jp/en/guide/index.html",checked:"2026-10-18",en:"Museum 09:30-17:30; Fridays until 20:00 during special exhibitions. Exhibition-specific closure and fees.",ja:"9:30～17:30。特別展期間の金曜は20:00まで。展覧会別の休室日と料金を確認。",ko:"09:30~17:30, 특별전 기간 금요일 20:00까지. 전시별 휴관·요금 확인."}
+a45:{url:"https://www.teien-art-museum.ne.jp/en/visit/",checked:"2026-10-18",en:"Museum 10:00-18:00; last entry 17:30. Monday closures and exhibition changeovers apply.",ja:"開館10:00～18:00、入館17:30まで。月曜休館と展示替えに注意。",ko:"10:00~18:00, 입장 17:30 마감. 월요일 휴관 및 전시 교체 확인."},
+a46:{url:"https://gardenplace.jp/service/",checked:"2026-10-18",en:"Museum 10:00-18:00; Thursday and Friday until 20:00. Monday closure and exhibition exceptions apply.",ja:"通常10:00～18:00、木金は20:00まで。月曜休館、展覧会別に確認。",ko:"통상 10:00~18:00, 목·금 20:00까지. 월요일 휴관 및 전시별 확인."},
+a47:{url:"https://www.tobikan.jp/en/guide/index.html",checked:"2026-10-18",en:"Museum 09:30-17:30; Fridays until 20:00 during special exhibitions. Exhibition-specific closure and fees.",ja:"9:30～17:30。特別展期間の金曜は20:00まで。展覧会別の休室日と料金を確認。",ko:"09:30~17:30, 특별전 기간 금요일 20:00까지. 전시별 휴관·요금 확인."}
 });
 /* Explicit audit queue; not official venue verification. */
 const PENDING_OFFICIAL_REVIEW={"r52":{"name":"Nagatacho Ouka","ja":"永田町 謳歌","area":"Nagatacho","reason":"IDENTITY_CORRECTED_SECONDARY_SOURCE_MEMBERS_ONLY_REPORTED_OFFICIAL_BOOKING_CHANNEL_UNCONFIRMED"}};
