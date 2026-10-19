@@ -1,0 +1,27 @@
+name: Audit AI image cards
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'assets/photos/**'
+      - 'tests/audit-ai-image-uniqueness.cjs'
+      - '.github/workflows/audit-ai-images.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify 131 venues, 50 AI cards, and image files
+        run: node tests/audit-ai-image-uniqueness.cjs
+      - name: Upload duplication report
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-image-uniqueness-report
+          path: audits/ai-image-uniqueness.csv
