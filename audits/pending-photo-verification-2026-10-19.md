@@ -19,3 +19,12 @@ This is a research queue, not a photo license or authorization to republish imag
 - r18 SÉZANNE: Wikimedia Commons `File:Sézanne - fontaine de la place de la République.jpg` depicts a French town fountain, **not** the Tokyo restaurant. Exclude: https://commons.wikimedia.org/wiki/File:S%C3%A9zanne_-_fontaine_de_la_place_de_la_R%C3%A9publique.jpg
 
 No new image is authorized for publication from these matches. Existing venue fallback remains in place.
+
+## Direct web verification — 2026-10-19
+
+- **r06 Seirinkan:** Verified venue-specific Flickr images at https://www.flickr.com/photos/marley1/2399486554/ and https://www.flickr.com/photos/yusheng/6225457113 . Both source pages state **All rights reserved**; do **not** publish without permission.
+- **w05 Musashi-Koyama Onsen Shimizuyu:** Venue photos appear on https://www.gotokyo.org/en/spot/333/index.html and https://www.gotokyo.org/book/wp-content/uploads/2020/11/2011_discovery-shinagawa_SC.pdf ; no reuse grant established; do **not** copy.
+- **r45 Zauo Shibuya:** https://fishingbooker.com/blog/fishing-in-japan/ credits a Zauo photo by Thierry Draus as CC BY 2.0; venue branch is **not established as Shibuya**. https://blog.japanwondertravel.com/most-instagrammable-restaurants-in-tokyo-49642/ credits jencu CC BY 2.0 for **Meguro** branch. Do **not** mislabel either as Shibuya.
+- **a29 Ninja Trick House:** https://kr.hotels.com/go/japan/jp-best-tokyo-family-things-to-do credits a modified go.biwako image as CC BY-SA 2.0, but the displayed visual is generic shuriken rather than verified facility photo; not a venue-specific match.
+
+**Status:** No newly approved venue-specific photo. Existing registry remains unchanged; avoid counting web finds as deployed photos.
