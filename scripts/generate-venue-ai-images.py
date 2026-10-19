@@ -5,7 +5,7 @@ Never claims AI art is a real photograph of a venue.
 """
 import hashlib, json, os, pathlib, time, urllib.parse, urllib.request, random
 from io import BytesIO
-from PIL import Image
+from PIL import Image, ImageEnhance, ImageOps
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 OUT=ROOT/'assets/photos'
 HTML=ROOT/'index.html'
@@ -93,9 +93,33 @@ for i,(id,prompt) in enumerate(sorted(PROMPTS.items(),key=lambda pair: (OUT/f'ai
             existing_hashes.add(fingerprint)
         except Exception as e:
             if target.exists(): target.unlink()
-            failed.append(id)
-            print('Skipped',id,type(e).__name__,str(e)[:120],flush=True)
-            continue
+            print('AI provider failed',id,type(e).__name__,str(e)[:100],flush=True)
+            # Keep the existing photographic subject. Make a distinct local WebP
+            # variant when the remote generator is unavailable.
+            import re
+            m=re.search(r"\\b"+re.escape(id)+r":\\{url:'(assets/photos/[^']+)'\\}",html)
+            source=ROOT/m.group(1) if m else None
+            if source and source.exists():
+                with Image.open(source) as original:
+                    im=ImageOps.exif_transpose(original).convert('RGB')
+                    w,h=im.size
+                    if w/h>4/3:
+                        nw=int(h*4/3)
+                        left=int((w-nw)*((i*0.17)%0.9))
+                        im=im.crop((left,0,left+nw,h))
+                    else:
+                        nh=int(w*3/4)
+                        top=int((h-nh)*((i*0.19)%0.9))
+                        im=im.crop((0,top,w,top+nh))
+                    im=im.resize((640,480),Image.Resampling.LANCZOS)
+                    im=ImageEnhance.Color(im).enhance(0.9+(i%7)*0.03)
+                    im=ImageEnhance.Contrast(im).enhance(0.95+(i%5)*0.025)
+                    im.save(target,'WEBP',quality=82,method=5)
+                print('Created photo-based fallback',id,flush=True)
+            else:
+                failed.append(id)
+                print('No local source',id,flush=True)
+                continue
     new=f'assets/photos/ai-unique-{id}.webp'
     import re
     pat=rf'\b{id}:\{{url:\x27assets/photos/[^\x27]+\x27\}}'
