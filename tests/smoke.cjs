@@ -192,6 +192,35 @@ const assert=require('assert');
   assert.equal(await card.locator('img[data-venue-photo]').count(),0,'No copyright-unverified photo added '+id);
  }
 
+
+ // Photo-link upgrades: retain originals on the publisher's site, never relabel them as CC-cleared files.
+ const batch8=[
+  ['restaurant','r33','tabelog.com','/tokyo/A1303/A130302/13079402/dtlphotolst/smp2/','listing','Independent photo listing'],
+  ['wellness','w06','tokyosomeionsensakura.com','/facility/','operator','Venue / operator website'],
+  ['attraction','a32','www.kimono-wa.com','/en/plan.html','operator','Venue / operator website']
+ ];
+ for(const [category,id,host,path,kind,provenance] of batch8){
+  const entry=publicPhotoSourceBlock.split(String.fromCharCode(10)).find(line=>line.trim().startsWith(id+':'));
+  assert(entry,'Photo gallery source mapping preserved '+id);
+  const match=entry.match(/url:"([^"]+)",kind:"([^"]+)"/);
+  assert(match,'Valid source mapping '+id);
+  const url=new URL(match[1]);
+  assert.equal(url.hostname,host,'Exactly verified photo host '+id);
+  assert.equal(url.pathname,path,'Exact gallery or official photo page '+id);
+  assert.equal(match[2],kind,'Accurate photo source ownership kind '+id);
+  assert(!expectedPhotos.includes(id),'No unlicensed photo promoted into registry '+id);
+  await page.locator('#tabs [data-cat="'+category+'"]').click();
+  const card=page.locator('article.card').filter({has:page.locator('.detail-trigger[data-detail="'+id+'"]')});
+  const link=card.locator('a.venue-photo-source');
+  assert.equal(await link.count(),1,'Original photo source link visible '+id);
+  assert.equal(await link.getAttribute('href'),match[1],'Displayed link agrees with checked registry '+id);
+  assert((await link.locator('small').textContent()).includes(provenance),'Venue photo origin explained in English '+id);
+  assert.equal(await card.locator('img[data-venue-photo]').count(),0,'No uncleared photograph embedded '+id);
+  await card.locator('.detail-trigger').click();
+  assert.equal(await page.locator('#detailActions .detail-photo-source').getAttribute('href'),match[1],'Same original page in detail modal '+id);
+  await page.locator('#detailClose').click();
+ }
+
  const checkedPhotoRefs=[
    ['restaurant','r06','tabelog.com'],
    ['wellness','w05','www.shimizuyu.com'],
