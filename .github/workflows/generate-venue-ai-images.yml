@@ -6,6 +6,8 @@ on:
       - '.github/workflows/generate-venue-ai-images.yml'
       - 'scripts/generate-venue-ai-images.py'
   workflow_dispatch:
+  schedule:
+    - cron: '17 5 * * 1'
 permissions:
   contents: write
 jobs:
