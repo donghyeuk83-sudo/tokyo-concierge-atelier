@@ -1,5 +1,19 @@
 [
   {
+    "id": "r19",
+    "file": "assets/photos/pizza-studio-tamaki-33000007438.webp",
+    "source": "https://www.flickr.com/photos/fri13th/33000007438/",
+    "credit": "lazy fri13th",
+    "title": "pizza studio tamaki",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+    "retrievedFrom": "https://a2.cdn.japantravel.com/photo/68889-230898/1440x960!/tokyo-s-top-rated-pizza-restaurants-230898.webp",
+    "sha256": "dfaf5ecf550e781e4b47481a63f27fc7a40d5e410b8b6931c9acfd03605534f6",
+    "reviewedOn": "2026-10-19",
+    "changes": "Japan Travel published crop and WebP rendition; no additional editing",
+    "venueEvidence": "Original Flickr geotag 35.655588,139.744203 and Japan Travel article identify Higashi-Azabu; photographed 2018-10-20"
+  },
+  {
     "id": "r20",
     "file": "assets/photos/midori-sushi-ginza-5130489292.jpg",
     "source": "https://www.flickr.com/photos/dgeen/5130489292/",
