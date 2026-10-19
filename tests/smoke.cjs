@@ -83,6 +83,9 @@ const assert=require('assert');
  const quickButtons=page.locator('#photoQuickbar button[data-photo-quick]');
  assert.equal(await quickButtons.count(),4,'Four one-tap photo browsing choices on mobile');
  assert(await page.locator('#photoQuickbar').isVisible(),'Quick photo shortcuts visible on iPhone');
+ const initialCount=await page.locator('#cards .card').count();
+ assert((await page.locator('#photoQuickbar [data-photo-quick="all"]').textContent()).includes('('+initialCount+')'),'All quick filter badge reflects visible restaurant count');
+
  const quickVenue=page.locator('#photoQuickbar [data-photo-quick="venue"]');
  await quickVenue.click();
  assert.equal(await page.locator('#photoFilter').inputValue(),'venue','Venue-only chip sets photo filter select');
@@ -92,6 +95,9 @@ const assert=require('assert');
  assert.equal(await page.locator('#photoFilter').inputValue(),'building','Building-exterior chip filters correctly');
  const actualBuildingCards=await page.locator('#cards .card').count();
  assert.equal(actualBuildingCards,6,'Six restaurant cards depict their verified building exteriors');
+ assert((await page.locator('#photoQuickbar [data-photo-quick="building"]').textContent()).includes('(6)'),'Building chip count matches six restaurant host-building exteriors');
+ assert.equal(await page.locator('#photoQuickbar [data-photo-quick="building"]').getAttribute('aria-label'),'Building exteriors: 6','Accessible building filter count');
+
  await page.locator('#photoQuickbar [data-photo-quick="source"]').click();
  const sourceOnlyCount=await page.locator('#cards .card').count();
  assert(sourceOnlyCount>0,'Photo source chip returns gallery-linked venues');
@@ -99,8 +105,13 @@ const assert=require('assert');
  await page.locator('#photoQuickbar [data-photo-quick="all"]').click();
  assert.equal(await page.locator('#photoFilter').inputValue(),'all','All places chip resets photo mode');
  await page.locator('#language').selectOption('ko');
- assert.equal(await page.locator('#photoQuickbar [data-photo-quick="source"]').textContent(),'사진·자료 링크','Quick shortcuts translate into Korean');
+ assert.equal(await page.locator('#photoQuickbar [data-photo-quick="source"]').textContent(),'사진·자료 링크 ('+sourceOnlyCount+')','Quick shortcuts translate into Korean with correct category-aware source count');
  assert.equal(await page.locator('#photoQuickbar [data-photo-quick="all"]').getAttribute('aria-pressed'),'true','Language switch retains active filter status');
+ assert.equal(await page.locator('#photoQuickbar [data-photo-quick="all"]').getAttribute('aria-label'),'전체: '+initialCount,'Accessible all filter count translated to Korean');
+ await page.locator('#query').fill('NO_SUCH_PLACE_12345');
+ assert((await page.locator('#photoQuickbar [data-photo-quick="venue"]').textContent()).includes('(0)'),'Photo totals recalculate after search change');
+ await page.locator('#query').fill('');
+
  assert((await page.locator('#photoQuickbar').evaluate(el=>el.scrollWidth))>=0,'Quick photo chips have contained horizontal scrolling');
  assert((await page.locator('body').evaluate(el=>el.scrollWidth))<=405,'Photo shortcuts do not cause horizontal page overflow');
 
