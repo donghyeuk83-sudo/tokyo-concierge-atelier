@@ -20,6 +20,8 @@ jobs:
           git diff --exit-code -- audits/missing-photo-queue.csv
       - name: Audit permission inquiry routes for missing photos
         run: node tests/audit-photo-permission-queue.cjs
+      - name: Audit 32 photo leads and 48 original image rightsholders
+        run: node tests/audit-photo-rightsholder-research.cjs
       - name: Block unreviewed new or replaced real venue photos
         run: node tests/require-photo-clearance.cjs
       - name: Audit all 131 venue records and photo provenance
