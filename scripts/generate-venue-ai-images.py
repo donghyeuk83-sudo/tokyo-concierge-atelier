@@ -87,10 +87,10 @@ for i,(id,prompt) in enumerate(PROMPTS.items()):
                 raise ValueError('duplicate generated image')
             existing_hashes.add(fingerprint)
         except Exception as e:
+            if target.exists(): target.unlink()
             failed.append(id)
             print('Skipped',id,type(e).__name__,str(e)[:120],flush=True)
             continue
-    old='ai-sushi-concept.webp' if id in ('r01','r38','r39','r40','r41','r42','r43','r44') else 'tsukiji-sushi.webp'
     new=f'assets/photos/ai-unique-{id}.webp'
     import re
     pat=rf'\b{id}:\{{url:\x27assets/photos/[^\x27]+\x27\}}'
