@@ -1,4 +1,31 @@
 {
   "description": "New or changed real venue photos are forbidden unless a file-specific commercially reusable license and an exact-venue identity check are documented. Records require human/source verification.",
-  "approvals": []
+  "approvals": [
+    {
+      "id": "r32",
+      "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Shibuya_Parco.jpg?width=960",
+      "source": "https://commons.wikimedia.org/wiki/File:Shibuya_Parco.jpg",
+      "credit": "Syced",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "venueEvidenceUrl": "https://www.maimon-susi.com/shop/sibuya_parco/730/",
+      "licenseEvidenceUrl": "https://commons.wikimedia.org/wiki/File:Shibuya_Parco.jpg",
+      "venueIdentityExplanation": "The Commons 2024 Syced image shows Shibuya PARCO itself; the restaurant operator's exact Shibuya PARCO listing establishes Kanazawa Maimon Sushi as a seventh-floor tenant. The image is labeled as the shopping building exterior only, not a restaurant interior or specific storefront.",
+      "rightsExplanation": "Commons original Shibuya Parco.jpg records author Syced as the original uploader and explicitly grants CC0 1.0 universal public domain dedication allowing commercial reuse. Site links to original file and CC0 terms and credits photographer voluntarily; the image is shown without deceptive branch claims.",
+      "reviewedOn": "2026-10-19"
+    },
+    {
+      "id": "r34",
+      "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Omotesando-Harajuku-Tokyo---2024-06-15_010.jpg?width=960",
+      "source": "https://commons.wikimedia.org/wiki/File:Omotesando-Harajuku-Tokyo---2024-06-15_010.jpg",
+      "credit": "RuinDig/Yuki Uchida",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "venueEvidenceUrl": "https://neo-emotion.jp/brands/harajuku-harakado/",
+      "licenseEvidenceUrl": "https://commons.wikimedia.org/wiki/File:Omotesando-Harajuku-Tokyo---2024-06-15_010.jpg",
+      "venueIdentityExplanation": "The Commons photograph's original Japanese description explicitly identifies the Tokyu Plaza Harajuku Harakado exterior in Jingumae 6-chome; Neo Emotion's precise branch page establishes Maguro Tonya Megumi as a tenant on its fifth floor. The photo is labeled as the Harakado building exterior, not the restaurant dining room.",
+      "rightsExplanation": "Original photographer RuinDig/Yuki Uchida self-published Omotesando-Harajuku-Tokyo---2024-06-15 010.jpg on Commons under CC BY 4.0 which permits commercial reuse subject to credit and license link. Original photo is displayed intact, credited with an active Commons source and license link, without filters or re-coloring.",
+      "reviewedOn": "2026-10-19"
+    }
+  ]
 }
