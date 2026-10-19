@@ -8,10 +8,18 @@ Current source registry: 131 cards, 81 uniquely mapped photographic entries, 50 
 | --- | --- | --- | --- | --- |
 | r06 | Seirinkan, Nakameguro | [Japan Travel venue photograph by Dennis Amith](https://en.japantravel.com/guide/tokyo-s-top-rated-pizza-restaurants/68889) and [Flickr photograph by yusheng](https://www.flickr.com/photos/yusheng/6225457113) | **REJECTED**: the former is CC BY-NC 2.0 (noncommercial only); the latter is All rights reserved | Obtain photographer permission or find a commercially reusable, venue-matched CC file |
 | r09 | Ristorante ASO, Daikanyama | [Exact venue Flickr photograph by Iyhon Chiu](https://www.flickr.com/photos/iyhon/18181444855), dated 2014 | **REJECTED**: the original Flickr file states *All rights reserved* | Obtain explicit photographer permission or find a CC-licensed image of the same restaurant |
-| r37 | Kura Sushi Oshiage | [Kura Sushi chain information](https://www.kurasushi.co.jp/) | **NOT CLEARED**: images of other branches cannot represent Oshiage | Require Oshiage branch-specific evidence and file license |
+| r37 | Kura Sushi Oshiage | [Commons CC BY-SA 4.0 photo](https://commons.wikimedia.org/wiki/File:Kura_sushi_s20250820_201056.jpg) explicitly captions the location as **Nagoya Moriyama-ku**; [another Commons CC BY 2.0 photo](https://commons.wikimedia.org/wiki/File:Sushi_(Kura_Sushi._Costa_Mesa,_CA.).jpg) is from **Costa Mesa, California** | **REJECTED FOR THIS VENUE**: commercial-use licenses are acceptable, but neither image depicts Oshiage | Require Oshiage branch-specific evidence and a file-level reuse license |
 | r48 | NINJA TOKYO, Otemachi | [Official venue site](https://ninja-tokyo.jp/) identifies restaurant | **NOT CLEARED**: photos from the restaurant site have no confirmed reuse grant | Seek a suitably licensed Otemachi venue photograph |
 | w05 | Musashi-Koyama Onsen Shimizuyu | [Tokyo Sento Association venue page](https://www.1010.or.jp/map-en/item/item-cnt-417) identifies 3-9-1 Koyama | **NOT CLEARED**: venue-page photography has no confirmed CC license | Seek photographer-granted reuse or CC image of the exact bathhouse |
 | r45 | Zauo Shibuya | [Operator's branch-specific information](https://www.zauo.com/) | **NOT CLEARED**: official photos are not automatically available for reuse | Verify license for the exact Shibuya branch |
+
+
+### Candidate screening update (2026-10-19)
+
+- `r37`: Wikimedia Commons' **Kura sushi s20250820 201056.jpg** is CC BY-SA 4.0 but its file caption, camera coordinates and categories identify **Moriyama-ku, Nagoya**, not the Oshiage flagship. The **Sushi (Kura Sushi. Costa Mesa, CA.).jpg** file is CC BY 2.0 but likewise not the Oshiage branch. Neither should be installed in `r37`.
+- `r48`: A [Commons photo labeled Otemachi](https://commons.wikimedia.org/wiki/File:Otemachi_@_Tokyo_(9479869370).jpg) is CC BY 2.0, but the description does not establish that it depicts **NINJA TOKYO**. Rejected for this venue.
+- `w05`: [Minami-Aoyama Shimizuyu gallery](https://shimizuyu.jp/gallery) is **a different bathhouse** from Musashi-Koyama Shimizuyu. Do not reuse its imagery even if separately permitted.
+- Current review produced **no photo cleared on both exact-venue identity and commercial-use licensing**. Keep existing illustration fallback until both conditions are established.
 
 ## Release requirements
 
