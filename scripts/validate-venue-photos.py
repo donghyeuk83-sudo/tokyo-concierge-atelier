@@ -41,6 +41,15 @@ else:
         if venue_id not in venue_ids:
             issues.append(f"{venue_id}: photo does not match any published venue card")
 
+# Report coverage gaps without treating absent, unlicensed photos as errors.
+if data_match:
+    card_rows = re.findall(r'\["([a-z]\d+)","[^"]+","([^"]+)"', data_match.group(1))
+    photo_ids = {venue_id for venue_id, _ in entries}
+    missing_cards = [(venue_id, name) for venue_id, name in card_rows if venue_id not in photo_ids]
+    print(f"Venue photo coverage: {len(photo_ids)}/{len(card_rows)} cards; missing: {len(missing_cards)}")
+    for venue_id, name in missing_cards:
+        print(f"PHOTO NEEDED: {venue_id} | {name} (use only venue-matched, reuse-cleared media)")
+
 ids = [key for key, _ in entries]
 if len(ids) != len(set(ids)):
     issues.append("Duplicate licensed venue IDs")
