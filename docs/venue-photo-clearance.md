@@ -79,6 +79,26 @@ The strict publication requirement remains **commercially reusable CC BY / CC BY
 - Browser logs include **166 `VENUE_PHOTO_STATUS` events** (83 distinct card IDs × local/deployed) with image natural widths greater than 0, and no image-width-zero failures.
 - [Venue photo validator 39224491958](https://github.com/donghyeuk83-sudo/tokyo-concierge-atelier/actions/runs/39224491958): **success**, counting 83 displayed photos (5 local, 78 external).
 
+## 2026-10-19 additional screening — strict exact-branch and commercial-CC requirement
+
+A verified *restaurant chain*, *general neighborhood*, *activity type*, or *operator website photograph* is insufficient. **No new photos were published in this screening batch** because the following files/pages do not establish both exact identity and a commercially reusable file-level license.
+
+| Card | Candidate and evidence | Identity check | Reuse rights | Decision |
+| --- | --- | --- | --- | --- |
+| `r45` Zauo Shibuya | [Japan Wonder Travel's Zauo Shinjuku article](https://blog.japanwondertravel.com/best-izakaya-in-shinjuku-49869) credits a photograph to **Thierry Draus / CC BY 2.0** | Photo specifically illustrates the **Shinjuku** branch (not Shibuya's Jinnan branch). [Additional Shinjuku location evidence](https://www.insightguides.com/inspire-me/blog/10-experiences-youll-only-find-in-tokyo) | CC BY 2.0 is a commercial-use-compatible CC family, but place identity fails | **REJECT for r45**; never use photos from another Zauo branch |
+| `a29` Ninja Trick House, Shinjuku | [Go Guides article](https://jp.hotels.com/go/japan/jp-best-tokyo-family-things-to-do) describes a CC BY-SA 2.0 photograph by **go.biwako** | Caption describes generic *throwing stars in hands*, not demonstrably inside Shinjuku's Ninja Trick House | Secondary source names a compatible CC license, but original file URL and verified exact site are missing | **DO NOT PUBLISH** until original file page and location can be established |
+| `r08` Il Lupone | [Nakameguro venue listing](https://tabelog.com/en/tokyo/A1317/A131701/13021093/) has shop/food photos, and [restaurant facade photo](https://bimi.jorudan.co.jp/shop/30260/) identifies the actual venue | Exact Nakameguro branch identifiable | No photographer-granted CC release established on either site | **DO NOT PUBLISH**; ordinary site photos are not freely reusable |
+| `w05` Musashi-Koyama Onsen Shimizuyu | [Tokyo Onsen photograph](https://tokyoonsen.com/area03/shimizuyu.php) shows the correct bathhouse and exterior | Matches Shimizuyu in Musashi-Koyama, **not** the similarly named Minami-Aoyama sento | Page does not establish a file-specific commercial-CC release | **DO NOT PUBLISH** |
+| `w06` Tokyo Somei Onsen SAKURA | [Onsen's official English page](https://tokyosomeionsensakura.com/en/) verifies 5-4-24 Komagome, Toshima | Exact branch/operator | Site gallery has no file-specific commercially reusable CC license demonstrated | **DO NOT PUBLISH** |
+| `r02` Sushi Takeuchi, Daikanyama | [Daikanyama restaurant description](https://boutiquejapan.com/tokyo-sushi-restaurants/) vs [Osaka Namba Sushi Takeuchi article](https://points852.com/latest/country/japan/61307/) | **Different restaurant with the same English name**; Osaka photo must never stand in for Daikanyama | No qualifying exact-Daikanyama CC original found | **DO NOT PUBLISH** |
+| `r06` Seirinkan | [Japan Travel Seirinkan photograph](https://en.japantravel.com/guide/tokyo-s-top-rated-pizza-restaurants/68889) | Correct Nakameguro pizzeria at 2-6-4 Kamimeguro | **CC BY-NC 2.0** explicitly forbids commercial reuse without additional consent | **REJECT** |
+
+### Verification baseline for this screening batch
+
+- Before this research-only edit, commit `e5e31598142bb42fe9ca84d6a6ff5e570447ce6b` had [Pages deployment **success**](https://github.com/donghyeuk83-sudo/tokyo-concierge-atelier/actions/runs/39225803247) and [browser QA **success**](https://github.com/donghyeuk83-sudo/tokyo-concierge-atelier/actions/runs/39225803583). Browser job steps included a passing `Wait for current revision on GitHub Pages` and `Test deployed GitHub Pages in Chromium`.
+- Existing photos: **83/131**, missing **48**. No new `LICENSED_VENUE_PHOTOS` mapping was made in this screening batch. The site and previous compliant photo registry are unchanged.
+- Source and license claims are not blanket guarantees for all 83 pictures. Each new candidate must pass original-file and exact-venue review before publishing.
+
 ## Release requirements
 
 1. Check image content and branch/location match using the file description and operator address as needed. Keep venue identity, *not just the photo's general subject*, as the criterion.
