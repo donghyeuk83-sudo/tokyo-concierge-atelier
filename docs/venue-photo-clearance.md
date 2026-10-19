@@ -57,6 +57,28 @@ There were **no additions to the photo registry** in this research round because
 
 Tokyo Concierge Atelier is a **guest information and concierge guide**, **not a photo or goods-selling service**. Photograph licensing must be assessed based on this actual use rather than assuming that all publication is paid commercial use. However, use by a hotel or hospitality business may still be interpreted as primarily directed toward commercial advantage under the CC NonCommercial definition; the absence of a purchase button or direct photo sale alone does not establish CC BY-NC eligibility. Prefer CC0, Public Domain Mark for qualifying works, CC BY, and CC BY-SA; record separate photographer permissions for ambiguous CC BY-NC content before public publication. An image must still depict the correct venue or branch, and keep attribution and license notices.
 
+## 2026-10-19 follow-up: venue-matched but commercially restricted photos
+
+The strict publication requirement remains **commercially reusable CC BY / CC BY-SA / CC0 / public-domain, plus verified exact venue and file-level source**. A photo usable for editorial or non-commercial contexts is **not** automatically usable for this catalogue.
+
+| Card | Source examined | Place identity | File-level reuse result | Decision |
+| --- | --- | --- | --- | --- |
+| `r06` Seirinkan | [CharleyMarley Flickr photo](https://www.flickr.com/photos/marley1/2399486554/) (2008-04-03), explicitly says Seirinkan at 2-6-4 Kamimeguro | Exact venue | Flickr original states **All rights reserved** | Exclude; photograph is correctly located but not reuse-cleared |
+| `r08` Il Lupone | [Laurent Flickr staff mosaic](https://www.flickr.com/photos/32936167@N02/5309379254/), explicitly describes Il Lupone employees at Nakameguro | The mosaic contains multiple unrelated businesses; not a standalone venue photograph | Flickr original states **All rights reserved** | Exclude; no rights grant and mixed venue content |
+| `r47` Robataya Roppongi | [Rick Cogley Flickr photograph](https://www.flickr.com/photos/rickcogley/8171494828/) (2012-11-09), caption says Roppongi Robataya | Exact historic restaurant visit | Flickr's license link resolves to [**CC BY-NC-ND 2.0**](https://creativecommons.org/licenses/by-nc-nd/2.0/), **NonCommercial** | Exclude; not cleared for commercial reuse |
+| `w05` Musashi-Koyama Shimizuyu | [Visitor's article](https://note.com/shalachandra/n/nc032e5927a89), explicitly visits Musashi-Koyama Shimizuyu | Exact bathhouse visit | No file-specific commercially reusable CC license was established | Do not extract or hotlink the visitor's photos |
+| `s15` Ryogoku Takahashi | [Tokyo tourism brochure](https://www.gotokyo.org/book/wp-content/uploads/2019/12/1912_tcvbnewsletter71_low_EN.pdf) includes a store photo and name | Exact store (historical guide) | Brochure availability is not photo redistribution permission; no photo-specific CC license demonstrated | Do not extract the photo from the brochure |
+
+**Result:** Five targeted records reviewed; **zero** candidate files passed *both* the exact-venue and commercially reusable-license requirements. Keep the licensed-photo count at **83/131**, with **48** missing. This does not claim all 48 were exhaustively screened in this iteration.
+
+### Actual production verification (before this screening)
+
+- Current `main` commit before review: `233cd95507bb38f5eaf9b38fb46170e7584755ac`.
+- [GitHub Pages deployment 39224917492](https://github.com/donghyeuk83-sudo/tokyo-concierge-atelier/actions/runs/39224917492): **success**.
+- [Browser smoke test 39224918145](https://github.com/donghyeuk83-sudo/tokyo-concierge-atelier/actions/runs/39224918145): **success**, including deployed Pages in Chromium.
+- Browser logs include **166 `VENUE_PHOTO_STATUS` events** (83 distinct card IDs × local/deployed) with image natural widths greater than 0, and no image-width-zero failures.
+- [Venue photo validator 39224491958](https://github.com/donghyeuk83-sudo/tokyo-concierge-atelier/actions/runs/39224491958): **success**, counting 83 displayed photos (5 local, 78 external).
+
 ## Release requirements
 
 1. Check image content and branch/location match using the file description and operator address as needed. Keep venue identity, *not just the photo's general subject*, as the criterion.
