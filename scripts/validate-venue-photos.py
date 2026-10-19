@@ -9,16 +9,16 @@ from PIL import Image
 
 root = pathlib.Path(__file__).resolve().parents[1]
 html = (root / "index.html").read_text(encoding="utf-8")
-match = re.search(r"const AI_VENUE_VISUALS=\\{(.*?)\\};", html, re.S)
+match = re.search(r"const AI_VENUE_VISUALS=\{(.*?)\};", html, re.S)
 if not match:
     sys.exit("ERROR: AI_VENUE_VISUALS registry missing")
-entries = re.findall(r"\\b([a-z]\\d+):\\{url:'([^']+)'\\}", match.group(1))
+entries = re.findall(r"\b([a-z]\d+):\{url:'([^']+)'\}", match.group(1))
 issues = []
 if len(entries) != 50 or len(set(k for k, _ in entries)) != 50:
     issues.append(f"Expected 50 distinct cards; got {len(entries)}")
 hashes = defaultdict(list)
 for venue_id, relative in entries:
-    if not re.fullmatch(r"assets/photos/ai-unique-[a-z]\\d+\\.webp", relative):
+    if not re.fullmatch(r"assets/photos/ai-unique-[a-z]\d+\.webp", relative):
         issues.append(f"{venue_id}: unexpected image path {relative}")
         continue
     if pathlib.PurePosixPath(relative).stem != f"ai-unique-{venue_id}":
