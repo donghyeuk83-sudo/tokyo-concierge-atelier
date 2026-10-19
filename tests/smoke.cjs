@@ -176,7 +176,7 @@ const assert=require('assert');
  };
  await page.locator('#tabs [data-cat="restaurant"]').click();
  for(const [id,expectedPath] of Object.entries(batch7GalleryPaths)){
-  const row=publicPhotoSourceBlock.split('\\n').find(line=>line.trim().startsWith(id+':'));
+  const row=publicPhotoSourceBlock.split(String.fromCharCode(10)).find(line=>line.trim().startsWith(id+':'));
   assert(row,'The photo source registry contains '+id);
   const parsed=row.match(/url:"([^"]+)",kind:"([^"]+)"/);
   assert(parsed,'Parsable original source for '+id);
