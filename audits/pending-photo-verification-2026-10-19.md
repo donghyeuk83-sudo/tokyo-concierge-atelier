@@ -12,3 +12,10 @@ This is a research queue, not a photo license or authorization to republish imag
 2. Record author, license, license URL, original source, venue evidence, and any alterations before publication.
 3. Do not substitute generic Tokyo sushi/pizza photographs for venue-specific photographs.
 4. Add confirmed images to the existing `LICENSED_VENUE_PHOTOS` registry, with multilingual context, source records, and audit tests. Preserve the 81 currently registered entries.
+
+## Additional false-positive image matches
+- r06 Seirinkan: Wikimedia Commons `File:Seirinkan High School Hommachi Campus.JPG` depicts an Aichi high school, **not** the Nakameguro pizzeria. Exclude: https://commons.wikimedia.org/wiki/File:Seirinkan_High_School_Hommachi_Campus.JPG
+- r18 SÉZANNE: Wikimedia Commons `File:Casa sezanne.jpg` depicts a Venice building, **not** the Tokyo restaurant. Exclude: https://commons.wikimedia.org/wiki/File:Casa_sezanne.jpg
+- r18 SÉZANNE: Wikimedia Commons `File:Sézanne - fontaine de la place de la République.jpg` depicts a French town fountain, **not** the Tokyo restaurant. Exclude: https://commons.wikimedia.org/wiki/File:S%C3%A9zanne_-_fontaine_de_la_place_de_la_R%C3%A9publique.jpg
+
+No new image is authorized for publication from these matches. Existing venue fallback remains in place.
