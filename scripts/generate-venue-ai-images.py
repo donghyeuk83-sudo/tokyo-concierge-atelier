@@ -65,17 +65,15 @@ MORE_PROMPTS={
 }
 PROMPTS.update({k:'Photorealistic editorial travel photography, '+v+', authentic details, natural light, no logos, no text, distinct composition' for k,v in MORE_PROMPTS.items()})
 
-html=HTML.read_text()
+html=HTML.read_text(encoding='utf-8')
 changed=[]
 failed=[]
 attempted=0
-MAX_NEW_PER_RUN=12
+MAX_NEW_PER_RUN=13
 # Retry missing images first; never overwrite an already published unique concept.
 existing_hashes={hashlib.sha256(p.read_bytes()).hexdigest() for p in OUT.glob('ai-unique-*.webp')}
-processed=set()
 for i,(id,prompt) in enumerate(sorted(PROMPTS.items(),key=lambda pair: (OUT/f'ai-unique-{pair[0]}.webp').exists())):
     target=OUT/f'ai-unique-{id}.webp'
-    processed.add(id)
     if not target.exists():
         if attempted>=MAX_NEW_PER_RUN: continue
         attempted+=1
