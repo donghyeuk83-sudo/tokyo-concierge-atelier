@@ -7,8 +7,6 @@ on:
       - 'scripts/generate-venue-ai-images.py'
       - 'scripts/validate-venue-photos.py'
   workflow_dispatch:
-  schedule:
-    - cron: '17 */3 * * *'
 permissions:
   contents: write
 concurrency:
