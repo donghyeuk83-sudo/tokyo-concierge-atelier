@@ -2,10 +2,11 @@
 
 Only place-specific photography with a **confirmed file-level license** may enter `LICENSED_VENUE_PHOTOS` in `index.html`. An accessible image or official venue URL is not permission to embed it. Record the author, file-specific source link, CC/Public Domain license and target venue ID before publishing. A building in the same neighborhood, another branch of a chain, or a food illustration is **not** a verified image of that venue.
 
-Current source registry: 131 cards, 82 uniquely mapped photographic entries, 49 without photos. The registry checks do **not** prove all 82 source pages are alive, correctly licensed or visually matched to the venue. GitHub Actions reports IDs of cards still needing photos.
+Current source registry: 131 cards, 83 uniquely mapped photographic entries, 48 without photos. The registry checks do **not** prove all 83 source pages are alive, correctly licensed or visually matched to the venue. GitHub Actions reports IDs of cards still needing photos.
 
 | Venue ID | Target | Candidate evidence | Reuse clearance | Next action |
 | --- | --- | --- | --- | --- |
+| a33 | JIDAIYA Rickshaw Asakusa | [Wikimedia Commons original photo](https://commons.wikimedia.org/wiki/File:Rickshawers_by_malias_in_Asakusa,_Tokyo.jpg) explicitly identifies the subjects as rickshaw drivers at Asakusa Jidaiya in Kaminarimon, taken 2007-01-28; [Asakusa Merchants Association](https://asakusa-shoren.jp/en/stores/1629/) confirms Jidaiya at Kaminarimon 2-3-5. | **CLEARED AND PUBLISHED**: Flickr-sourced Commons file independently reviewed by FlickreviewR (2007-05-28) as CC BY 2.0. Credited photographer malias (Gideon). Photo depicts historic drivers, **not** a present-day storefront. | Confirmed source + attribution; verify a33 naturalWidth in deployed Chromium smoke test for commit c0076a496. |
 | r28 | YEBISU BAR STAND Garden Place | [Wikimedia Commons original photo by RuinDig/Yuki Uchida](https://commons.wikimedia.org/wiki/File:Ebisu-Tokyo---2024-08-28_106.jpg), taken 2024-08-28: caption explicitly identifies YEBISU BAR STAND in Ebisu 4-chome at Yebisu Garden Place. [Garden Place operator listing](https://gardenplace.jp/shop/detail/39) independently confirms exact venue. | **CLEARED AND PUBLISHED**: original uploader's CC BY 4.0 permits commercial reuse with attribution; card r28 credits author and links license. | **Verified:** [Chromium browser smoke run 39222156960](https://github.com/donghyeuk83-sudo/tokyo-concierge-atelier/actions/runs/39222156960) succeeded for deployed Pages, including r28 at 960px natural image width. |
 | r06 | Seirinkan, Nakameguro | [Japan Travel venue photograph by Dennis Amith](https://en.japantravel.com/guide/tokyo-s-top-rated-pizza-restaurants/68889) and [Flickr photograph by yusheng](https://www.flickr.com/photos/yusheng/6225457113) | **REJECTED**: the former is CC BY-NC 2.0 (noncommercial only); the latter is All rights reserved | Obtain photographer permission or find a commercially reusable, venue-matched CC file |
 | r09 | Ristorante ASO, Daikanyama | [Exact venue Flickr photograph by Iyhon Chiu](https://www.flickr.com/photos/iyhon/18181444855), dated 2014 | **REJECTED**: the original Flickr file states *All rights reserved* | Obtain explicit photographer permission or find a CC-licensed image of the same restaurant |
@@ -42,6 +43,16 @@ The following original-file or explicitly location-named sources were inspected 
 
 There were **no additions to the photo registry** in this research round because none of these candidates passed both the exact-place and commercial-use checks. The [prior licensed r28 YEBISU BAR STAND photo](https://commons.wikimedia.org/wiki/File:Ebisu-Tokyo---2024-08-28_106.jpg) remains in place.
 
+
+## Photo clearance update (2026-10-19, JIDAIYA)
+
+- **Approved**: JIDAIYA rickshaw drivers, Asakusa Kaminarimon, original 2007-01-28 [Commons file](https://commons.wikimedia.org/wiki/File:Rickshawers_by_malias_in_Asakusa,_Tokyo.jpg), CC BY 2.0, photographer malias (Gideon). This is a period-specific photo, so the card explicitly says it is not a current exterior.
+- **Rejected r32**: [Flickr photo of Kanazawa Maimon Sushi Shibuya PARCO](https://www.flickr.com/photos/195604149@N07/54358476840/) confirms the exact branch but its owner marked it **All rights reserved**. No copying.
+- **Rejected r02**: [Flickr Sushi Takeuchi Daikanyama photo](https://www.flickr.com/photos/aktkbk/54190513826/) identifies the restaurant but is **All rights reserved**.
+- **Rejected r11**: [Flickr Yoroniku Aoyama photo](https://www.flickr.com/photos/78797573@N00/6008737778/) explicitly depicts the matching restaurant but is **All rights reserved**.
+- **Rejected r21**: [Flickr The Pizza Bar on 38th photo](https://www.flickr.com/photos/official_fuyuhiko/54665909627/) identifies the exact Mandarin Oriental Tokyo restaurant but is **All rights reserved**.
+- **Rejected a29**: [Commons Ninja Trick Mansion photo](https://commons.wikimedia.org/wiki/File:Togakushi_Folk_Museum,_Togakushi_Ninja_Museum,_Ninja_Trick_Mansion.jpg) is CC BY-SA 4.0 but depicts Togakushi, **Nagano**, not the listed Shinjuku Kabukicho Ninja Trick House.
+
 ## Release requirements
 
 1. Check image content and branch/location match using the file description and operator address as needed. Keep venue identity, *not just the photo's general subject*, as the criterion.
@@ -51,7 +62,7 @@ There were **no additions to the photo registry** in this research round because
 
 ## Latest review (2026-10-19)
 
-- Public Pages URL could not be retrieved from the external verification environment. This is **not proof** that Pages is disabled; inspect the Actions **GitHub Pages diagnostics** step and repository Settings → Pages.
+- Historical note: public Pages had previously been inaccessible to the external inspection tool, but **actual GitHub Actions deployed Chromium tests subsequently succeeded**. For each new photo, inspect latest Pages and Browser smoke QA run outcomes instead of treating that older limitation as a live deployment failure.
 - The Actions diagnostics now compare the checked-out `index.html` SHA256 with the public page body, when HTTP 200. An unequal hash can indicate a stale deploy, incorrect source, or HTML transformation; investigate before concluding deployment is broken.
 - CC BY-NC images are not accepted for the concierge site's general use. A photo of Daikanyama generally cannot be substituted for a photograph of Ristorante ASO specifically.
 
