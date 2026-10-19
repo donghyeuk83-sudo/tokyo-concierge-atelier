@@ -95,32 +95,9 @@ for i,(id,prompt) in enumerate(sorted(PROMPTS.items(),key=lambda pair: (OUT/f'ai
         except Exception as e:
             if target.exists(): target.unlink()
             print('AI provider failed',id,type(e).__name__,str(e)[:100],flush=True)
-            # Keep the existing photographic subject. Make a distinct local WebP
-            # variant when the remote generator is unavailable.
-            import re
-            m=re.search(r'\b'+re.escape(id)+r":\{url:'(assets/photos/[^']+)'\}",html)
-            source=ROOT/m.group(1) if m else None
-            if source and source.exists():
-                with Image.open(source) as original:
-                    im=ImageOps.exif_transpose(original).convert('RGB')
-                    w,h=im.size
-                    if w/h>4/3:
-                        nw=int(h*4/3)
-                        left=int((w-nw)*((i*0.17)%0.9))
-                        im=im.crop((left,0,left+nw,h))
-                    else:
-                        nh=int(w*3/4)
-                        top=int((h-nh)*((i*0.19)%0.9))
-                        im=im.crop((0,top,w,top+nh))
-                    im=im.resize((640,480),Image.Resampling.LANCZOS)
-                    im=ImageEnhance.Color(im).enhance(0.9+(i%7)*0.03)
-                    im=ImageEnhance.Contrast(im).enhance(0.95+(i%5)*0.025)
-                    im.save(target,'WEBP',quality=82,method=5)
-                print('Created photo-based fallback',id,flush=True)
-            else:
-                failed.append(id)
-                print('No local source',id,flush=True)
-                continue
+            # Do not substitute another venue's image or a recolored crop.
+            failed.append(id)
+            continue
     if not target.exists() or target.stat().st_size < 1500:
         failed.append(id)
         print('Invalid output skipped',id,flush=True)
