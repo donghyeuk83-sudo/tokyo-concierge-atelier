@@ -89,6 +89,19 @@ jobs:
             --output "$RUNNER_TEMP/pages-home.html" --write-out '%{http_code}' "$site") || http_code="000"
           echo "Expected published URL: $site" >> "$GITHUB_STEP_SUMMARY"
           echo "Public site HTTP: $http_code" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$http_code" = "200" ]; then
+            local_sha=$(sha256sum index.html | cut -d' ' -f1)
+            remote_sha=$(sha256sum "$RUNNER_TEMP/pages-home.html" | cut -d' ' -f1)
+            echo "Checked commit: $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+            echo "Source index SHA256: $local_sha" >> "$GITHUB_STEP_SUMMARY"
+            echo "Published index SHA256: $remote_sha" >> "$GITHUB_STEP_SUMMARY"
+            if [ "$local_sha" = "$remote_sha" ]; then
+              echo "Published content matches checked source: YES" >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "Published content matches checked source: NO / may be transformed or stale" >> "$GITHUB_STEP_SUMMARY"
+              echo "::warning::Pages index differs from checked source; check publishing branch, deployment age and possible Jekyll processing."
+            fi
+          fi
           if [ "$http_code" = "200" ] && grep -q 'Tokyo Concierge Atelier' "$RUNNER_TEMP/pages-home.html"; then
             echo "Public content check: PASS" >> "$GITHUB_STEP_SUMMARY"
           else
