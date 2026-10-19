@@ -86,12 +86,14 @@ async function lookup(query){
 
 const venues=[];
 let failed=0;
+const researchDeadline=Date.now()+18*60*1000;
 for(const venue of rows){
   // A quoted, venue-specific phrase produces fewer generic book/PDF matches
   // than three broad searches. It is a screening query, NOT exhaustive coverage.
   const label=venue.ja.length>3?venue.ja:venue.en;
   const query='"'+label.replace(/"/g,'')+'"';
-  const result=await lookup(query);
+  const result=Date.now()<researchDeadline?await lookup(query):
+    {error:'Search skipped: Commons request budget exceeded',candidates:[]};
   if(result.error)failed++;
   const candidates=[...new Map(result.candidates.map(p=>[p.file,p])).values()];
   venues.push({...venue,query,error:result.error,candidates,
