@@ -164,6 +164,34 @@ const assert=require('assert');
  }
 
  await page.locator('#language').selectOption('en'); // Exercise English provenance labels first; Korean separately below.
+ // Batch seven: source links must open the exact restaurant's pictures (not another branch or copied images).
+ const batch7GalleryPaths={
+  r02:'/tokyo/A1303/A130303/13210936/dtlphotolst/3/smp2/',
+  r03:'/tokyo/A1317/A131701/13220479/dtlphotolst/smp2/',
+  r09:'/tokyo/A1303/A130303/13003356/dtlphotolst/3/smp2/',
+  r11:'/tokyo/A1306/A130602/13042979/dtlphotolst/3/smp2/',
+  r29:'/tokyo/A1317/A131701/13301330/dtlphotolst/3/smp2/',
+  r36:'/tokyo/A1311/A131102/13075573/dtlphotolst/smp2/',
+  r45:'/tokyo/A1303/A130301/13180300/dtlphotolst/smp2/'
+ };
+ await page.locator('#tabs [data-cat="restaurant"]').click();
+ for(const [id,expectedPath] of Object.entries(batch7GalleryPaths)){
+  const row=publicPhotoSourceBlock.split('\\n').find(line=>line.trim().startsWith(id+':'));
+  assert(row,'The photo source registry contains '+id);
+  const parsed=row.match(/url:"([^"]+)",kind:"([^"]+)"/);
+  assert(parsed,'Parsable original source for '+id);
+  const original=new URL(parsed[1]);
+  assert.equal(original.host,'tabelog.com','Exact listing host for '+id);
+  assert.equal(original.pathname,expectedPath,'Exact restaurant and gallery page for '+id);
+  assert.equal(parsed[2],'listing','Guest-facing photo provenance is an independent gallery '+id);
+  assert(!expectedPhotos.includes(id),'Photos remain unlicensed and are not embedded '+id);
+  const card=page.locator('article.card').filter({has:page.locator('.detail-trigger[data-detail="'+id+'"]')});
+  assert.equal(await card.locator('a.venue-photo-source').count(),1,'Photo reference visible for '+id);
+  assert.equal(new URL(await card.locator('a.venue-photo-source').getAttribute('href')).pathname,expectedPath,'Actual card link matches venue '+id);
+  assert((await card.locator('a.venue-photo-source small').textContent()).includes('Independent photo listing'),'Independent gallery provenance displayed '+id);
+  assert.equal(await card.locator('img[data-venue-photo]').count(),0,'No copyright-unverified photo added '+id);
+ }
+
  const checkedPhotoRefs=[
    ['restaurant','r06','tabelog.com'],
    ['wellness','w05','www.shimizuyu.com'],
