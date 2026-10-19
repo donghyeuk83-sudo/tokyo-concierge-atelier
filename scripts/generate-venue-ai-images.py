@@ -122,7 +122,18 @@ for i,(id,prompt) in enumerate(sorted(PROMPTS.items(),key=lambda pair: (OUT/f'ai
                 print('No local source',id,flush=True)
                 continue
     if not target.exists() or target.stat().st_size < 1500:
-        raise RuntimeError('Missing or invalid generated WebP: '+id)
+        failed.append(id)
+        print('Invalid output skipped',id,flush=True)
+        if target.exists(): target.unlink()
+        continue
+    try:
+        with Image.open(target) as check:
+            check.verify()
+    except Exception as e:
+        failed.append(id)
+        print('Corrupt WebP skipped',id,str(e)[:100],flush=True)
+        target.unlink(missing_ok=True)
+        continue
     new=f'assets/photos/ai-unique-{id}.webp'
     import re
     pat=rf'\b{id}:\{{url:\x27assets/photos/[^\x27]+\x27\}}'
