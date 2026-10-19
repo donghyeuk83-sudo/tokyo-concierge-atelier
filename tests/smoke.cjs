@@ -53,6 +53,9 @@ const assert=require('assert');
  await page.locator('#tabs [data-cat="attraction"]').click();
  const studioWA=page.locator('article.card').filter({has:page.locator('.detail-trigger[data-detail="a32"]')});
  assert((await studioWA.locator('.venue-alert').textContent()).includes('Meguro'),'Kimono Studio WA location discrepancy is clearly disclosed');
+ assert.equal(await studioWA.locator('a.venue-photo-source').count(),1,'Kimono WA card links its own studio photography instead of borrowing pictures');
+ assert.equal(new URL(await studioWA.locator('a.venue-photo-source').getAttribute('href')).hostname,'www.kimono-wa.com','Studio photo gallery comes from actual studio operator');
+ assert.equal(await studioWA.locator('img[data-venue-photo]').count(),0,'Studio photos are not copied without license');
  const studioMapUrl=new URL(await studioWA.locator('.actions a[href*="/maps/search/"]').getAttribute('href'));
  const studioQuery=studioMapUrl.searchParams.get('query')||'';
  assert(studioQuery.includes('上大崎2-24-13')&&!studioQuery.includes('Asakusa'),'Map search uses verified Meguro address, not the stale Asakusa catalogue area');
@@ -63,6 +66,9 @@ const assert=require('assert');
  await page.locator('#detailClose').click();
 
  await page.locator('#tabs [data-cat="restaurant"]').click();
+ const privateOuka=page.locator('article.card').filter({has:page.locator('.detail-trigger[data-detail="r52"]')});
+ assert((await privateOuka.locator('.venue-alert').textContent()).includes('INVITATION-ONLY'),'Nagatacho Ouka is not presented as an ordinary publicly bookable restaurant');
+ assert.equal(await privateOuka.locator('img[data-venue-photo]').count(),0,'Do not embed unrelated photos for private Nagatacho Ouka');
  await page.locator('.card button[data-id]').first().click();
  assert((await page.locator('#guide .guide-item').count())>0,'shortlist add');
  await page.locator('#share').click();
@@ -134,7 +140,7 @@ const assert=require('assert');
  const expectedPhotos=[...registry.matchAll(/^([a-z]\d+):\{/gm)].map(m=>m[1]);
  const publicPhotoSourceBlock=html.split('const VENUE_PHOTO_SOURCE_LINKS={')[1]?.split('};')[0]||'';
  const externalPhotoIds=[...publicPhotoSourceBlock.matchAll(/^([a-z]\d+):\{url:/gm)].map(m=>m[1]);
- assert.equal(externalPhotoIds.length,45,'45 original venue photo/information links expected');
+ assert.equal(externalPhotoIds.length,46,'46 original venue photo/information links expected');
  assert.equal(new Set(externalPhotoIds).size,externalPhotoIds.length,'Duplicate external source ID');
  await page.locator('#language').selectOption('en'); // Exercise English provenance labels first; Korean separately below.
  const checkedPhotoRefs=[
