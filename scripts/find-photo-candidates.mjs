@@ -10,7 +10,7 @@ const rows = csv.trim().split(/\r?\n/).slice(1).map(line => {
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function lookup(q){
  const u=new URL('https://commons.wikimedia.org/w/api.php');
- for(const [k,v] of Object.entries({action:'query',generator:'search',gsrsearch:'filetype:bitmap '+q,gsrnamespace:'6',gsrlimit:'8',prop:'imageinfo',iiprop:'url|extmetadata',format:'json',origin:'*'}))u.searchParams.set(k,v);
+ for(const [k,v] of Object.entries({action:'query',generator:'search',gsrsearch:q,gsrnamespace:'6',gsrlimit:'8',prop:'imageinfo',iiprop:'url|extmetadata',format:'json',origin:'*'}))u.searchParams.set(k,v);
  for(let attempt=0;attempt<3;attempt++){
   try{
    const res=await fetch(u,{headers:{'User-Agent':'TokyoConciergeAtelierPhotoAudit/1.0 (source verification; no publishing)'}});
@@ -27,7 +27,7 @@ async function lookup(q){
 const out=[];
 let failed=0;
 for(const v of rows){
- const queries=[v.ja+' '+v.area,v.en+' Tokyo'];
+ const queries=[v.ja,v.en+' Tokyo',v.en];
  const results=[];
  for(const q of queries){results.push(...await lookup(q));await sleep(120);}
  const errors=results.filter(x=>x.error).map(x=>x.error);
@@ -36,6 +36,8 @@ for(const v of rows){
  out.push({...v,queries,errors,candidates:unique,status:'UNVERIFIED_REQUIRES_HUMAN_VENUE_AND_LICENSE_REVIEW'});
  console.log(v.id+' '+v.en+': '+unique.length+' candidates');
 }
+const total=out.reduce((n,v)=>n+v.candidates.length,0);
+if(total===0){console.error('No Commons candidates found across all venues: search may be broken or over-restrictive');process.exitCode=1;}
 await fs.mkdir('audits',{recursive:true});
 await fs.writeFile('audits/commons-photo-candidates.json',JSON.stringify({generatedAt:new Date().toISOString(),warning:'Search results are NOT evidence of venue identity or image reuse permission.',venues:out},null,2)+'\n');
 console.log('Saved audits/commons-photo-candidates.json');
