@@ -97,7 +97,7 @@ for i,(id,prompt) in enumerate(sorted(PROMPTS.items(),key=lambda pair: (OUT/f'ai
             # Keep the existing photographic subject. Make a distinct local WebP
             # variant when the remote generator is unavailable.
             import re
-            m=re.search(r"\\b"+re.escape(id)+r":\\{url:'(assets/photos/[^']+)'\\}",html)
+            m=re.search(r'\b'+re.escape(id)+r":\{url:'(assets/photos/[^']+)'\}",html)
             source=ROOT/m.group(1) if m else None
             if source and source.exists():
                 with Image.open(source) as original:
