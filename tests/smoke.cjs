@@ -25,6 +25,8 @@ const assert=require('assert');
  const specificCount=await page.locator('#cards .card').count();
  assert(specificCount>0,'Venue-specific photo filter returns pictures');
  assert.equal(await page.locator('#cards img[data-venue-photo]').count(),specificCount,'Venue-specific filter includes only pictured places');
+ const filterDebug=await page.evaluate(()=>({value:document.querySelector('#photoFilter').value,category:document.querySelector('#tabs .tab.active')?.dataset.cat,matched:[...document.querySelectorAll('#cards article.card')].map(el=>({id:el.querySelector('img[data-venue-photo]')?.getAttribute('data-venue-photo'),label:el.querySelector('.card-photo-label')?.textContent||''})).filter(x=>x.label.includes('BUILDING EXTERIOR'))}));
+ console.log('VENUE_FILTER_DEBUG',JSON.stringify(filterDebug));
  assert.equal(await page.locator('#cards .card-photo-label').filter({hasText:'BUILDING EXTERIOR'}).count(),0,'Venue-specific photo filter excludes host building exteriors');
  await page.locator('#photoFilter').selectOption('building');
  const exteriorCount=await page.locator('#cards .card').count();
