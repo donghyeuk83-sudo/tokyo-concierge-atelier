@@ -22,6 +22,17 @@ jobs:
           python-version: '3.11'
       - name: Install image verification dependency
         run: python -m pip install Pillow
+      - name: Check published page JavaScript syntax
+        run: |
+          python - <<'PY'
+          import pathlib, re
+          html = pathlib.Path("index.html").read_text(encoding="utf-8")
+          scripts = re.findall(r"<script(?:\\s[^>]*)?>(.*?)</script>", html, re.S)
+          if len(scripts) != 1 or not scripts[0].strip():
+              raise SystemExit(f"Expected one nonempty inline script, got {len(scripts)}")
+          pathlib.Path("/tmp/atelier-inline.js").write_text(scripts[0], encoding="utf-8")
+          PY
+          node --check /tmp/atelier-inline.js
       - name: Validate currently displayed licensed venue photos
         id: photo_validation
         run: |
