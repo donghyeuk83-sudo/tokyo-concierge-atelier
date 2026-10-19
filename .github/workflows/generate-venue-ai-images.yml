@@ -7,7 +7,7 @@ on:
       - 'scripts/generate-venue-ai-images.py'
   workflow_dispatch:
   schedule:
-    - cron: '17 5 * * 1'
+    - cron: '17 */3 * * *'
 permissions:
   contents: write
 jobs:
