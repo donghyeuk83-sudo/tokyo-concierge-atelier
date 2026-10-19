@@ -14,6 +14,10 @@ jobs:
           node-version: '22'
       - run: npm install --no-save playwright
       - run: npx playwright install --with-deps chromium
+      - name: Ensure missing-photo queue is current
+        run: |
+          node tests/photo-queue.cjs
+          git diff --exit-code -- audits/missing-photo-queue.csv
       - name: Audit all 131 venue records and photo provenance
         run: node tests/audit-venues.cjs
       - name: Check reachability of 131 venue URLs
