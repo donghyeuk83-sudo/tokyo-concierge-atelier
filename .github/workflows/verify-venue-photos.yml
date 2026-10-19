@@ -22,4 +22,22 @@ jobs:
       - name: Install image verification dependency
         run: python -m pip install Pillow
       - name: Validate currently displayed licensed venue photos
-        run: python scripts/validate-venue-photos.py
+        id: photo_validation
+        run: |
+          python scripts/validate-venue-photos.py 2>&1 | tee venue-photo-audit.log
+          exit ${PIPESTATUS[0]}
+      - name: Publish validation summary
+        if: always()
+        run: |
+          echo "## Tokyo Concierge Atelier · Venue photo audit" >> "$GITHUB_STEP_SUMMARY"
+          echo "Validation outcome: ${{ steps.photo_validation.outcome }}" >> "$GITHUB_STEP_SUMMARY"
+          echo '~~~' >> "$GITHUB_STEP_SUMMARY"
+          if [ -f venue-photo-audit.log ]; then cat venue-photo-audit.log >> "$GITHUB_STEP_SUMMARY"; else echo "Validation did not start." >> "$GITHUB_STEP_SUMMARY"; fi
+          echo '~~~' >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload photo audit log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: venue-photo-audit
+          path: venue-photo-audit.log
+          if-no-files-found: ignore
