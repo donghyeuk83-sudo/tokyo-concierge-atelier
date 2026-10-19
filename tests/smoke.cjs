@@ -46,7 +46,7 @@ const assert=require('assert');
  const publicPhotoSourceBlock=html.split('const VENUE_PHOTO_SOURCE_LINKS={')[1]?.split('};')[0]||'';
  const externalPhotoIds=[...publicPhotoSourceBlock.matchAll(/^([a-z]\d+):\{url:/gm)].map(m=>m[1]);
  assert.equal(externalPhotoIds.length,39,'39 external exact-venue photo and information source references expected');
- assert.equal(new Set(externalPhotoIds).size,15,'Duplicate external source ID');
+ assert.equal(new Set(externalPhotoIds).size,externalPhotoIds.length,'Duplicate external source ID');
  const checkedPhotoRefs=[
    ['restaurant','r18','www.fourseasons.com'],
    ['wellness','w05','www.shimizuyu.com'],
