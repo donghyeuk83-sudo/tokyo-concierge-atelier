@@ -221,11 +221,47 @@ const assert=require('assert');
   await page.locator('#detailClose').click();
  }
 
+
+ // Batch 9: verified original operator galleries and official tourism authority, not a reuse grant.
+ const batch9=[
+  ['attraction','a28','wanariya.co.jp','/gallery/','operator','Venue / operator website'],
+  ['shopping','s15','www.gotokyo.org','/en/new-and-now/new-and-trending/260113/topics.html','tourism','Official Tokyo tourism guide'],
+  ['attraction','a29','ninja-trick-house.com','/','operator','Venue / operator website'],
+  ['attraction','a40','www.sunrise-tours.jp','/en/','operator','Venue / operator website']
+ ];
+ for(const [category,id,host,path,kind,label] of batch9){
+   const entry=publicPhotoSourceBlock.split(String.fromCharCode(10)).find(line=>line.trim().startsWith(id+':'));
+   assert(entry,'Mapped original photo source remains '+id);
+   const match=entry.match(/url:"([^"]+)",kind:"([^"]+)"/);
+   assert(match,'Parse photo source '+id);
+   const url=new URL(match[1]);
+   assert.equal(url.hostname,host,'Verified exact official image source '+id);
+   assert.equal(url.pathname,path,'Direct photo gallery, operator presentation or tour photo catalogue '+id);
+   assert.equal(match[2],kind,'Correct photo source provenance '+id);
+   assert(!expectedPhotos.includes(id),'Do not promote copyright-unverified pictures '+id);
+   await page.locator('#tabs [data-cat="'+category+'"]').click();
+   const card=page.locator('article.card').filter({has:page.locator('.detail-trigger[data-detail="'+id+'"]')});
+   const link=card.locator('a.venue-photo-source');
+   assert.equal(await link.count(),1,'Exact venue publisher link visible '+id);
+   assert.equal(await link.getAttribute('href'),match[1],'Card link matches original page '+id);
+   assert((await link.locator('small').textContent()).includes(label),'Publisher provenance localized in English '+id);
+   assert.equal(await card.locator('img[data-venue-photo]').count(),0,'No unlicensed photo embedded '+id);
+   await card.locator('.detail-trigger').click();
+   assert.equal(await page.locator('#detailActions .detail-photo-source').getAttribute('href'),match[1],'Modal photo-source page matches '+id);
+   await page.locator('#detailClose').click();
+ }
+ await page.locator('#language').selectOption('ko');
+ await page.locator('#tabs [data-cat="shopping"]').click();
+ const officialPhoto=page.locator('article.card').filter({has:page.locator('.detail-trigger[data-detail="s15"]')});
+ assert((await officialPhoto.locator('.venue-photo-source small').textContent()).includes('도쿄도 공식 관광 안내'),'Korean official Tokyo tourism source provenance');
+ await page.locator('#language').selectOption('ja');
+ assert((await officialPhoto.locator('.venue-photo-source small').textContent()).includes('東京都の公式観光ガイド'),'Japanese official tourism source provenance');
+ await page.locator('#language').selectOption('en');
  const checkedPhotoRefs=[
    ['restaurant','r06','tabelog.com'],
    ['wellness','w05','www.shimizuyu.com'],
    ['attraction','a30','prtimes.jp'],
-   ['shopping','s15','www.jalan.net']
+   ['shopping','s15','www.gotokyo.org']
  ];
  for(const [category,id,host] of checkedPhotoRefs){
    await page.locator('#tabs [data-cat="'+category+'"]').click();
@@ -235,7 +271,7 @@ const assert=require('assert');
    assert.equal(new URL(await link.getAttribute('href')).hostname,host,'Original-source hostname '+id);
    if(id==='r06')assert.equal(new URL(await link.getAttribute('href')).pathname,'/tokyo/A1317/A131701/13003188/dtlphotolst/4/smp2/','Seirinkan reference links directly to genuine Nakameguro exterior photographs');
 
-   const provenance=(await link.locator('small').textContent()),provenanceType={r06:'Independent photo listing',w05:'Venue / operator website',a30:'Press or media page',s15:'Independent photo listing'}[id];assert(provenance.includes(provenanceType),'Source accurately distinguishes operator, press and third-party photo pages '+id);
+   const provenance=(await link.locator('small').textContent()),provenanceType={r06:'Independent photo listing',w05:'Venue / operator website',a30:'Press or media page',s15:'Official Tokyo tourism guide'}[id];assert(provenance.includes(provenanceType),'Source accurately distinguishes operator, press and third-party photo pages '+id);
    assert.equal(await link.getAttribute('target'),'_blank','External source opens independently '+id);
    assert((await link.getAttribute('rel')).includes('noopener'),'External source protects opener '+id);
    assert.equal(await card.locator('img[data-venue-photo]').count(),0,'Original third-party photography not embedded '+id);
