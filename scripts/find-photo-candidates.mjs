@@ -25,14 +25,18 @@ async function lookup(q){
  }
 }
 const out=[];
+let failed=0;
 for(const v of rows){
  const queries=[v.ja+' '+v.area,v.en+' Tokyo'];
  const results=[];
  for(const q of queries){results.push(...await lookup(q));await sleep(120);}
+ const errors=results.filter(x=>x.error).map(x=>x.error);
+ if(errors.length)failed+=errors.length;
  const unique=[...new Map(results.filter(x=>x.file).map(x=>[x.file,x])).values()];
- out.push({...v,queries,candidates:unique,status:'UNVERIFIED_REQUIRES_HUMAN_VENUE_AND_LICENSE_REVIEW'});
+ out.push({...v,queries,errors,candidates:unique,status:'UNVERIFIED_REQUIRES_HUMAN_VENUE_AND_LICENSE_REVIEW'});
  console.log(v.id+' '+v.en+': '+unique.length+' candidates');
 }
 await fs.mkdir('audits',{recursive:true});
 await fs.writeFile('audits/commons-photo-candidates.json',JSON.stringify({generatedAt:new Date().toISOString(),warning:'Search results are NOT evidence of venue identity or image reuse permission.',venues:out},null,2)+'\n');
 console.log('Saved audits/commons-photo-candidates.json');
+if(failed){console.error('Lookup failures: '+failed);process.exitCode=1;}
