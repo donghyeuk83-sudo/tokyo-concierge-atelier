@@ -137,7 +137,7 @@ const assert=require('assert');
    assert.equal(new URL(await link.getAttribute('href')).hostname,host,'Original-source hostname '+id);
    if(id==='r06')assert.equal(new URL(await link.getAttribute('href')).pathname,'/tokyo/A1317/A131701/13003188/dtlphotolst/4/smp2/','Seirinkan reference links directly to genuine Nakameguro exterior photographs');
 
-   const provenance=(await link.locator('small').textContent());assert(provenance.includes(id==='r06'?'Independent photo listing':id==='s15'?'Independent photo listing':'Venue / operator website')||id==='a30','Source clearly identifies its official or third-party nature '+id);
+   const provenance=(await link.locator('small').textContent()),provenanceType={r06:'Independent photo listing',w05:'Venue / operator website',a30:'Press or media page',s15:'Independent photo listing'}[id];assert(provenance.includes(provenanceType),'Source accurately distinguishes operator, press and third-party photo pages '+id);
    assert.equal(await link.getAttribute('target'),'_blank','External source opens independently '+id);
    assert((await link.getAttribute('rel')).includes('noopener'),'External source protects opener '+id);
    assert.equal(await card.locator('img[data-venue-photo]').count(),0,'Original third-party photography not embedded '+id);
