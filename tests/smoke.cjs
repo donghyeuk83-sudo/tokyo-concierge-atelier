@@ -125,6 +125,7 @@ const assert=require('assert');
    assert.equal(await article.locator('img[data-venue-photo="'+id+'"]').count(),1,'Licensed exterior photo visible '+id);
    assert.equal(await article.locator('a.venue-photo-source').count(),1,'Building image keeps operator-specific venue details link '+id);
    assert.equal((await article.locator('.card-photo-label').textContent()).trim(),'BUILDING EXTERIOR','Exterior is never labeled as the restaurant interior '+id);
+   assert((await article.locator('img[data-venue-photo="'+id+'"]').getAttribute('alt')).toLowerCase().includes('exterior'),'Accessible alt text identifies host building exterior '+id);
    assert.equal(await article.locator('.photo-credit a').count(),2,'Author and CC license links '+id);
  }
 
