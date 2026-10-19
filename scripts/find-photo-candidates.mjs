@@ -1,4 +1,4 @@
-// Conservative Wikimedia Commons candidate discovery for 48 unphotographed venues.
+// Conservative Wikimedia Commons candidate discovery for currently unphotographed venues.
 // This file only generates a research artifact. It NEVER publishes image assets.
 // Usage: node scripts/find-photo-candidates.mjs
 import fs from 'node:fs/promises';
@@ -9,8 +9,18 @@ const rows=csv.trim().split(/\r?\n/).slice(1).map(line=>{
   if(cells.length!==8)throw Error('Malformed missing-photo queue CSV row: '+line);
   return {id:cells[0],category:cells[1],en:cells[2],ja:cells[3],area:cells[4]};
 });
-if(rows.length!==48||new Set(rows.map(v=>v.id)).size!==48)
-  throw Error('The expected 48 unique missing-photo IDs changed. Rebuild the queue first.');
+// Derive the live missing-photo ID list from the actual site. It shrinks as cleared
+// exact-site images are added, unlike the dated historical 48-venue research sheets.
+const html=await fs.readFile('index.html','utf8');
+const catalogue=html.split('const DATA=[')[1]?.split('].map(')[0];
+const published=html.split('const LICENSED_VENUE_PHOTOS={')[1]?.split('};')[0];
+if(!catalogue||!published)throw Error('Cannot locate actual venue/photo catalog');
+const venueIds=[...catalogue.matchAll(/^\["([a-z]\d+)","(?:restaurant|attraction|shopping|wellness|transport)"/gm)].map(m=>m[1]);
+const photoIds=new Set([...published.matchAll(/^([a-z]\d+):\{/gm)].map(m=>m[1]));
+if(venueIds.length!==131)throw Error('Unexpected catalogue size');
+const expectedIds=venueIds.filter(id=>!photoIds.has(id));
+if(rows.length!==expectedIds.length||rows.some((v,i)=>v.id!==expectedIds[i])||new Set(rows.map(v=>v.id)).size!==rows.length)
+  throw Error('Missing-photo queue disagrees with live site. Run node tests/photo-queue.cjs first.');
 
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 const minIntervalMs=Number(process.env.COMMONS_REQUEST_INTERVAL_MS||8000);
