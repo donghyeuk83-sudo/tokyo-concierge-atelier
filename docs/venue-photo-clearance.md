@@ -116,3 +116,11 @@ A verified *restaurant chain*, *general neighborhood*, *activity type*, or *oper
 ## GitHub Pages verification
 
 The repository README specifies **Settings → Pages → Deploy from branch → main / root**. This setting cannot be inferred from a commit or a missing PR workflow run. The `Verify published venue photos` workflow now checks its configuration via GitHub's Pages API and probes the expected public URL. Review its **GitHub Pages diagnostics** job step and step summary after a `main` push. HTTP 200 with the expected page title is evidence of availability, not confirmation that every image loaded successfully.
+
+
+## October 19 Commons automation incident and candidate triage
+
+- The [photo candidate collection run 39249220194](https://github.com/donghyeuk83-sudo/tokyo-concierge-atelier/actions/runs/39249220194) produced a downloadable research artifact but **failed** after **104 HTTP 429 rate-limit responses** from the Commons API. These failed searches are *unknown*, not proofs of missing photos. The browser QA and Pages deploy at the same commit passed separately.
+- Reviewing that artifact revealed false candidate matches: r02 result is a USACE bamboo-bridge PDF (not Sushi Takeuchi); r04 results include Taiwanese temples and unrelated books (not Ten-Masa); r18 results include Mount Hangetsu and judo images (not SÉZANNE); r21 results include Manhattan streets and magazines (not The Pizza Bar on 38th); a29 results were unrelated PDFs (not Shinjuku Ninja Trick House). Their Commons licenses **do not make them photos of the listed venues**. None may be added.
+- **Publication decision:** zero additional photos passed *both* branch/location identification and file-level commercial reuse clearance in this triage. Leave the published photo registry unchanged at **83/131** and the missing-photo queue at **48/131**; continue to show existing illustrations on those cards.
+- Candidate search now uses a single precise quoted-name query per venue, image-file filtering, a minimum interval between requests and server-aware HTTP 429 retries. Its report distinguishes API failures from legitimate zero-result searches. The search is deliberately non-exhaustive and **never authorizes automated image publication**; all possible candidates still need human scrutiny of original-file attribution, licensing and exact venue identity.
