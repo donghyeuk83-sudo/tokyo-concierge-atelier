@@ -43,6 +43,7 @@ assert(html.includes("photo.insertAdjacentElement('afterend',fallback.firstEleme
 // Evidence-backed manual checks; all other images remain unverified.
 // This records source-page metadata, not blanket permission for every downstream use.
 const manuallyChecked=new Map([
+ ['r26',{source:'https://commons.wikimedia.org/wiki/File:Curry_Udon_@_Tsurutontan_@_Roppongi_(13621744175).jpg',author:'Guilhem Vellut',license:'CC BY 2.0',subject:'Curry udon at the former Roppongi location, April 2014; full frame',checked:'2026-10-19'}],
  ...localPhotos.map(photo=>[photo.id,{source:photo.source,author:photo.credit,license:photo.license,subject:photo.title,checked:photo.reviewedOn,evidence:photo.source+' | Published copy: '+photo.retrievedFrom}]),
  ['w07',{source:'https://commons.wikimedia.org/wiki/File:Westin_Hotel_Tokyo.jpg',author:'Harani0403',license:'CC BY-SA 3.0',subject:'Westin Tokyo hotel exterior, not spa interior',checked:'2026-10-18'}],
  ['w02',{source:'https://commons.wikimedia.org/wiki/File:LaQua01s3872.jpg',author:'663highland',license:'CC BY 2.5',subject:'LaQua complex exterior',checked:'2026-10-18'}],
