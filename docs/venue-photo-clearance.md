@@ -53,6 +53,10 @@ There were **no additions to the photo registry** in this research round because
 - **Rejected r21**: [Flickr The Pizza Bar on 38th photo](https://www.flickr.com/photos/official_fuyuhiko/54665909627/) identifies the exact Mandarin Oriental Tokyo restaurant but is **All rights reserved**.
 - **Rejected a29**: [Commons Ninja Trick Mansion photo](https://commons.wikimedia.org/wiki/File:Togakushi_Folk_Museum,_Togakushi_Ninja_Museum,_Ninja_Trick_Mansion.jpg) is CC BY-SA 4.0 but depicts Togakushi, **Nagano**, not the listed Shinjuku Kabukicho Ninja Trick House.
 
+## License decision for guest guides
+
+Tokyo Concierge Atelier is a **guest information and concierge guide**, **not a photo or goods-selling service**. Photograph licensing must be assessed based on this actual use rather than assuming that all publication is paid commercial use. However, use by a hotel or hospitality business may still be interpreted as primarily directed toward commercial advantage under the CC NonCommercial definition; the absence of a purchase button or direct photo sale alone does not establish CC BY-NC eligibility. Prefer CC0, Public Domain Mark for qualifying works, CC BY, and CC BY-SA; record separate photographer permissions for ambiguous CC BY-NC content before public publication. An image must still depict the correct venue or branch, and keep attribution and license notices.
+
 ## Release requirements
 
 1. Check image content and branch/location match using the file description and operator address as needed. Keep venue identity, *not just the photo's general subject*, as the criterion.
