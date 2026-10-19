@@ -86,6 +86,8 @@ const assert=require('assert');
      const card=img.locator('xpath=ancestor::article');
      assert.equal(await card.locator('.photo-credit a').count(),2,'Photo source and license links: '+id);
      if(id==='r20'){
+       await card.hover();
+       assert.equal(await card.locator('.card-photo').evaluate(el=>getComputedStyle(el).filter),'none','Midori photo colors remain unchanged on hover');
        assert.equal(await img.evaluate(el=>getComputedStyle(el).objectFit),'contain','Midori photo preserves its complete frame');
        assert((await card.locator('.photo-credit').textContent()).includes('Midori Sushi, Ginza, Tokyo'),'Midori original title is credited');
        assert.equal(await card.locator('.card-photo-label').textContent(),({en:'REAL VENUE PHOTO',ja:'実際の施設写真',ko:'실제 장소 사진'})[await page.locator('html').getAttribute('lang')],'Midori photo is not labeled as a building exterior');
