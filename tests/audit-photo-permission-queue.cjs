@@ -23,6 +23,8 @@ for(const row of items){
  }
 }
 const count=items.filter(row=>row[idx.contact_review_status]==='OFFICIAL_CONTACT_VERIFIED').length;
-assert(count>=37,'The 37 confirmed operator inquiry routes must not regress');
+assert(count>=46,'The 46 evidenced business/contact paths must not regress');
+assert.equal(items.filter(row=>row[idx.contact_review_status]==='CONTACT_NOT_YET_VERIFIED').length,1,'Only invitation-only r52 remains unresolved');
+assert.equal(items.find(row=>row[idx.id]==='r52')[idx.contact_review_status],'CONTACT_NOT_YET_VERIFIED','Do not invent a public Nagatacho Ouka contact');
 assert.equal(items.filter(row=>row[idx.contact_review_status]==='HISTORIC_CLOSED_DO_NOT_PROMOTE').length,1,'Closed historical branch must remain separate');
-console.log('PASS contact queue: '+items.length+' photo-pending venues; '+count+' verified official operator contact routes; zero granted image permissions');
+console.log('PASS contact queue: '+items.length+' photo-pending venues; '+count+' evidenced direct business/inquiry routes (some platform-hosted); zero granted image permissions');
