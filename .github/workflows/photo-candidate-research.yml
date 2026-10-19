@@ -1,4 +1,8 @@
 name: Collect unverified venue photo candidates
+# Avoid overlapping research runs competing for Wikimedia Commons API capacity.
+concurrency:
+  group: tokyo-concierge-commons-photo-research
+  cancel-in-progress: true
 on:
   workflow_dispatch:
   push:
@@ -17,6 +21,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Check candidate discovery script syntax
+        run: node --check scripts/find-photo-candidates.mjs
       - name: Find image candidates (research only)
         run: node scripts/find-photo-candidates.mjs
       - name: Upload candidate report for review
