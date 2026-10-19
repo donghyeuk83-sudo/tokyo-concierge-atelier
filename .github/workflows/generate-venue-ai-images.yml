@@ -21,6 +21,8 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install Pillow
+      - name: Compile Python generation and QA scripts
+        run: python -m py_compile scripts/generate-venue-ai-images.py scripts/validate-venue-photos.py
       - name: Fetch unique photorealistic AI images and map successful files
         run: python scripts/generate-venue-ai-images.py
       - name: Validate generated WebP files and all 50 card links
