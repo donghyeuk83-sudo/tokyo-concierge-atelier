@@ -39,6 +39,8 @@ const assert=require('assert');
  await page.locator('#tabs [data-cat="attraction"]').click();
  const fs=require('node:fs');
  const html=fs.readFileSync('index.html','utf8');
+ const localPhotos=JSON.parse(fs.readFileSync('assets/photos/sources.json','utf8'));
+ const localPhotoById=new Map(localPhotos.map(photo=>[photo.id,photo]));
  const registry=html.split('const LICENSED_VENUE_PHOTOS={')[1]?.split('};')[0]||'';
  const expectedPhotos=[...registry.matchAll(/^([a-z]\d+):\{/gm)].map(m=>m[1]);
  assert(expectedPhotos.length>=24,'Photo registry unexpectedly shrank');
@@ -56,10 +58,11 @@ const assert=require('assert');
    const imagePath=new URL(url,'https://atelier.invalid/').pathname;
    const imgName=decodeURIComponent(imagePath.includes('/commons/thumb/')?imagePath.split('/').slice(-2,-1)[0]:imagePath.split('/').pop()).replace(/^[0-9]+px-/,'').replace(/_/g,' ');
    if(sourceHost==='www.flickr.com'){
-     assert.equal(id,'r20','Flickr photo has a reviewed venue mapping');
-     assert.equal(source,'https://www.flickr.com/photos/dgeen/5130489292/','Flickr source identity');
-     assert.equal(url,'assets/photos/midori-sushi-ginza-5130489292.jpg','Local asset identity');
-     assert.equal(license,'CC BY-ND 2.0','Flickr license matches review');
+     const review=localPhotoById.get(id);assert(review,'Flickr photo has a reviewed venue mapping: '+id);
+     assert.equal(source,review.source,'Flickr source identity: '+id);
+     assert.equal(url,review.file,'Local asset identity: '+id);
+     assert.equal(credit,review.credit,'Local photo photographer: '+id);
+     assert.equal(license,review.license,'Flickr license matches review: '+id);
    }else assert.equal(imgName,srcName,'Photo image and source filename match: '+id);
    assert(!seenSources.has(source),'Photo source reused across venues: '+id);
    seenSources.add(source);
@@ -85,12 +88,12 @@ const assert=require('assert');
      if(status.width===0)failedPhotos.push(id+' '+status.src);
      const card=img.locator('xpath=ancestor::article');
      assert.equal(await card.locator('.photo-credit a').count(),2,'Photo source and license links: '+id);
-     if(id==='r20'){
+     if(localPhotoById.has(id)){
        await card.hover();
-       assert.equal(await card.locator('.card-photo').evaluate(el=>getComputedStyle(el).filter),'none','Midori photo colors remain unchanged on hover');
-       assert.equal(await img.evaluate(el=>getComputedStyle(el).objectFit),'contain','Midori photo preserves its complete frame');
-       assert((await card.locator('.photo-credit').textContent()).includes('Midori Sushi, Ginza, Tokyo'),'Midori original title is credited');
-       assert.equal(await card.locator('.card-photo-label').textContent(),({en:'REAL VENUE PHOTO',ja:'実際の施設写真',ko:'실제 장소 사진'})[await page.locator('html').getAttribute('lang')],'Midori photo is not labeled as a building exterior');
+       assert.equal(await card.locator('.card-photo').evaluate(el=>getComputedStyle(el).filter),'none','Published photo colors remain unchanged on hover: '+id);
+       assert.equal(await img.evaluate(el=>getComputedStyle(el).objectFit),'contain','Published photo preserves its complete frame: '+id);
+       assert((await card.locator('.photo-credit').textContent()).includes(localPhotoById.get(id).title),'Original photo title is credited: '+id);
+       assert.equal(await card.locator('.card-photo-label').textContent(),({en:'REAL VENUE PHOTO',ja:'実際の施設写真',ko:'실제 장소 사진'})[await page.locator('html').getAttribute('lang')],'Venue photo is not labeled as a building exterior: '+id);
      }
    }
  }

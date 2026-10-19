@@ -2,6 +2,8 @@
 const fs=require('node:fs');
 const assert=require('node:assert/strict');
 const html=fs.readFileSync('index.html','utf8');
+const localPhotos=JSON.parse(fs.readFileSync('assets/photos/sources.json','utf8'));
+assert.equal(new Set(localPhotos.map(p=>p.id)).size,localPhotos.length,'Duplicate local source review');
 const dataSection=html.split('const DATA=[')[1]?.split('].map(')[0];
 assert(dataSection,'DATA catalog section missing');
 const entries=[...dataSection.matchAll(/^\[("(?:[^"\\]|\\.)*"(?:,\s*"(?:[^"\\]|\\.)*"){6})\],?$/gm)]
@@ -22,10 +24,13 @@ assert(html.includes('licensedPhoto|| illustration(r)'),'Missing illustration fa
 assert(html.includes("img.addEventListener('error'"),'Missing broken-photo fallback handler');
 for(const p of licensed){
  if(p.url.startsWith('assets/photos/')){
-  assert.equal(p.id,'r20','Local photo requires a reviewed source record');
-  assert.equal(p.source,'https://www.flickr.com/photos/dgeen/5130489292/','Local photo source changed');
-  assert.equal(p.url,'assets/photos/midori-sushi-ginza-5130489292.jpg','Flickr photo identity must match the asset');
-  assert.equal(require('node:crypto').createHash('sha256').update(fs.readFileSync(p.url)).digest('hex'),'85da582ad61fecd78d5b3be1726ca1d74ed9eb7fdce6978536e54cea6f5eb4e9','Published photo bytes changed since review');
+  const review=localPhotos.find(photo=>photo.id===p.id);assert(review,'Local photo requires a reviewed source record: '+p.id);
+  assert.equal(p.source,review.source,'Local photo source changed: '+p.id);
+  assert.equal(p.url,review.file,'Local photo identity must match the asset: '+p.id);
+  assert.equal(p.credit,review.credit,'Local photographer changed: '+p.id);
+  assert.equal(p.license,review.license,'Local photo license changed: '+p.id);
+  assert.equal(p.licenseUrl,review.licenseUrl,'Local photo license URL changed: '+p.id);
+  assert.equal(require('node:crypto').createHash('sha256').update(fs.readFileSync(p.url)).digest('hex'),review.sha256,'Published photo bytes changed since review: '+p.id);
   continue;
  }
  const path=decodeURIComponent(new URL(p.url).pathname); const imageName=path.includes('/Special:FilePath/')?path.split('/Special:FilePath/')[1].replace(/_/g,' '):path.includes('/commons/thumb/')?path.split('/').slice(-2,-1)[0].replace(/_/g,' '):path.split('/').pop().replace(/_/g,' ');
@@ -38,7 +43,7 @@ assert(html.includes("photo.insertAdjacentElement('afterend',fallback.firstEleme
 // Evidence-backed manual checks; all other images remain unverified.
 // This records source-page metadata, not blanket permission for every downstream use.
 const manuallyChecked=new Map([
- ['r20',{source:'https://www.flickr.com/photos/dgeen/5130489292/',author:'DavidGeen',license:'CC BY-ND 2.0',subject:'Midori Sushi, Ginza, Tokyo; published copy from https://static.trip101.com/paragraph_media/pictures/002/296/706/large/midori-sushi_-ginza_-tokyo-1606301450.jpg?1606302016; no further editing',checked:'2026-10-19'}],
+ ...localPhotos.map(photo=>[photo.id,{source:photo.source,author:photo.credit,license:photo.license,subject:photo.title,checked:photo.reviewedOn,evidence:photo.source+' | Published copy: '+photo.retrievedFrom}]),
  ['w07',{source:'https://commons.wikimedia.org/wiki/File:Westin_Hotel_Tokyo.jpg',author:'Harani0403',license:'CC BY-SA 3.0',subject:'Westin Tokyo hotel exterior, not spa interior',checked:'2026-10-18'}],
  ['w02',{source:'https://commons.wikimedia.org/wiki/File:LaQua01s3872.jpg',author:'663highland',license:'CC BY 2.5',subject:'LaQua complex exterior',checked:'2026-10-18'}],
  ['r30',{source:'https://commons.wikimedia.org/wiki/File:道玄坂_2024年10月12日の渋谷_202410121836_IMG_3124.jpg',author:'ウィ貴公子',license:'CC BY-SA 4.0',subject:'Dogenzaka streetscape with Kura Sushi building sign',checked:'2026-10-18'}],
@@ -63,7 +68,7 @@ assert.equal(missingVenueReferences.length,0,'Venue reference URLs missing: '+JS
 assert.equal(header.length,19,'Audit CSV schema changed unexpectedly');
 const rows=entries.map(([id,category,name,nameJa,area,type,url])=>{
  const p=photos.get(id); const checked=manuallyChecked.get(id);
- return [id,category,name,nameJa,area,type,url,p?'PHOTO_REGISTERED':'PHOTO_NOT_YET_VERIFIED',p?.url||'',p?.source||'',p?.credit||'',p?.license||'',p?.licenseUrl||'','NEEDS_MANUAL_REVIEW',p?'REGISTERED_IMAGE_NEEDS_VISUAL_REVIEW':'NOT_REVIEWED',p?'LICENSE_CLAIM_RECORDED_RIGHTS_UNVERIFIED':'NOT_REVIEWED',checked?'SOURCE_METADATA_CHECKED':'NEEDS_MANUAL_REVIEW',checked?.checked||'',checked?.source||''].map(esc).join(',');
+ return [id,category,name,nameJa,area,type,url,p?'PHOTO_REGISTERED':'PHOTO_NOT_YET_VERIFIED',p?.url||'',p?.source||'',p?.credit||'',p?.license||'',p?.licenseUrl||'','NEEDS_MANUAL_REVIEW',p?'REGISTERED_IMAGE_NEEDS_VISUAL_REVIEW':'NOT_REVIEWED',p?'LICENSE_CLAIM_RECORDED_RIGHTS_UNVERIFIED':'NOT_REVIEWED',checked?'SOURCE_METADATA_CHECKED':'NEEDS_MANUAL_REVIEW',checked?.checked||'',checked?.evidence||checked?.source||''].map(esc).join(',');
 });
 fs.mkdirSync('audits',{recursive:true});
 fs.writeFileSync('audits/venue-photo-audit.csv',[header.map(esc).join(','),...rows].join('\n')+'\n');
