@@ -39,6 +39,15 @@ const assert=require('assert');
  await page.locator('#tabs [data-cat="attraction"]').click();
  const studioWA=page.locator('article.card').filter({has:page.locator('.detail-trigger[data-detail="a32"]')});
  assert((await studioWA.locator('.venue-alert').textContent()).includes('Meguro'),'Kimono Studio WA location discrepancy is clearly disclosed');
+ const studioMapUrl=new URL(await studioWA.locator('.actions a[href*="/maps/search/"]').getAttribute('href'));
+ const studioQuery=studioMapUrl.searchParams.get('query')||'';
+ assert(studioQuery.includes('上大崎2-24-13')&&!studioQuery.includes('Asakusa'),'Map search uses verified Meguro address, not the stale Asakusa catalogue area');
+ await studioWA.locator('.detail-trigger').click();
+ const studioDestinations=await page.locator('#detailActions .route-links a').evaluateAll(els=>els.map(el=>new URL(el.href).searchParams.get('destination')));
+ assert.equal(studioDestinations.length,3,'Walk/transit/car links offered');
+ assert(studioDestinations.every(destination=>destination.includes('上大崎2-24-13')&&!destination.includes('Asakusa')),'All three hotel routes use studio address from official operator');
+ await page.locator('#detailClose').click();
+
  await page.locator('#tabs [data-cat="restaurant"]').click();
  await page.locator('.card button[data-id]').first().click();
  assert((await page.locator('#guide .guide-item').count())>0,'shortlist add');
@@ -86,6 +95,8 @@ const assert=require('assert');
    const link=card.locator('a.venue-photo-source');
    assert.equal(await link.count(),1,'External original-venue image reference shown on illustration card '+id);
    assert.equal(new URL(await link.getAttribute('href')).hostname,host,'Original-source hostname '+id);
+   if(id==='r06')assert.equal(new URL(await link.getAttribute('href')).pathname,'/tokyo/A1317/A131701/13003188/dtlphotolst/4/smp2/','Seirinkan reference links directly to genuine Nakameguro exterior photographs');
+
    assert.equal(await link.getAttribute('target'),'_blank','External source opens independently '+id);
    assert((await link.getAttribute('rel')).includes('noopener'),'External source protects opener '+id);
    assert.equal(await card.locator('img[data-venue-photo]').count(),0,'Original third-party photography not embedded '+id);
