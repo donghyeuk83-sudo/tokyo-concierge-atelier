@@ -10,6 +10,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  pages: read
 jobs:
   verify:
     runs-on: ubuntu-latest
@@ -41,3 +42,45 @@ jobs:
           name: venue-photo-audit
           path: venue-photo-audit.log
           if-no-files-found: ignore
+
+      - name: Diagnose GitHub Pages deployment
+        if: always()
+        env:
+          GH_PAGES_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          API_ROOT: ${{ github.api_url }}
+        run: |
+          echo "## GitHub Pages diagnostics" >> "$GITHUB_STEP_SUMMARY"
+          api_code=$(curl --silent --show-error --max-time 20 --output "$RUNNER_TEMP/pages-status.json" --write-out '%{http_code}' \
+            --header "Accept: application/vnd.github+json" \
+            --header "Authorization: Bearer $GH_PAGES_TOKEN" \
+            "$API_ROOT/repos/$REPOSITORY/pages") || api_code="000"
+          echo "Pages configuration API HTTP: $api_code" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$api_code" = "200" ]; then
+            python - <<'PY'
+          import json, os
+          from pathlib import Path
+          p = json.loads((Path(os.environ["RUNNER_TEMP"]) / "pages-status.json").read_text())
+          src = p.get("source") or {}
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as out:
+              out.write(f"Build type: {p.get('build_type', 'unknown')}\n\n")
+              out.write(f"Source: {src.get('branch', 'not returned')} {src.get('path', '')}\n\n")
+              out.write(f"Pages status: {p.get('status', 'unknown')}\n\n")
+              out.write(f"Configured URL: {p.get('html_url', 'not returned')}\n\n")
+          PY
+          else
+            echo "::warning::Cannot verify GitHub Pages configuration (HTTP $api_code). Check Settings > Pages."
+          fi
+          owner="${REPOSITORY%/*}"
+          project="${REPOSITORY#*/}"
+          site="https://${owner}.github.io/${project}/"
+          http_code=$(curl --silent --show-error --location --max-time 25 \
+            --output "$RUNNER_TEMP/pages-home.html" --write-out '%{http_code}' "$site") || http_code="000"
+          echo "Expected published URL: $site" >> "$GITHUB_STEP_SUMMARY"
+          echo "Public site HTTP: $http_code" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$http_code" = "200" ] && grep -q 'Tokyo Concierge Atelier' "$RUNNER_TEMP/pages-home.html"; then
+            echo "Public content check: PASS" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Public content check: NOT VERIFIED (publishing may be delayed or Pages may be disabled)" >> "$GITHUB_STEP_SUMMARY"
+            echo "::warning::Published site not verified: HTTP $http_code at $site"
+          fi
