@@ -1106,10 +1106,21 @@ function searchText(r){return [r.name,r.ja,r.area,r.type,SEARCH_ALIASES[r.area]|
 function syncPhotoQuickbar(){
  const current=$("photoFilter").value, labels=PHOTO_QUICK_LABELS[lang];
  const group=$("photoQuickbar");if(!group)return;
+ // Count only the currently selected category / area / type / query.
+ // This distinguishes genuine venue photos from CC photos of their host buildings.
+ const query=$("query").value.trim().toLocaleLowerCase(),area=$("area").value,type=$("type").value;
+ const matches=DATA.filter(r=>r.category===category&&(!area||r.area===area)&&(!type||r.type===type)&&searchText(r).includes(query));
+ const totals={
+  all:matches.length,
+  venue:matches.filter(r=>Boolean(LICENSED_VENUE_PHOTOS[r.id])&&!isBuildingExteriorPhoto(r.id)).length,
+  building:matches.filter(r=>Boolean(LICENSED_VENUE_PHOTOS[r.id])&&isBuildingExteriorPhoto(r.id)).length,
+  source:matches.filter(r=>Boolean(VENUE_PHOTO_SOURCE_LINKS[r.id])).length
+ };
  group.setAttribute("aria-label",labels.label);
  group.querySelectorAll("button[data-photo-quick]").forEach(button=>{
   const mode=button.dataset.photoQuick;
-  button.textContent=labels[mode];
+  button.textContent=labels[mode]+" ("+totals[mode]+")";
+  button.setAttribute("aria-label",labels[mode]+": "+totals[mode]);
   button.setAttribute("aria-pressed",String(mode===current));
  });
 }
