@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate all AI venue photo links against actual decodable WebP files."""
+"""Validate photographs actually displayed on venue cards (not hidden legacy AI assets)."""
 import hashlib
 import pathlib
 import re
@@ -9,38 +9,49 @@ from PIL import Image
 
 root = pathlib.Path(__file__).resolve().parents[1]
 html = (root / "index.html").read_text(encoding="utf-8")
-match = re.search(r"const AI_VENUE_VISUALS=\{(.*?)\};", html, re.S)
+match = re.search(r"const LICENSED_VENUE_PHOTOS=\{(.*?)\};", html, re.S)
 if not match:
-    sys.exit("ERROR: AI_VENUE_VISUALS registry missing")
-entries = re.findall(r"\b([a-z]\d+):\{url:'([^']+)'\}", match.group(1))
+    sys.exit("ERROR: licensed venue photo registry missing")
+entries = re.findall(r"\b([a-z]\d+):\{url:\"([^\"]+)\"", match.group(1))
 issues = []
-if len(entries) != 50 or len(set(k for k, _ in entries)) != 50:
-    issues.append(f"Expected 50 distinct cards; got {len(entries)}")
-hashes = defaultdict(list)
-for venue_id, relative in entries:
-    if not re.fullmatch(r"assets/photos/ai-unique-[a-z]\d+\.webp", relative):
-        issues.append(f"{venue_id}: unexpected image path {relative}")
+ids = [key for key, _ in entries]
+if len(ids) != len(set(ids)):
+    issues.append("Duplicate licensed venue IDs")
+url_ids = defaultdict(list)
+hash_ids = defaultdict(list)
+local_count = 0
+for venue_id, url in entries:
+    url_ids[url].append(venue_id)
+    if url.startswith("http"):
+        if not url.startswith("https://"):
+            issues.append(f"{venue_id}: insecure external image URL")
         continue
-    if pathlib.PurePosixPath(relative).stem != f"ai-unique-{venue_id}":
-        issues.append(f"{venue_id}: image assigned to wrong card")
-    path = root / relative
+    if not url.startswith("assets/photos/") or ".." in url:
+        issues.append(f"{venue_id}: unsafe image path {url}")
+        continue
+    path = root / url
     if not path.is_file():
-        issues.append(f"{venue_id}: missing file {relative}")
+        issues.append(f"{venue_id}: missing local photo {url}")
         continue
+    local_count += 1
     try:
-        with Image.open(path) as image:
-            if image.format != "WEBP" or image.width < 320 or image.height < 240:
-                issues.append(f"{venue_id}: invalid image format or dimensions")
-            image.verify()
-        hashes[hashlib.sha256(path.read_bytes()).hexdigest()].append(venue_id)
+        with Image.open(path) as img:
+            if img.width < 320 or img.height < 240:
+                issues.append(f"{venue_id}: image too small")
+            img.verify()
+        hash_ids[hashlib.sha256(path.read_bytes()).hexdigest()].append(venue_id)
     except Exception as exc:
-        issues.append(f"{venue_id}: image decode failed: {exc}")
-for ids in hashes.values():
-    if len(ids) > 1:
-        issues.append(f"Identical image bytes for cards: {', '.join(ids)}")
-print(f"Validated {len(entries)} photo cards, {len(hashes)} distinct WebP files")
+        issues.append(f"{venue_id}: unreadable image: {exc}")
+for url, keys in url_ids.items():
+    if len(keys) > 1:
+        issues.append(f"Same photo URL reused for {', '.join(keys)}: {url}")
+for keys in hash_ids.values():
+    if len(keys) > 1:
+        issues.append(f"Identical local photo bytes for {', '.join(keys)}")
+print(f"Displayed licensed photos: {len(entries)}; local decoded: {local_count}; external: {len(entries)-local_count}")
+print("Note: external URL availability and venue identity require separate live/manual verification.")
 for issue in issues:
     print("ERROR:", issue)
 if issues:
     sys.exit(1)
-print("PASS: all photo links resolve to valid, byte-distinct WebP files")
+print("PASS: displayed photo registry has no repeated URLs, and local photos decode")
