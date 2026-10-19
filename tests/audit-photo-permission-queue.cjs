@@ -16,7 +16,7 @@ assert.equal(new Set(actual).size,48,'Duplicate historic contact review');
 assert.equal(approvedIds.size,activeApprovals.length,'Duplicate licensed image approvals');
 assert.equal(ids.length+approvedIds.size,48,'Pending catalogue and newly approved photos must cover all original 48 IDs');
 assert.deepEqual(ids,actual.filter(id=>!approvedIds.has(id)),'Live queue must exclude only individually approved images');
-assert.deepEqual([...approvedIds].sort(),['r32','r34'],'Approved building photos changed; review and update this protection');
+assert.deepEqual([...approvedIds].sort(),['a36','r18','r21','r32','r34','r48'],'Published CC building-photo clearance IDs changed without this audit being reviewed');
 const idx=Object.fromEntries(b.map((k,i)=>[k,i]));
 for(const row of items){
  const id=row[idx.id],status=row[idx.contact_review_status],contact=row[idx.contact_route],evidence=row[idx.contact_evidence_url];

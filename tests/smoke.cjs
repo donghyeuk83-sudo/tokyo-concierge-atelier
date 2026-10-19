@@ -45,7 +45,7 @@ const assert=require('assert');
  const expectedPhotos=[...registry.matchAll(/^([a-z]\d+):\{/gm)].map(m=>m[1]);
  const publicPhotoSourceBlock=html.split('const VENUE_PHOTO_SOURCE_LINKS={')[1]?.split('};')[0]||'';
  const externalPhotoIds=[...publicPhotoSourceBlock.matchAll(/^([a-z]\d+):\{url:/gm)].map(m=>m[1]);
- assert.equal(externalPhotoIds.length,39,'39 external exact-venue photo and information source references expected');
+ assert.equal(externalPhotoIds.length,44,'44 original venue photo/information links expected');
  assert.equal(new Set(externalPhotoIds).size,externalPhotoIds.length,'Duplicate external source ID');
  const checkedPhotoRefs=[
    ['restaurant','r18','www.fourseasons.com'],
@@ -74,9 +74,20 @@ const assert=require('assert');
  assert((await koreanRef.textContent()).includes('현장 사진·시설 보기'),'Korean photo source link translation');
  await page.locator('#language').selectOption('en');
  assert((await page.locator('body').evaluate(el=>el.scrollWidth))<=405,'Photo-source links do not overflow iPhone viewport');
+ // Minimum tap target and readable attribution on narrow iPhone screens.
+ await page.locator('#tabs [data-cat="restaurant"]').click();
+ const mobilePhotoCard=page.locator('article.card').filter({has:page.locator('.detail-trigger[data-detail="r21"]')});
+ const mobileSource=mobilePhotoCard.locator('.venue-photo-source');
+ const linkHeight=await mobileSource.evaluate(el=>el.getBoundingClientRect().height);
+ assert(linkHeight>=44,'Mobile external venue photo link meets 44px touch target');
+ const creditSize=await mobilePhotoCard.locator('.photo-credit').evaluate(el=>parseFloat(getComputedStyle(el).fontSize));
+ assert(creditSize>=11,'Mobile photo licensing source and credit are legible');
+ const photoButtonHeight=await mobilePhotoCard.locator('.photo-view-trigger').evaluate(el=>el.getBoundingClientRect().height);
+ assert(photoButtonHeight>=44,'Mobile photo enlargement touch target');
+
  assert(expectedPhotos.length>=24,'Photo registry unexpectedly shrank');
- assert.equal(expectedPhotos.length,85,'Expected 85 original images including 2 licensed shopping-complex exteriors');
- for(const [id,filename] of [['r32','Shibuya_Parco.jpg'],['r34','Omotesando-Harajuku-Tokyo---2024-06-15_010.jpg']]){
+ assert.equal(expectedPhotos.length,89,'Expected 89 original images including six licensed host-building exteriors');
+ for(const [id,filename] of [['r32','Shibuya_Parco.jpg'],['r34','Omotesando-Harajuku-Tokyo---2024-06-15_010.jpg'],['r18','Pacific Century Place Marunouchi.jpg'],['r21','Nihonbashi Mitsui Tower @ Nihonbashi (9044324513).jpg'],['r48','新大手町ビル.jpg'],['a36','Ginza INZ.jpg']]){
    assert(expectedPhotos.includes(id),'Missing newly licensed building exterior image for '+id);
    const line=registry.split('\n').find(row=>row.startsWith(id+':{'));
    assert(line && line.includes(encodeURIComponent(filename)),'Expected exact Commons source file for '+id);
@@ -85,7 +96,7 @@ const assert=require('assert');
  // the target restaurant, NOT interior photos of those sushi restaurants.
  await page.locator('#language').selectOption('en');
  await page.locator('#tabs [data-cat="restaurant"]').click();
- for(const id of ['r32','r34']){
+ for(const id of ['r32','r34','r18','r21','r48','a36']){
    const article=page.locator('article.card').filter({has:page.locator('.detail-trigger[data-detail="'+id+'"]')});
    assert.equal(await article.locator('img[data-venue-photo="'+id+'"]').count(),1,'Licensed exterior photo visible '+id);
    assert.equal(await article.locator('a.venue-photo-source').count(),1,'Building image keeps operator-specific venue details link '+id);

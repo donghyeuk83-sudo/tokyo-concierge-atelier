@@ -26,6 +26,58 @@
       "venueIdentityExplanation": "The Commons photograph's original Japanese description explicitly identifies the Tokyu Plaza Harajuku Harakado exterior in Jingumae 6-chome; Neo Emotion's precise branch page establishes Maguro Tonya Megumi as a tenant on its fifth floor. The photo is labeled as the Harakado building exterior, not the restaurant dining room.",
       "rightsExplanation": "Original photographer RuinDig/Yuki Uchida self-published Omotesando-Harajuku-Tokyo---2024-06-15 010.jpg on Commons under CC BY 4.0 which permits commercial reuse subject to credit and license link. Original photo is displayed intact, credited with an active Commons source and license link, without filters or re-coloring.",
       "reviewedOn": "2026-10-19"
+    },
+    {
+      "id": "r18",
+      "source": "https://commons.wikimedia.org/wiki/File:Pacific_Century_Place_Marunouchi.jpg",
+      "credit": "Yasu",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "venueEvidenceUrl": "https://www.sezanne.tokyo/location/four-seasons-tokyo-sezanne/",
+      "venueIdentityExplanation": "The photographer's Commons original identifies Pacific Century Place Marunouchi from the Kajibashi crossing. SÉZANNE's own restaurant address and seventh-floor location establish that it operates within the Four Seasons Hotel Tokyo at Marunouchi housed in that exact office/hotel building. Clearly labelled historic building exterior, not restaurant interior.",
+      "rightsExplanation": "Original photo by Commons user Yasu is their own work, dated December 2010, published under CC BY-SA 3.0 Unported permitting commercial copying and redistribution with attribution. The full-frame original is shown unchanged with source, photographer and license hyperlinks.",
+      "reviewedOn": "2026-10-20",
+      "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Pacific%20Century%20Place%20Marunouchi.jpg?width=960",
+      "licenseEvidenceUrl": "https://commons.wikimedia.org/wiki/File:Pacific_Century_Place_Marunouchi.jpg"
+    },
+    {
+      "id": "r21",
+      "source": "https://commons.wikimedia.org/wiki/File:Nihonbashi_Mitsui_Tower_@_Nihonbashi_(9044324513).jpg",
+      "credit": "Guilhem Vellut",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+      "venueEvidenceUrl": "https://www.mitsuitower.jp/en/shops/mandarin.html",
+      "venueIdentityExplanation": "Original photographer's Wikimedia/Flickr file title identifies Nihonbashi Mitsui Tower. The tower operator's original Mandarin Oriental shop/dining directory expressly lists The Pizza Bar on 38th in the Mandarin Oriental inside that same exact Nihonbashi Mitsui Tower. The picture shows a historical tower exterior, never the Pizza Bar counter/interior.",
+      "rightsExplanation": "Commons transfer from Guilhem Vellut's Flickr original was verified by FlickreviewR as CC BY 2.0 Generic for the exact original file, dated June 2013. License permits commercial display with photographer/source attribution. Show full frame and link to Commons and Creative Commons license.",
+      "reviewedOn": "2026-10-20",
+      "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Nihonbashi%20Mitsui%20Tower%20%40%20Nihonbashi%20(9044324513).jpg?width=960",
+      "licenseEvidenceUrl": "https://commons.wikimedia.org/wiki/File:Nihonbashi_Mitsui_Tower_@_Nihonbashi_(9044324513).jpg"
+    },
+    {
+      "id": "r48",
+      "source": "https://commons.wikimedia.org/wiki/File:%E6%96%B0%E5%A4%A7%E6%89%8B%E7%94%BA%E3%83%93%E3%83%AB.jpg",
+      "credit": "Shinmaebashi",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "venueEvidenceUrl": "https://ninja-tokyo.jp/",
+      "venueIdentityExplanation": "Commons photographer Shinmaebashi identifies the subject as the Shin-Otemachi Building, Otemachi, Chiyoda. The current official NINJA TOKYO operator's site explicitly states 2-2-1 Otemachi, Shin-Otemachi Building basement level 1 as the restaurant's exact location. Only the building exterior is pictured, not the secret entrance or actual dining room.",
+      "rightsExplanation": "Commons original photo 新大手町ビル.jpg is the credited photographer Shinmaebashi's own 2017 work, publicly licensed CC BY-SA 4.0 International for commercial reuse with credit. Show the source and license in the UI and retain complete uncropped photograph.",
+      "reviewedOn": "2026-10-20",
+      "url": "https://commons.wikimedia.org/wiki/Special:FilePath/%E6%96%B0%E5%A4%A7%E6%89%8B%E7%94%BA%E3%83%93%E3%83%AB.jpg?width=960",
+      "licenseEvidenceUrl": "https://commons.wikimedia.org/wiki/File:%E6%96%B0%E5%A4%A7%E6%89%8B%E7%94%BA%E3%83%93%E3%83%AB.jpg"
+    },
+    {
+      "id": "a36",
+      "source": "https://commons.wikimedia.org/wiki/File:Ginza_INZ.jpg",
+      "credit": "Fred Cherrygarden",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "venueEvidenceUrl": "https://www.ginza-inz.co.jp/en/shopinfo/tokyo-sumo-festival/",
+      "venueIdentityExplanation": "2026 Wikimedia Commons original image by Fred Cherrygarden describes the Ginza INZ shopping complex in Tokyo's Ginza. The Ginza INZ shopping center's official Tokyo Sumo Festival tenant page confirms the exact operator is on Ginza INZ 1 B1. The image is clearly described as a complex exterior, not the event's stage or a confirmed entrance to Ginza INZ 1.",
+      "rightsExplanation": "Original photographer Fred Cherrygarden published the January 2026 Ginza INZ photograph as own work under CC BY-SA 4.0 permitting commercial redistribution when credited with original file and license link. Display the intact image, mark the broad mall-level context and do not imply depiction of Tokyo Sumo Festival interior.",
+      "reviewedOn": "2026-10-20",
+      "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Ginza%20INZ.jpg?width=960",
+      "licenseEvidenceUrl": "https://commons.wikimedia.org/wiki/File:Ginza_INZ.jpg"
     }
   ]
 }
