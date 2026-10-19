@@ -45,7 +45,7 @@ const assert=require('assert');
  const expectedPhotos=[...registry.matchAll(/^([a-z]\d+):\{/gm)].map(m=>m[1]);
  const publicPhotoSourceBlock=html.split('const VENUE_PHOTO_SOURCE_LINKS={')[1]?.split('};')[0]||'';
  const externalPhotoIds=[...publicPhotoSourceBlock.matchAll(/^([a-z]\d+):\{url:/gm)].map(m=>m[1]);
- assert.equal(externalPhotoIds.length,15,'15 external original-venue photo source references expected');
+ assert.equal(externalPhotoIds.length,39,'39 external exact-venue photo and information source references expected');
  assert.equal(new Set(externalPhotoIds).size,15,'Duplicate external source ID');
  const checkedPhotoRefs=[
    ['restaurant','r18','www.fourseasons.com'],
@@ -71,10 +71,28 @@ const assert=require('assert');
  await page.locator('#language').selectOption('ko');
  await page.locator('#tabs [data-cat="wellness"]').click();
  const koreanRef=page.locator('article.card').filter({has:page.locator('.detail-trigger[data-detail="w05"]')}).locator('a.venue-photo-source');
- assert((await koreanRef.textContent()).includes('현장 사진 보기'),'Korean photo reference translation');
+ assert((await koreanRef.textContent()).includes('현장 사진·시설 보기'),'Korean photo source link translation');
  await page.locator('#language').selectOption('en');
  assert((await page.locator('body').evaluate(el=>el.scrollWidth))<=405,'Photo-source links do not overflow iPhone viewport');
  assert(expectedPhotos.length>=24,'Photo registry unexpectedly shrank');
+ assert.equal(expectedPhotos.length,85,'Expected 85 original images including 2 licensed shopping-complex exteriors');
+ for(const [id,filename] of [['r32','Shibuya_Parco.jpg'],['r34','Omotesando-Harajuku-Tokyo---2024-06-15_010.jpg']]){
+   assert(expectedPhotos.includes(id),'Missing newly licensed building exterior image for '+id);
+   const line=registry.split('\n').find(row=>row.startsWith(id+':{'));
+   assert(line && line.includes(encodeURIComponent(filename)),'Expected exact Commons source file for '+id);
+ }
+ // Both exterior photos are authentic photos of shopping complexes containing
+ // the target restaurant, NOT interior photos of those sushi restaurants.
+ await page.locator('#language').selectOption('en');
+ await page.locator('#tabs [data-cat="restaurant"]').click();
+ for(const id of ['r32','r34']){
+   const article=page.locator('article.card').filter({has:page.locator('.detail-trigger[data-detail="'+id+'"]')});
+   assert.equal(await article.locator('img[data-venue-photo="'+id+'"]').count(),1,'Licensed exterior photo visible '+id);
+   assert.equal(await article.locator('a.venue-photo-source').count(),1,'Building image keeps operator-specific venue details link '+id);
+   assert.equal((await article.locator('.card-photo-label').textContent()).trim(),'BUILDING EXTERIOR','Exterior is never labeled as the restaurant interior '+id);
+   assert.equal(await article.locator('.photo-credit a').count(),2,'Author and CC license links '+id);
+ }
+
 
  // Structural metadata checks catch mismatched Wikimedia filenames and missing attribution.
  const entries=[...registry.matchAll(/^([a-z]\d+):\{([^\n]+)\},?$/gm)];

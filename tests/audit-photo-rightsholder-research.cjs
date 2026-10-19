@@ -38,4 +38,7 @@ const nagatacho=rights.find(row=>row[ri.id]==='r52');
 assert(nagatacho,'Missing Nagatacho Ouka rights investigation');
 assert.equal(nagatacho[ri.operator_contact_route],'','Do not invent a public owner/phone for invitation-only Nagatacho Ouka');
 assert(/株式会社月下/.test(nagatacho[ri.potential_successor_legal_lead]),'Corporate merger lead missing');
-console.log('PASS photo source/rights audit: 32 investigated rows; '+count+' exact/possible venue source-page leads; 48 rights-owner statuses unverified; zero commercial grants');
+const cleared=JSON.parse(fs.readFileSync('audits/photo-clearance-approvals.json','utf8')).approvals;
+assert.deepEqual(cleared.map(x=>x.id).sort(),['r32','r34'],'Only the two evidenced building-exterior files are approved in this batch');
+assert(cleared.every(x=>x.license==='CC0 1.0'||x.license==='CC BY 4.0'),'All added photos require commercially reusable CC');
+console.log('PASS photo source/rights audit: '+pages.length+' legacy lead rows; '+count+' old source-page leads; '+rights.length+' historical rights-route records; '+cleared.length+' new file-specific CC grants recorded in the live approval ledger');
