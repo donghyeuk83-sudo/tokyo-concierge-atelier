@@ -3,10 +3,14 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+# A newer main push supersedes older Pages revisions. Avoid stale jobs racing deployment.
+concurrency:
+  group: atelier-browser-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   browser-smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -36,20 +40,30 @@ jobs:
       - name: Test repository HTML in Chromium
         run: node tests/smoke.cjs
       - name: Wait for current revision on GitHub Pages
+        id: pages_ready
         env:
           LIVE_URL: https://donghyeuk83-sudo.github.io/tokyo-concierge-atelier/
         run: |
-          for attempt in $(seq 1 36); do
+          for attempt in $(seq 1 60); do
             if curl -fsSL --max-time 15 "$LIVE_URL" -o /tmp/atelier-live.html && cmp -s index.html /tmp/atelier-live.html; then
+              echo 'ready=true' >> "$GITHUB_OUTPUT"
               echo 'Public site has exact checked-out revision'
               exit 0
             fi
-            echo "Waiting for Pages deployment: $attempt/36"
+            # Old revisions must never block or test a newer public Pages revision.
+            REMOTE_SHA="$(git ls-remote origin refs/heads/main 2>/dev/null | cut -f1)"
+            if [ -n "$REMOTE_SHA" ] && [ "$REMOTE_SHA" != "$GITHUB_SHA" ]; then
+              echo 'ready=false' >> "$GITHUB_OUTPUT"
+              echo "::notice::Superseded by main $REMOTE_SHA; newer push runs its own browser QA"
+              exit 0
+            fi
+            echo "Waiting for Pages revision $GITHUB_SHA: $attempt/60"
             sleep 10
           done
-          echo 'Public Pages did not expose exact checked-out revision within 6 minutes'
+          echo "::error::Current Pages revision not published after 10 minutes; inspect GitHub Pages/Actions status"
           exit 1
       - name: Test deployed GitHub Pages in Chromium
+        if: steps.pages_ready.outputs.ready == 'true'
         env:
           TEST_URL: https://donghyeuk83-sudo.github.io/tokyo-concierge-atelier/
         run: node tests/smoke.cjs
