@@ -40,7 +40,7 @@ console.log('PASS contact queue: '+ids.length+' live pending; '+items.length+' h
 const sourceCandidates=parse('audits/photo-original-candidate-decisions-2026-10-19.csv');
 const [candidateHeader,...candidateRows]=sourceCandidates;
 const candidateCols=Object.fromEntries(candidateHeader.map((key,index)=>[key,index]));
-assert.deepEqual(candidateRows.map(row=>row[candidateCols.id]),ids,'Original photo decisions must match all 48 pending venue IDs');
+assert.deepEqual(candidateRows.map(row=>row[candidateCols.id]),actual,'Dated original-photo decisions must retain all 48 historically researched IDs');
 for(const row of candidateRows){
   const id=row[candidateCols.id];
   assert.equal(row[candidateCols.publication_status],'DO_NOT_PUBLISH','Cannot publish unapproved candidate: '+id);
