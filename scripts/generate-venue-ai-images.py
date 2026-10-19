@@ -64,7 +64,8 @@ MORE_PROMPTS={
 'r37':'High end Tokyo sushi chef arranging seasonal nigiri on wooden counter',
 }
 PROMPTS.update({k:'Photorealistic editorial travel photography, '+v+', authentic details, natural light, no logos, no text, distinct composition' for k,v in MORE_PROMPTS.items()})
-\nhtml=HTML.read_text()
+
+html=HTML.read_text()
 changed=[]
 failed=[]
 attempted=0
@@ -120,6 +121,8 @@ for i,(id,prompt) in enumerate(sorted(PROMPTS.items(),key=lambda pair: (OUT/f'ai
                 failed.append(id)
                 print('No local source',id,flush=True)
                 continue
+    if not target.exists() or target.stat().st_size < 1500:
+        raise RuntimeError('Missing or invalid generated WebP: '+id)
     new=f'assets/photos/ai-unique-{id}.webp'
     import re
     pat=rf'\b{id}:\{{url:\x27assets/photos/[^\x27]+\x27\}}'
