@@ -67,10 +67,14 @@ PROMPTS.update({k:'Photorealistic editorial travel photography, '+v+', authentic
 \nhtml=HTML.read_text()
 changed=[]
 failed=[]
+attempted=0
+MAX_NEW_PER_RUN=12
 existing_hashes={hashlib.sha256(p.read_bytes()).hexdigest() for p in OUT.glob('ai-unique-*.webp')}
 for i,(id,prompt) in enumerate(PROMPTS.items()):
     target=OUT/f'ai-unique-{id}.webp'
     if not target.exists():
+        if attempted>=MAX_NEW_PER_RUN: continue
+        attempted+=1
         query=urllib.parse.quote(prompt,safe='')
         url=f'https://image.pollinations.ai/prompt/{query}?width=640&height=480&seed={20261019+i}&nologo=true&model=flux'
         try:
@@ -101,4 +105,4 @@ for i,(id,prompt) in enumerate(PROMPTS.items()):
     time.sleep(0.15)
 if changed:
     HTML.write_text(html)
-print(json.dumps({'changed':changed,'total':len(changed),'failed':failed,'remaining':sum(not (OUT/f'ai-unique-{id}.webp').exists() for id in PROMPTS)},ensure_ascii=False))
+print(json.dumps({'changed':changed,'total':len(changed),'failed':failed,'remaining':sum(not (OUT/f'ai-unique-{id}.webp').exists() for id in PROMPTS),'attempted':attempted},ensure_ascii=False))
