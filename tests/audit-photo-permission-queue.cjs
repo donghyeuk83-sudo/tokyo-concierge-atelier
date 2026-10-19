@@ -23,6 +23,21 @@ for(const row of items){
  }
 }
 const count=items.filter(row=>row[idx.contact_review_status]==='OFFICIAL_CONTACT_VERIFIED').length;
-assert(count>=37,'The 37 confirmed operator inquiry routes must not regress');
+assert(count>=46,'The 46 evidenced business/contact paths must not regress');
+assert.equal(items.filter(row=>row[idx.contact_review_status]==='CONTACT_NOT_YET_VERIFIED').length,1,'Only invitation-only r52 remains unresolved');
+assert.equal(items.find(row=>row[idx.id]==='r52')[idx.contact_review_status],'CONTACT_NOT_YET_VERIFIED','Do not invent a public Nagatacho Ouka contact');
 assert.equal(items.filter(row=>row[idx.contact_review_status]==='HISTORIC_CLOSED_DO_NOT_PROMOTE').length,1,'Closed historical branch must remain separate');
-console.log('PASS contact queue: '+items.length+' photo-pending venues; '+count+' verified official operator contact routes; zero granted image permissions');
+console.log('PASS contact queue: '+items.length+' photo-pending venues; '+count+' evidenced direct business/inquiry routes (some platform-hosted); zero granted image permissions');
+
+
+const sourceCandidates=parse('audits/photo-original-candidate-decisions-2026-10-19.csv');
+const [candidateHeader,...candidateRows]=sourceCandidates;
+const candidateCols=Object.fromEntries(candidateHeader.map((key,index)=>[key,index]));
+assert.deepEqual(candidateRows.map(row=>row[candidateCols.id]),ids,'Original photo decisions must match all 48 pending venue IDs');
+for(const row of candidateRows){
+  const id=row[candidateCols.id];
+  assert.equal(row[candidateCols.publication_status],'DO_NOT_PUBLISH','Cannot publish unapproved candidate: '+id);
+  assert(row[candidateCols.candidate_disposition]!=='APPROVED','Only explicit approval ledger + photo gate may clear a photo: '+id);
+  if(row[candidateCols.original_candidate_url])assert(/^https:\/\//.test(row[candidateCols.original_candidate_url]),'Candidate must link original research source '+id);
+}
+console.log('PASS original-file screening queue: '+candidateRows.length+' venues; '+candidateRows.filter(row=>row[candidateCols.original_candidate_url]).length+' documented rejected candidate examples; no permissions presumed');
