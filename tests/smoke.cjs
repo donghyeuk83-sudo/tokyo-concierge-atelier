@@ -97,6 +97,8 @@ const assert=require('assert');
  await page.locator('#language').selectOption('en');
  await page.locator('#tabs [data-cat="restaurant"]').click();
  for(const id of ['r32','r34','r18','r21','r48','a36']){
+   // The sumo show is an attraction, while the other five host-building images are restaurant cards.
+   await page.locator('#tabs [data-cat="'+(id==='a36'?'attraction':'restaurant')+'"]' ).click();
    const article=page.locator('article.card').filter({has:page.locator('.detail-trigger[data-detail="'+id+'"]')});
    assert.equal(await article.locator('img[data-venue-photo="'+id+'"]').count(),1,'Licensed exterior photo visible '+id);
    assert.equal(await article.locator('a.venue-photo-source').count(),1,'Building image keeps operator-specific venue details link '+id);
