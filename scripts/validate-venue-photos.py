@@ -23,6 +23,25 @@ for venue_id, fields in metadata_entries:
     for required in ('source', 'credit', 'license', 'licenseUrl'):
         if not re.search(r'\b' + required + r':"[^"]+"', fields):
             issues.append(f"{venue_id}: missing {required} attribution field")
+    license_match = re.search(r'\blicense:"([^"]+)"', fields)
+    license_url_match = re.search(r'\blicenseUrl:"([^"]+)"', fields)
+    if license_match and license_url_match:
+        label = license_match.group(1)
+        url = license_url_match.group(1).rstrip("/")
+        accepted = {
+            "CC0 1.0": "https://creativecommons.org/publicdomain/zero/1.0",
+            "Public domain": "https://creativecommons.org/publicdomain/mark/1.0",
+            "CC BY 2.0": "https://creativecommons.org/licenses/by/2.0",
+            "CC BY 2.5": "https://creativecommons.org/licenses/by/2.5",
+            "CC BY 4.0": "https://creativecommons.org/licenses/by/4.0",
+            "CC BY-SA 2.0": "https://creativecommons.org/licenses/by-sa/2.0",
+            "CC BY-SA 3.0": "https://creativecommons.org/licenses/by-sa/3.0",
+            "CC BY-SA 4.0": "https://creativecommons.org/licenses/by-sa/4.0",
+            "CC BY-ND 2.0": "https://creativecommons.org/licenses/by-nd/2.0",
+        }
+        if label not in accepted or url != accepted[label]:
+            issues.append(f"{venue_id}: unrecognized or mismatched photo license {label} / {url}")
+
     for field in ('source', 'licenseUrl'):
         value = re.search(r'\b' + field + r':"([^"]+)"', fields)
         if value and not value.group(1).startswith("https://"):
