@@ -2,7 +2,7 @@
 
 ## Site change
 
-The established **131 venue records**, **89 image mappings**, **45 external source links**, and **42 missing-photo venues** are preserved. The existing photo filter now separately lists venue-specific photos (83 mappings) and expressly labelled host-building exterior photos (6 mappings); its all-photos and external-source options are unchanged. Translations are available in English, Japanese and Korean, including the compact iPhone select box.
+The established **131 venue records**, **89 image mappings**, **45 external source links**, and **42 missing-photo venues** are preserved. The existing photo filter now separately lists 83 existing photo cards that are not explicitly tagged as host-building exteriors, and six cards explicitly tagged as host-building exteriors; its all-photos and external-source options are unchanged. Translations are available in English, Japanese and Korean, including the compact iPhone select box.
 
 This feature concerns the *kind of subject photographed*, not an assertion that all 83 legacy photos have undergone a new independent commercial reuse clearance. Building exteriors remain correctly credited and identified in their cards.
 
