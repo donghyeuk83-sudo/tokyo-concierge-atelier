@@ -124,3 +124,34 @@ The repository README specifies **Settings → Pages → Deploy from branch → 
 - Reviewing that artifact revealed false candidate matches: r02 result is a USACE bamboo-bridge PDF (not Sushi Takeuchi); r04 results include Taiwanese temples and unrelated books (not Ten-Masa); r18 results include Mount Hangetsu and judo images (not SÉZANNE); r21 results include Manhattan streets and magazines (not The Pizza Bar on 38th); a29 results were unrelated PDFs (not Shinjuku Ninja Trick House). Their Commons licenses **do not make them photos of the listed venues**. None may be added.
 - **Publication decision:** zero additional photos passed *both* branch/location identification and file-level commercial reuse clearance in this triage. Leave the published photo registry unchanged at **83/131** and the missing-photo queue at **48/131**; continue to show existing illustrations on those cards.
 - Candidate search now uses a single precise quoted-name query per venue, image-file filtering, a minimum interval between requests and server-aware HTTP 429 retries. Its report distinguishes API failures from legitimate zero-result searches. The search is deliberately non-exhaustive and **never authorizes automated image publication**; all possible candidates still need human scrutiny of original-file attribution, licensing and exact venue identity.
+
+
+## 2026-10-19 additional Flickr/Commons photograph and permission screening
+
+Photos must show the **listed exact venue/branch**, and the original file must grant commercial reuse through CC0, compatible Creative Commons license, public-domain evidence or the copyright holder's **explicit written permission** for the hotel's guest guide. The owner keeping a photo publicly viewable or reposting it to a directory does not grant copying permission. No permission request was sent on anyone's behalf in this pass.
+
+The updated Wikimedia Commons [48-venue research job](https://github.com/donghyeuk83-sudo/tokyo-concierge-atelier/actions/runs/39251197345) returned 18 non-verified filename matches, no API lookup failures. Direct examination of the candidates rejected false venue matches including: Ten-Masa versus the Crab Nebula and unrelated textbook imagery; Seirinkan versus Seirinkan High School in Toyohashi; SÉZANNE versus the town of Sézanne, France; Ninja Trick House in Shinjuku versus the Togakushi Ninja Museum, Nagano; Sunrise Tours Japan versus a Keihan bus, not demonstrated as a Tokyo Sunrise Tours tour. None is an appropriate actual-venue photo even where a file-level CC license is present.
+
+| ID | Exact-place/photo candidate (original file) | Original-file rights finding | Decision |
+| --- | --- | --- | --- |
+| r06 | [Seirinkan margherita pizza by 雨笙/yusheng](https://www.flickr.com/photos/yusheng/6225457113), dated September 16, 2011; caption gives Kami-Meguro 2-6-4 | **All rights reserved** on original Flickr photo | Correct restaurant; seek explicit photographer permission; do not publish |
+| r06 | [Seirinkan photograph by CharleyMarley](https://www.flickr.com/photos/marley1/2399486554), dated April 3, 2008; exact street address is in file text | **All rights reserved** on original Flickr photo | Correct restaurant; do not publish |
+| r09 | [Ristorante ASO by Iyhon Chiu, Flickr 18010332130](https://www.flickr.com/photos/iyhon/18010332130), taken December 8, 2014; expressly identifies Daikanyama | **All rights reserved** on original Flickr photo | Correct restaurant; seek permission; do not publish |
+| r09 | [Ristorante ASO by Iyhon Chiu, Flickr 18181444855](https://www.flickr.com/photos/iyhon/18181444855), same restaurant/date | **All rights reserved** on original Flickr photo | Do not publish |
+| a34 | [Hirakuza Ginza Sumo Live Restaurant by Sook Hian Lee](https://www.flickr.com/photos/139088118@N05/55366420486), taken June 11, 2026; original labels the Ginza venue | **All rights reserved** on original Flickr photo | Correct venue; seek photographer permission; do not publish |
+| r02 | [Daikanyama Sushi Takeuchi by anilegna](https://www.flickr.com/photos/aktkbk/54190513826), taken December 8, 2024 | **All rights reserved** on original Flickr photo | Correct venue; do not publish |
+
+**Result for this pass:** no new file passed both exact-place and commercial-use rights clearance. Keep the current public photo registry at **83/131**, with **48** fallbacks. This does not mean every location has been exhaustively screened: the Commons query was a single-phrase screening; Flickr searches were targeted spot checks rather than a complete API license-filtered inventory.
+
+### Permanent publish gate
+
+- `audits/photo-registry-baseline.json` records the 83 photo mappings that existed before this batch, **not an assertion that each original image is independently re-cleared**.
+- `audits/photo-clearance-approvals.json` holds file-level approval evidence for **new/replaced** photo mappings. A new or changed real photo must include the original source, credit, license, evidence of commercially usable rights, source page identifying the exact facility/branch, dates and an explanatory review.
+- The browser QA workflow runs `node tests/require-photo-clearance.cjs`. It rejects new or replaced images with no explicit review record. This guards against accidental publication but **does not substitute for manually inspecting the actual source/license**.
+- In the absence of written permission or commercially reusable CC terms, request permission from the photographer or business via a channel confirmed on its original page; do not scrape, hotlink or copy the image while waiting.
+
+### Suggested photo-use permission wording
+
+**Japanese**: ホテルのコンシェルジュがお客様にご案内する東京の観光・飲食ガイドで、貴殿の写真（撮影場所・元画像URLを記載）を掲載できるか、ご許可をお願いしたくご連絡しました。ホテル業務内での商用利用、Web掲載、画像の縮小表示について、許諾範囲・必要なクレジット表記・有効期間をご教示ください。
+
+**English**: We are requesting written permission to display your identified photograph (original image URL) in a Tokyo hotel concierge guest guide, including commercial hospitality use and web publication. Please confirm permitted use, whether resizing is allowed, required attribution and any time limits. We will not reproduce the image without your approval.
