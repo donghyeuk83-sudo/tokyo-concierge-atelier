@@ -92,9 +92,15 @@ const assert=require('assert');
    assert((await page.locator('#photoTitle').textContent()).trim(),'Enlarged photo has a title');
    assert((await page.locator('#photoDialog').boundingBox()).width<=390,'Photo viewer fits mobile');
    assert.equal(await page.locator('#photoLarge').evaluate(el=>getComputedStyle(el).objectFit),'contain','Enlarged photo keeps full frame');
+   const backgroundScroll=await page.evaluate(()=>window.scrollY);
+   await page.mouse.move(3,200);
+   await page.mouse.wheel(0,600);
+   await page.waitForTimeout(150);
+   assert.equal(await page.evaluate(()=>window.scrollY),backgroundScroll,'Photo backdrop does not scroll the catalogue');
    if(language==='ja')await page.locator('#photoClose').click();else await page.keyboard.press('Escape');
    assert(!await page.locator('#photoDialog').evaluate(el=>el.open),'Photo viewer closes: '+language);
    assert(await trigger.evaluate(el=>el===document.activeElement),'Focus returns to photo button');
+   assert.notEqual(await page.evaluate(()=>getComputedStyle(document.documentElement).overflowY),'hidden','Catalogue scrolling restored after close');
  }
  await page.locator('[data-view-photo="a01"]').click();
  await page.locator('#photoLarge').evaluate(el=>el.dispatchEvent(new Event('error')));
