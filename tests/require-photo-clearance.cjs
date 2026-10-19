@@ -25,6 +25,9 @@ let newOrChanged=0;
 for(const [id,photo] of current){
   if(baseline[id]&&JSON.stringify(photo)===JSON.stringify(baseline[id]))continue;
   newOrChanged++;
+  // Official operator lists Kimono Photo Studio WA in Meguro, while the venue catalogue says Asakusa.
+  // Do not approve a photo against a misidentified location until the catalogue is reconciled.
+  assert.notEqual(id,'a32','a32 studio area mismatch (Meguro vs Asakusa) must be resolved before photo publication');
   const review=approvals.get(id);
   assert(review,'New or replaced photo '+id+' needs approval record before publication');
   for(const key of ['url','source','credit','license','licenseUrl']){
