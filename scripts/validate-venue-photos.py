@@ -16,15 +16,15 @@ entries = re.findall(r"\b([a-z]\d+):\{url:\"([^\"]+)\"", match.group(1))
 issues = []
 if not entries:
     issues.append("No displayed licensed photos found; check registry parser")
-metadata_entries = re.findall(r'\\b([a-z]\\d+):\\{([^{}]+)\\}', match.group(1))
+metadata_entries = re.findall(r'\b([a-z]\d+):\{([^{}]+)\}', match.group(1))
 if len(metadata_entries) != len(entries):
     issues.append(f"Photo registry parse mismatch: {len(metadata_entries)} objects vs {len(entries)} image URLs")
 for venue_id, fields in metadata_entries:
     for required in ('source', 'credit', 'license', 'licenseUrl'):
-        if not re.search(r'\\b' + required + r':"[^"]+"', fields):
+        if not re.search(r'\b' + required + r':"[^"]+"', fields):
             issues.append(f"{venue_id}: missing {required} attribution field")
     for field in ('source', 'licenseUrl'):
-        value = re.search(r'\\b' + field + r':"([^"]+)"', fields)
+        value = re.search(r'\b' + field + r':"([^"]+)"', fields)
         if value and not value.group(1).startswith("https://"):
             issues.append(f"{venue_id}: {field} must use HTTPS")
 ids = [key for key, _ in entries]
