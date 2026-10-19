@@ -22,6 +22,8 @@ jobs:
       - run: pip install Pillow
       - name: Fetch unique photorealistic AI images and map successful files
         run: python scripts/generate-venue-ai-images.py
+      - name: Validate generated WebP files and all 50 card links
+        run: python scripts/validate-venue-photos.py
       - name: Commit generated venue photo files
         run: |
           git config user.name "github-actions[bot]"
