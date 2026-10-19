@@ -1,0 +1,24 @@
+name: Verify Midori photo source
+on:
+  push:
+    branches: [photo-source-midori]
+permissions:
+  contents: read
+jobs:
+  original-photo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Fetch licensed unchanged original photo
+        run: |
+          curl -fLsS --retry 1 --retry-delay 5 --max-time 30 'https://live.staticflickr.com/4032/5130489292_e6f208a6a6_b.jpg' -o /tmp/midori-ginza.jpg
+          file /tmp/midori-ginza.jpg
+          sha256sum /tmp/midori-ginza.jpg
+          echo PHOTO_BYTES_BEGIN
+          base64 -w 76 /tmp/midori-ginza.jpg
+          echo PHOTO_BYTES_END
+      - uses: actions/upload-artifact@v4
+        with:
+          name: midori-licensed-original
+          path: /tmp/midori-ginza.jpg
+          retention-days: 3
