@@ -43,6 +43,37 @@ const assert=require('assert');
  const localPhotoById=new Map(localPhotos.map(photo=>[photo.id,photo]));
  const registry=html.split('const LICENSED_VENUE_PHOTOS={')[1]?.split('};')[0]||'';
  const expectedPhotos=[...registry.matchAll(/^([a-z]\d+):\{/gm)].map(m=>m[1]);
+ const publicPhotoSourceBlock=html.split('const VENUE_PHOTO_SOURCE_LINKS={')[1]?.split('};')[0]||'';
+ const externalPhotoIds=[...publicPhotoSourceBlock.matchAll(/^([a-z]\d+):\{url:/gm)].map(m=>m[1]);
+ assert.equal(externalPhotoIds.length,15,'15 external original-venue photo source references expected');
+ assert.equal(new Set(externalPhotoIds).size,15,'Duplicate external source ID');
+ const checkedPhotoRefs=[
+   ['restaurant','r18','www.fourseasons.com'],
+   ['wellness','w05','www.shimizuyu.com'],
+   ['attraction','a30','prtimes.jp'],
+   ['shopping','s15','www.jalan.net']
+ ];
+ for(const [category,id,host] of checkedPhotoRefs){
+   await page.locator('#tabs [data-cat="'+category+'"]').click();
+   const card=page.locator('article.card').filter({has:page.locator('.detail-trigger[data-detail="'+id+'"]')});
+   const link=card.locator('a.venue-photo-source');
+   assert.equal(await link.count(),1,'External original-venue image reference shown on illustration card '+id);
+   assert.equal(new URL(await link.getAttribute('href')).hostname,host,'Original-source hostname '+id);
+   assert.equal(await link.getAttribute('target'),'_blank','External source opens independently '+id);
+   assert((await link.getAttribute('rel')).includes('noopener'),'External source protects opener '+id);
+   assert.equal(await card.locator('img[data-venue-photo]').count(),0,'Original third-party photography not embedded '+id);
+   await card.locator('.detail-trigger').click();
+   const detailLink=page.locator('#detailActions .detail-photo-source');
+   assert.equal(await detailLink.count(),1,'Details expose the same photograph source '+id);
+   assert.equal(await detailLink.getAttribute('href'),await link.getAttribute('href'),'Details and card photo link agree '+id);
+   await page.locator('#detailClose').click();
+ }
+ await page.locator('#language').selectOption('ko');
+ await page.locator('#tabs [data-cat="wellness"]').click();
+ const koreanRef=page.locator('article.card').filter({has:page.locator('.detail-trigger[data-detail="w05"]')}).locator('a.venue-photo-source');
+ assert((await koreanRef.textContent()).includes('현장 사진 보기'),'Korean photo reference translation');
+ await page.locator('#language').selectOption('en');
+ assert((await page.locator('body').evaluate(el=>el.scrollWidth))<=405,'Photo-source links do not overflow iPhone viewport');
  assert(expectedPhotos.length>=24,'Photo registry unexpectedly shrank');
 
  // Structural metadata checks catch mismatched Wikimedia filenames and missing attribution.
