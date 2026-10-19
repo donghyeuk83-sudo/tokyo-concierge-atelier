@@ -66,6 +66,8 @@ MORE_PROMPTS={
 PROMPTS.update({k:'Photorealistic editorial travel photography, '+v+', authentic details, natural light, no logos, no text, distinct composition' for k,v in MORE_PROMPTS.items()})
 \nhtml=HTML.read_text()
 changed=[]
+failed=[]
+existing_hashes={hashlib.sha256(p.read_bytes()).hexdigest() for p in OUT.glob('ai-unique-*.webp')}
 for i,(id,prompt) in enumerate(PROMPTS.items()):
     target=OUT/f'ai-unique-{id}.webp'
     if not target.exists():
@@ -78,7 +80,13 @@ for i,(id,prompt) in enumerate(PROMPTS.items()):
             im=Image.open(BytesIO(data)); im.load()
             if im.width<320 or im.height<240: raise ValueError('image too small')
             im.convert('RGB').save(target,'WEBP',quality=80,method=5)
+            fingerprint=hashlib.sha256(target.read_bytes()).hexdigest()
+            if fingerprint in existing_hashes:
+                target.unlink()
+                raise ValueError('duplicate generated image')
+            existing_hashes.add(fingerprint)
         except Exception as e:
+            failed.append(id)
             print('Skipped',id,type(e).__name__,str(e)[:120],flush=True)
             continue
     old='ai-sushi-concept.webp' if id in ('r01','r38','r39','r40','r41','r42','r43','r44') else 'tsukiji-sushi.webp'
@@ -92,4 +100,4 @@ for i,(id,prompt) in enumerate(PROMPTS.items()):
     time.sleep(0.3)
 if changed:
     HTML.write_text(html)
-print(json.dumps({'changed':changed,'total':len(changed)}))
+print(json.dumps({'changed':changed,'total':len(changed),'failed':failed,'remaining':sum(not (OUT/f'ai-unique-{id}.webp').exists() for id in PROMPTS)},ensure_ascii=False))
