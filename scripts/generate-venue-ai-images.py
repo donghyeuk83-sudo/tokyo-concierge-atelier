@@ -3,7 +3,7 @@
 Only publishes successfully downloaded, valid, non-duplicate raster images.
 Never claims AI art is a real photograph of a venue.
 """
-import hashlib, json, os, pathlib, time, urllib.parse, urllib.request
+import hashlib, json, os, pathlib, time, urllib.parse, urllib.request, random
 from io import BytesIO
 from PIL import Image
 ROOT=pathlib.Path(__file__).resolve().parents[1]
@@ -75,10 +75,11 @@ for i,(id,prompt) in enumerate(PROMPTS.items()):
         url=f'https://image.pollinations.ai/prompt/{query}?width=640&height=480&seed={20261019+i}&nologo=true&model=flux'
         try:
             req=urllib.request.Request(url,headers={'User-Agent':'TokyoConciergeAtelier/1.0'})
-            with urllib.request.urlopen(req,timeout=45) as resp:
+            with urllib.request.urlopen(req,timeout=20) as resp:
                 data=resp.read(6_000_000)
             im=Image.open(BytesIO(data)); im.load()
             if im.width<320 or im.height<240: raise ValueError('image too small')
+            if im.format not in ('JPEG','PNG','WEBP'): raise ValueError('unsupported image format')
             im.convert('RGB').save(target,'WEBP',quality=80,method=5)
             fingerprint=hashlib.sha256(target.read_bytes()).hexdigest()
             if fingerprint in existing_hashes:
@@ -97,7 +98,7 @@ for i,(id,prompt) in enumerate(PROMPTS.items()):
     if not re.search(re.escape(new),html):
         html=re.sub(pat,id+':{url:\x27'+new+'\x27}',html,count=1)
         changed.append(id)
-    time.sleep(0.3)
+    time.sleep(0.15)
 if changed:
     HTML.write_text(html)
 print(json.dumps({'changed':changed,'total':len(changed),'failed':failed,'remaining':sum(not (OUT/f'ai-unique-{id}.webp').exists() for id in PROMPTS)},ensure_ascii=False))
