@@ -28,19 +28,19 @@ for venue_id, fields in metadata_entries:
         if value and not value.group(1).startswith("https://"):
             issues.append(f"{venue_id}: {field} must use HTTPS")
 # Every licensed photo must point to an actual card in the published DATA registry.
-data_match = re.search(r"const DATA=\\[(.*?)\\]\\.map\\(", html, re.S)
+data_match = re.search(r"const DATA=\[(.*?)\]\.map\(", html, re.S)
 if not data_match:
-    # The array is transformed later in the same statement in some builds.
-    data_match = re.search(r"const DATA=\\[(.*?)\\];", html, re.S)
+    data_match = re.search(r"const DATA=\[(.*?)\];", html, re.S)
 if not data_match:
     issues.append("Could not locate venue DATA registry")
 else:
-    venue_ids = set(re.findall(r'\\["([a-z]\\d+)",\\s*"(?:restaurant|attraction|experience|beauty|event|transport)', data_match.group(1)))
+    venue_ids = set(re.findall(r'\["([a-z]\d+)",', data_match.group(1)))
     if not venue_ids:
-        venue_ids = set(re.findall(r'\\["([a-z]\\d+)",', data_match.group(1)))
+        issues.append("No venue IDs parsed from DATA registry")
     for venue_id, _ in entries:
         if venue_id not in venue_ids:
             issues.append(f"{venue_id}: photo does not match any published venue card")
+
 ids = [key for key, _ in entries]
 if len(ids) != len(set(ids)):
     issues.append("Duplicate licensed venue IDs")
