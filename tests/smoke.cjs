@@ -28,7 +28,7 @@ const assert=require('assert');
  assert.equal(await page.locator('#cards .card-photo-label').filter({hasText:'BUILDING EXTERIOR'}).count(),0,'Venue-specific photo filter excludes host building exteriors');
  await page.locator('#photoFilter').selectOption('building');
  const exteriorCount=await page.locator('#cards .card').count();
- assert.equal(exteriorCount,5,'Five restaurant cards have licensed host-building exteriors');
+ assert.equal(exteriorCount,6,'Six restaurant cards have verified host-building exterior photo contexts');
  assert.equal(await page.locator('#cards .card-photo-label').filter({hasText:'BUILDING EXTERIOR'}).count(),exteriorCount,'Building exterior filter does not mix venue photos');
  await page.locator('#language').selectOption('ja');
  assert.equal(await page.locator('#photoFilter').inputValue(),'building','Exterior filter selection survives Japanese language switch');
@@ -141,8 +141,8 @@ const assert=require('assert');
  assert.equal(expectedPhotos.length,89,'Expected 89 original images including six licensed host-building exteriors');
  // Six of the 89 mapped photos depict host shopping/hotel buildings, not the venue itself.
  const photoContextBlock=html.split('const VENUE_PHOTO_CONTEXT={')[1]?.split('};')[0]||'';
- const buildingPhotoIds=[...photoContextBlock.matchAll(/^([a-z]\d+):\{kind:"building"/gm)].map(m=>m[1]);
- assert.deepEqual(buildingPhotoIds.slice().sort(),['r18','r21','r32','r34','r48','a36'].sort(),'Six explicitly labelled host-building exteriors');
+ const buildingPhotoIds=[...photoContextBlock.matchAll(/^([a-z]\d+):\{([^\n]+)\}/gm)].filter(m=>!m[2].includes('kind:"venue"')).map(m=>m[1]);
+ assert.deepEqual(buildingPhotoIds.slice().sort(),['r18','r21','r32','r34','r48','a36','r30','w02','w07'].sort(),'Nine photograph labels accurately identify host-building exteriors');
 
  for(const [id,filename] of [['r32','Shibuya_Parco.jpg'],['r34','Omotesando-Harajuku-Tokyo---2024-06-15_010.jpg'],['r18','Pacific Century Place Marunouchi.jpg'],['r21','Nihonbashi Mitsui Tower @ Nihonbashi (9044324513).jpg'],['r48','新大手町ビル.jpg'],['a36','Ginza INZ.jpg']]){
    assert(expectedPhotos.includes(id),'Missing newly licensed building exterior image for '+id);

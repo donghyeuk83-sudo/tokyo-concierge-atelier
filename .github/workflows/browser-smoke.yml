@@ -2,6 +2,8 @@ name: Browser smoke QA
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 # A newer main push supersedes older Pages revisions. Avoid stale jobs racing deployment.
 concurrency:
@@ -40,6 +42,7 @@ jobs:
       - name: Test repository HTML in Chromium
         run: node tests/smoke.cjs
       - name: Wait for current revision on GitHub Pages
+        if: github.event_name != 'pull_request'
         id: pages_ready
         env:
           LIVE_URL: https://donghyeuk83-sudo.github.io/tokyo-concierge-atelier/

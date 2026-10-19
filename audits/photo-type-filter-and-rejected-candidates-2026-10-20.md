@@ -18,3 +18,7 @@ The 42 pending venues require more original-file and precise-branch research. Th
 ## GitHub Actions condition
 
 At the start of this task, the latest commit 076c186's Pages and Chromium jobs were queued. The older 960e8b5 local Chromium check passed but its public-revision wait failed when its Pages deploy was cancelled. Do not claim public Pages/Chromium success for this feature until GitHub Actions actually completes.
+
+## Resolved live Chromium regression
+
+The earlier main-branch smoke test caught one misclassified restaurant exterior. PR-specific Chromium diagnostic logging identified venue r30 (a Kura Sushi host-building/street picture). Inspecting all context entries revealed w02 and w07 were subject to the same mismatch. The new shared isBuildingExteriorPhoto() predicate drives filter, card badge, accessible alt text and large-photo viewer labels consistently. Local PR-specific smoke tests must pass before merging this fix.
