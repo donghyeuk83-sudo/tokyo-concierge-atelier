@@ -985,6 +985,7 @@ const sparkle='<circle cx="'+(18+n1)+'" cy="'+(15+n3)+'" r="'+(4+identity%7)+'" 
 function currentVenueLocation(r){return r.id==="a32"?"着物フォトスタジオ和 東京都品川区上大崎2-24-13 目黒西口マンション1号館804":r.ja+" "+r.area+" Tokyo"}
 function hotelDirections(r,mode){return "https://www.google.com/maps/dir/?api=1&origin="+encodeURIComponent("The Westin Tokyo, 1-4-1 Mita, Meguro City, Tokyo")+"&destination="+encodeURIComponent(currentVenueLocation(r))+"&travelmode="+encodeURIComponent(mode)}
 const VENUE_ALERTS={
+r52:{en:"PRIVATE / INVITATION-ONLY REPORTED: A September 2026 guest review describes a members-only venue. Public photos are not available on its exact Tabelog listing. Do not promise guest bookings or display another restaurant’s photos.",ja:"【紹介制との報告】2026年9月の口コミで会員紹介制と記載。該当店舗の食べログ掲載写真はありません。予約可能と案内したり、別店舗の写真を使わないでください。",ko:"【회원 초대제라는 방문 후기】2026년 9월 후기에서 회원 전용으로 설명. 해당 점포의 타베로그 사진은 없습니다. 신규 예약 가능하다고 안내하거나 다른 식당 사진을 사용하지 마세요."},
 a32:{en:"LOCATION CORRECTION: The studio is at 2-24-13 Kamiosaki, Shinagawa-ku, 8F Room 804, near Meguro Station — NOT Asakusa. Map and hotel directions use the confirmed address.",ja:"所在地訂正：スタジオは浅草ではなく、目黒駅近くの東京都品川区上大崎2-24-13・目黒西口マンション1号館804号室です。地図・ホテルからの経路は正しい住所を使用します。",ko:"위치 정정: 스튜디오는 아사쿠사가 아닌 메구로역 인근 도쿄도 시나가와구 가미오사키 2-24-13, 메구로 니시구치 맨션 1호관 804호입니다. 지도와 호텔 출발 경로에 이 주소를 적용했습니다."},
 r31:{en:"PERMANENTLY CLOSED September 30, 2026 · Do not recommend",ja:"2026年9月30日閉店 · ご案内不可",ko:"2026년 9월 30일 폐점 · 추천 금지"},
 s16:{en:"PERMANENT CLOSURE after November 15, 2026",ja:"2026年11月15日営業終了",ko:"2026년 11월 15일 영업 종료"},
@@ -995,6 +996,7 @@ a43:{en:"CLOSED October 1, 2026–April 22, 2027",ja:"2026年10月1日～2027年
 };
 /* External source pages show actual venue material without copying their photographs. */
 const VENUE_PHOTO_SOURCE_LINKS={
+a32:{url:"https://www.kimono-wa.com/en/",kind:"operator"},
 r42:{url:"https://tabelog.com/tokyo/A1303/A130302/13015656/dtlphotolst/smp2/",kind:"listing"},
 r05:{url:"https://www.kusunoki-official.co.jp/store/",kind:"operator"},
 a37:{url:"https://wabunka-lux.jp/tokyo/",kind:"operator"},
