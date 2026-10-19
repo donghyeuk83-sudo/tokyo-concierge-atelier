@@ -72,8 +72,10 @@ attempted=0
 MAX_NEW_PER_RUN=12
 # Retry missing images first; never overwrite an already published unique concept.
 existing_hashes={hashlib.sha256(p.read_bytes()).hexdigest() for p in OUT.glob('ai-unique-*.webp')}
+processed=set()
 for i,(id,prompt) in enumerate(sorted(PROMPTS.items(),key=lambda pair: (OUT/f'ai-unique-{pair[0]}.webp').exists())):
     target=OUT/f'ai-unique-{id}.webp'
+    processed.add(id)
     if not target.exists():
         if attempted>=MAX_NEW_PER_RUN: continue
         attempted+=1
@@ -143,5 +145,5 @@ for i,(id,prompt) in enumerate(sorted(PROMPTS.items(),key=lambda pair: (OUT/f'ai
         changed.append(id)
     time.sleep(0.15)
 if changed:
-    HTML.write_text(html)
+    HTML.write_text(html,encoding='utf-8')
 print(json.dumps({'changed':changed,'total':len(changed),'failed':failed,'remaining':sum(not (OUT/f'ai-unique-{id}.webp').exists() for id in PROMPTS),'attempted':attempted},ensure_ascii=False))
