@@ -18,6 +18,8 @@ jobs:
         run: |
           node tests/photo-queue.cjs
           git diff --exit-code -- audits/missing-photo-queue.csv
+      - name: Block unreviewed new or replaced real venue photos
+        run: node tests/require-photo-clearance.cjs
       - name: Audit all 131 venue records and photo provenance
         run: node tests/audit-venues.cjs
       - name: Check reachability of 131 venue URLs
