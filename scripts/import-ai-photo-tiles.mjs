@@ -13,8 +13,9 @@ for(const [id,file] of Object.entries(mapping)){
  if(bytes.toString('ascii',0,4)!=='RIFF'||bytes.toString('ascii',8,12)!=='WEBP')throw Error('Not WebP: '+file);
  fs.copyFileSync(source,target);
  const entry=new RegExp(id+":\\{url:'[^']+'\\}");
- if(!entry.test(html.split('const AI_VENUE_VISUALS={')[1].split('};')[0]))throw Error('Missing AI mapping '+id);
- html=html.replace(entry,id+":{url:'"+target+"'}");
+ const registry=html.split('const AI_VENUE_VISUALS={')[1].split('};')[0];
+ if(entry.test(registry)) html=html.replace(entry,id+":{url:'"+target+"'}");
+ else html=html.replace('const AI_VENUE_VISUALS={','const AI_VENUE_VISUALS={'+id+":{url:'"+target+"'},");
  console.log(id+' -> '+target+' ('+bytes.length+' bytes)');
 }
 fs.writeFileSync('index.html',html);
