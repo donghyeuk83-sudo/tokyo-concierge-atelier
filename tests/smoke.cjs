@@ -142,6 +142,27 @@ const assert=require('assert');
  const externalPhotoIds=[...publicPhotoSourceBlock.matchAll(/^([a-z]\d+):\{url:/gm)].map(m=>m[1]);
  assert.equal(externalPhotoIds.length,46,'46 original venue photo/information links expected');
  assert.equal(new Set(externalPhotoIds).size,externalPhotoIds.length,'Duplicate external source ID');
+ // Every new source is an independently verified exact-branch gallery, not a photo reuse permission.
+ const galleryPaths={
+   r04:'/tokyo/A1317/A131701/13147445/dtlphotolst/smp2/',
+   r05:'/tokyo/A1317/A131701/13304124/dtlphotolst/smp2/',
+   r08:'/tokyo/A1317/A131701/13021093/dtlphotolst/4/smp2/',
+   r39:'/tokyo/A1303/A130302/13310768/dtlphotolst/smp2/',
+   r40:'/tokyo/A1307/A130703/13149832/dtlphotolst/4/smp2/',
+   r41:'/tokyo/A1303/A130302/13260579/dtlphotolst/4/smp2/',
+   r43:'/tokyo/A1303/A130302/13286155/dtlphotolst/1/smp2/',
+   r44:'/ebisu/about/',
+   r51:'/tokyo/A1302/A130202/13219884/dtlphotolst/smp2/'
+ };
+ for(const [id,expectedPath] of Object.entries(galleryPaths)){
+   const match=publicPhotoSourceBlock.match(new RegExp('^'+id+':\\{url:"([^"]+)",kind:"(listing|operator)"\\}', 'm'));
+   assert(match,'Venue '+id+' retains an externally linked original-source entry');
+   const url=new URL(match[1]);
+   assert.equal(url.pathname,expectedPath,'Exact venue and gallery path for '+id);
+   assert.equal(match[2],id==='r44'?'operator':'listing','Accurate published origin type '+id);
+   assert(!expectedPhotos.includes(id),'Uncleared image cannot be introduced into published photo registry '+id);
+ }
+
  await page.locator('#language').selectOption('en'); // Exercise English provenance labels first; Korean separately below.
  const checkedPhotoRefs=[
    ['restaurant','r06','tabelog.com'],
