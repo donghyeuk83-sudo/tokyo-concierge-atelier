@@ -78,6 +78,32 @@ const assert=require('assert');
  assert(!await page.locator('#detailDialog').evaluate(el=>el.open),'dialog close');
  await page.setViewportSize({width:390,height:844});
  assert((await page.locator('body').evaluate(el=>el.scrollWidth))<=405,'mobile horizontal overflow');
+ // iPhone quick photo shortcuts keep the full photo filter in sync and do not imply
+ // that a shopping building exterior is the interior of the listed restaurant.
+ const quickButtons=page.locator('#photoQuickbar button[data-photo-quick]');
+ assert.equal(await quickButtons.count(),4,'Four one-tap photo browsing choices on mobile');
+ assert(await page.locator('#photoQuickbar').isVisible(),'Quick photo shortcuts visible on iPhone');
+ const quickVenue=page.locator('#photoQuickbar [data-photo-quick="venue"]');
+ await quickVenue.click();
+ assert.equal(await page.locator('#photoFilter').inputValue(),'venue','Venue-only chip sets photo filter select');
+ assert.equal(await quickVenue.getAttribute('aria-pressed'),'true','Active chip announced accessibly');
+ assert.equal(await page.locator('#cards .card-photo-label').filter({hasText:'BUILDING EXTERIOR'}).count(),0,'Venue photo shortcut hides building exteriors');
+ await page.locator('#photoQuickbar [data-photo-quick="building"]').click();
+ assert.equal(await page.locator('#photoFilter').inputValue(),'building','Building-exterior chip filters correctly');
+ const actualBuildingCards=await page.locator('#cards .card').count();
+ assert.equal(actualBuildingCards,6,'Six restaurant cards depict their verified building exteriors');
+ await page.locator('#photoQuickbar [data-photo-quick="source"]').click();
+ const sourceOnlyCount=await page.locator('#cards .card').count();
+ assert(sourceOnlyCount>0,'Photo source chip returns gallery-linked venues');
+ assert.equal(await page.locator('#cards .venue-photo-source').count(),sourceOnlyCount,'Photo source chip shows only source-linked venues');
+ await page.locator('#photoQuickbar [data-photo-quick="all"]').click();
+ assert.equal(await page.locator('#photoFilter').inputValue(),'all','All places chip resets photo mode');
+ await page.locator('#language').selectOption('ko');
+ assert.equal(await page.locator('#photoQuickbar [data-photo-quick="source"]').textContent(),'사진·자료 링크','Quick shortcuts translate into Korean');
+ assert.equal(await page.locator('#photoQuickbar [data-photo-quick="all"]').getAttribute('aria-pressed'),'true','Language switch retains active filter status');
+ assert((await page.locator('#photoQuickbar').evaluate(el=>el.scrollWidth))>=0,'Quick photo chips have contained horizontal scrolling');
+ assert((await page.locator('body').evaluate(el=>el.scrollWidth))<=405,'Photo shortcuts do not cause horizontal page overflow');
+
  const filterHeight=await page.locator('#photoFilter').evaluate(el=>el.getBoundingClientRect().height);
  assert(filterHeight>=44,'Photo filter is finger-friendly on iPhone');
 
@@ -111,6 +137,7 @@ const assert=require('assert');
    assert.equal(new URL(await link.getAttribute('href')).hostname,host,'Original-source hostname '+id);
    if(id==='r06')assert.equal(new URL(await link.getAttribute('href')).pathname,'/tokyo/A1317/A131701/13003188/dtlphotolst/4/smp2/','Seirinkan reference links directly to genuine Nakameguro exterior photographs');
 
+   const provenance=(await link.locator('small').textContent());assert(provenance.includes(id==='r06'?'Independent photo listing':id==='s15'?'Independent photo listing':'Venue / operator website')||id==='a30','Source clearly identifies its official or third-party nature '+id);
    assert.equal(await link.getAttribute('target'),'_blank','External source opens independently '+id);
    assert((await link.getAttribute('rel')).includes('noopener'),'External source protects opener '+id);
    assert.equal(await card.locator('img[data-venue-photo]').count(),0,'Original third-party photography not embedded '+id);
