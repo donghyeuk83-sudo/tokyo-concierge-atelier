@@ -16,6 +16,25 @@ const assert=require('assert');
  assert.equal(await page.locator('.card').count(),0,'empty search');
  await page.locator('#query').fill('');
  for(const l of ['ja','ko','en']){await page.locator('#language').selectOption(l);assert.equal(await page.locator('html').getAttribute('lang'),l,'language '+l)}
+ // Photo-first guest browsing: show only illustrated/reviewed photo cards or external venue sources.
+ await page.locator('#photoFilter').selectOption('photo');
+ const photoCards=await page.locator('#cards .card').count();
+ assert(photoCards>0,'Photo-only filter returns venue cards in restaurant category');
+ assert.equal(await page.locator('#cards img[data-venue-photo]').count(),photoCards,'Photo-only filter excludes illustrated venues');
+ await page.locator('#language').selectOption('ko');
+ assert.equal(await page.locator('#photoFilter').inputValue(),'photo','Photo filter persists when switching to Korean');
+ assert((await page.locator('#photoFilter option:checked').textContent()).includes('실제 사진 카드'),'Korean photo filter label');
+ await page.locator('#photoFilter').selectOption('source');
+ const sourceCards=await page.locator('#cards .card').count();
+ assert(sourceCards>0,'Original-source-only filter returns venues');
+ assert.equal(await page.locator('#cards a.venue-photo-source').count(),sourceCards,'Source filter excludes cards without external venue links');
+ const ebisuShop=page.locator('article.card').filter({has:page.locator('.detail-trigger[data-detail="r42"]')});
+ assert.equal(await ebisuShop.locator('a.venue-photo-source').count(),1,'Exact Bikkuri Sushi Ebisu photo gallery link shown');
+ assert.equal(new URL(await ebisuShop.locator('.venue-photo-source').getAttribute('href')).pathname,'/tokyo/A1303/A130302/13015656/dtlphotolst/smp2/','Bikkuri Sushi Ebisu link points to its exact photo gallery');
+ assert.equal(await ebisuShop.locator('img[data-venue-photo]').count(),0,'Do not embed copyright-unverified shop photos');
+ await page.locator('#resetFilters').click();
+ assert.equal(await page.locator('#photoFilter').inputValue(),'all','Reset clears photo filter too');
+ await page.locator('#language').selectOption('en');
  await page.locator('.card button[data-id]').first().click();
  assert((await page.locator('#guide .guide-item').count())>0,'shortlist add');
  await page.locator('#share').click();
@@ -31,6 +50,9 @@ const assert=require('assert');
  assert(!await page.locator('#detailDialog').evaluate(el=>el.open),'dialog close');
  await page.setViewportSize({width:390,height:844});
  assert((await page.locator('body').evaluate(el=>el.scrollWidth))<=405,'mobile horizontal overflow');
+ const filterHeight=await page.locator('#photoFilter').evaluate(el=>el.getBoundingClientRect().height);
+ assert(filterHeight>=44,'Photo filter is finger-friendly on iPhone');
+
  await page.locator('#language').selectOption('ko');
  await page.locator('#query').fill('도쿄도 사진미술관');
  await page.locator('#tabs [data-cat="attraction"]').click();
@@ -45,7 +67,7 @@ const assert=require('assert');
  const expectedPhotos=[...registry.matchAll(/^([a-z]\d+):\{/gm)].map(m=>m[1]);
  const publicPhotoSourceBlock=html.split('const VENUE_PHOTO_SOURCE_LINKS={')[1]?.split('};')[0]||'';
  const externalPhotoIds=[...publicPhotoSourceBlock.matchAll(/^([a-z]\d+):\{url:/gm)].map(m=>m[1]);
- assert.equal(externalPhotoIds.length,44,'44 original venue photo/information links expected');
+ assert.equal(externalPhotoIds.length,45,'45 original venue photo/information links expected');
  assert.equal(new Set(externalPhotoIds).size,externalPhotoIds.length,'Duplicate external source ID');
  const checkedPhotoRefs=[
    ['restaurant','r06','tabelog.com'],
