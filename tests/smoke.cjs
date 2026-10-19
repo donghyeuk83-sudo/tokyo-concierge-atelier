@@ -48,7 +48,7 @@ const assert=require('assert');
  assert.equal(externalPhotoIds.length,44,'44 original venue photo/information links expected');
  assert.equal(new Set(externalPhotoIds).size,externalPhotoIds.length,'Duplicate external source ID');
  const checkedPhotoRefs=[
-   ['restaurant','r18','www.fourseasons.com'],
+   ['restaurant','r06','tabelog.com'],
    ['wellness','w05','www.shimizuyu.com'],
    ['attraction','a30','prtimes.jp'],
    ['shopping','s15','www.jalan.net']
