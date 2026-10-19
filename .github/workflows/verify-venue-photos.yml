@@ -21,5 +21,5 @@ jobs:
           python-version: '3.11'
       - name: Install image verification dependency
         run: python -m pip install Pillow
-      - name: Validate all 50 published venue photos
+      - name: Validate currently displayed licensed venue photos
         run: python scripts/validate-venue-photos.py
