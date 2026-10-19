@@ -35,6 +35,11 @@ const assert=require('assert');
  await page.locator('#resetFilters').click();
  assert.equal(await page.locator('#photoFilter').inputValue(),'all','Reset clears photo filter too');
  await page.locator('#language').selectOption('en');
+ // Do not send guests to an outdated Asakusa address when the studio itself lists Meguro.
+ await page.locator('#tabs [data-cat="attraction"]').click();
+ const studioWA=page.locator('article.card').filter({has:page.locator('.detail-trigger[data-detail="a32"]')});
+ assert((await studioWA.locator('.venue-alert').textContent()).includes('Meguro'),'Kimono Studio WA location discrepancy is clearly disclosed');
+ await page.locator('#tabs [data-cat="restaurant"]').click();
  await page.locator('.card button[data-id]').first().click();
  assert((await page.locator('#guide .guide-item').count())>0,'shortlist add');
  await page.locator('#share').click();
