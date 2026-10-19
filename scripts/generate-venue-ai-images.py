@@ -69,8 +69,9 @@ changed=[]
 failed=[]
 attempted=0
 MAX_NEW_PER_RUN=12
+# Retry missing images first; never overwrite an already published unique concept.
 existing_hashes={hashlib.sha256(p.read_bytes()).hexdigest() for p in OUT.glob('ai-unique-*.webp')}
-for i,(id,prompt) in enumerate(PROMPTS.items()):
+for i,(id,prompt) in enumerate(sorted(PROMPTS.items(),key=lambda pair: (OUT/f'ai-unique-{pair[0]}.webp').exists())):
     target=OUT/f'ai-unique-{id}.webp'
     if not target.exists():
         if attempted>=MAX_NEW_PER_RUN: continue
