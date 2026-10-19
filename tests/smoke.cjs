@@ -123,6 +123,7 @@ const assert=require('assert');
  const externalPhotoIds=[...publicPhotoSourceBlock.matchAll(/^([a-z]\d+):\{url:/gm)].map(m=>m[1]);
  assert.equal(externalPhotoIds.length,45,'45 original venue photo/information links expected');
  assert.equal(new Set(externalPhotoIds).size,externalPhotoIds.length,'Duplicate external source ID');
+ await page.locator('#language').selectOption('en'); // Exercise English provenance labels first; Korean separately below.
  const checkedPhotoRefs=[
    ['restaurant','r06','tabelog.com'],
    ['wellness','w05','www.shimizuyu.com'],
@@ -151,6 +152,7 @@ const assert=require('assert');
  await page.locator('#tabs [data-cat="wellness"]').click();
  const koreanRef=page.locator('article.card').filter({has:page.locator('.detail-trigger[data-detail="w05"]')}).locator('a.venue-photo-source');
  assert((await koreanRef.textContent()).includes('현장 사진·시설 보기'),'Korean photo source link translation');
+ assert((await koreanRef.locator('small').textContent()).includes('시설·운영사 홈페이지'),'Korean provenance label is correctly localized');
  await page.locator('#language').selectOption('en');
  assert((await page.locator('body').evaluate(el=>el.scrollWidth))<=405,'Photo-source links do not overflow iPhone viewport');
  // Minimum tap target and readable attribution on narrow iPhone screens.
