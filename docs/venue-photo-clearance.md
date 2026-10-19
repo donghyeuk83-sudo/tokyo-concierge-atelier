@@ -6,8 +6,8 @@ Current source registry: 131 cards, 81 uniquely mapped photographic entries, 50 
 
 | Venue ID | Target | Candidate evidence | Reuse clearance | Next action |
 | --- | --- | --- | --- | --- |
-| r06 | Seirinkan, Nakameguro | [Flickr photograph by yusheng](https://www.flickr.com/photos/yusheng/6225457113), caption says Seirinkan and 2-6-4 Kami-Meguro | **REJECTED**: source displays All rights reserved | Ask photographer for permission or locate a separately CC-licensed, venue-matched photo |
-| r09 | Ristorante ASO, Daikanyama | [Operator's venue page](https://www.hiramatsurestaurant.jp/smp/eng/aso/) identifies restaurant | **NOT CLEARED**: venue verification does not license the site's photos | Find Commons/Flickr image with explicit commercial reuse license and exact venue identification |
+| r06 | Seirinkan, Nakameguro | [Japan Travel venue photograph by Dennis Amith](https://en.japantravel.com/guide/tokyo-s-top-rated-pizza-restaurants/68889) and [Flickr photograph by yusheng](https://www.flickr.com/photos/yusheng/6225457113) | **REJECTED**: the former is CC BY-NC 2.0 (noncommercial only); the latter is All rights reserved | Obtain photographer permission or find a commercially reusable, venue-matched CC file |
+| r09 | Ristorante ASO, Daikanyama | [Exact venue Flickr photograph by Iyhon Chiu](https://www.flickr.com/photos/iyhon/18181444855), dated 2014 | **REJECTED**: the original Flickr file states *All rights reserved* | Obtain explicit photographer permission or find a CC-licensed image of the same restaurant |
 | r37 | Kura Sushi Oshiage | [Kura Sushi chain information](https://www.kurasushi.co.jp/) | **NOT CLEARED**: images of other branches cannot represent Oshiage | Require Oshiage branch-specific evidence and file license |
 | r48 | NINJA TOKYO, Otemachi | [Official venue site](https://ninja-tokyo.jp/) identifies restaurant | **NOT CLEARED**: photos from the restaurant site have no confirmed reuse grant | Seek a suitably licensed Otemachi venue photograph |
 | w05 | Musashi-Koyama Onsen Shimizuyu | [Tokyo Sento Association venue page](https://www.1010.or.jp/map-en/item/item-cnt-417) identifies 3-9-1 Koyama | **NOT CLEARED**: venue-page photography has no confirmed CC license | Seek photographer-granted reuse or CC image of the exact bathhouse |
@@ -19,6 +19,12 @@ Current source registry: 131 cards, 81 uniquely mapped photographic entries, 50 
 2. Open the **file-specific** license declaration (Commons/Flickr). Record creator and original URL. Exclude 'All rights reserved', unknown terms and unsupported use permissions.
 3. Use a direct HTTPS image URL and preserve its original file page, author, license label and license URL in the registry. Avoid reusing a single photo across unrelated venues.
 4. Run `python scripts/validate-venue-photos.py`, then verify the GitHub Actions audit and published site; distinguish successful source commit from verified deployment.
+
+## Latest review (2026-10-19)
+
+- Public Pages URL could not be retrieved from the external verification environment. This is **not proof** that Pages is disabled; inspect the Actions **GitHub Pages diagnostics** step and repository Settings → Pages.
+- The Actions diagnostics now compare the checked-out `index.html` SHA256 with the public page body, when HTTP 200. An unequal hash can indicate a stale deploy, incorrect source, or HTML transformation; investigate before concluding deployment is broken.
+- CC BY-NC images are not accepted for the concierge site's general use. A photo of Daikanyama generally cannot be substituted for a photograph of Ristorante ASO specifically.
 
 ## GitHub Pages verification
 
