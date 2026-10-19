@@ -141,7 +141,7 @@ const assert=require('assert');
  assert.equal(expectedPhotos.length,89,'Expected 89 original images including six licensed host-building exteriors');
  // Six of the 89 mapped photos depict host shopping/hotel buildings, not the venue itself.
  const photoContextBlock=html.split('const VENUE_PHOTO_CONTEXT={')[1]?.split('};')[0]||'';
- const buildingPhotoIds=[...photoContextBlock.matchAll(/^([a-z]\\d+):\\{kind:"building"/gm)].map(m=>m[1]);
+ const buildingPhotoIds=[...photoContextBlock.matchAll(/^([a-z]\d+):\{kind:"building"/gm)].map(m=>m[1]);
  assert.deepEqual(buildingPhotoIds.slice().sort(),['r18','r21','r32','r34','r48','a36'].sort(),'Six explicitly labelled host-building exteriors');
 
  for(const [id,filename] of [['r32','Shibuya_Parco.jpg'],['r34','Omotesando-Harajuku-Tokyo---2024-06-15_010.jpg'],['r18','Pacific Century Place Marunouchi.jpg'],['r21','Nihonbashi Mitsui Tower @ Nihonbashi (9044324513).jpg'],['r48','新大手町ビル.jpg'],['a36','Ginza INZ.jpg']]){
