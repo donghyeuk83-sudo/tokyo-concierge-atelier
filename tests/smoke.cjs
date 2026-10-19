@@ -109,8 +109,10 @@ const assert=require('assert');
  assert.equal(await page.locator('#photoQuickbar [data-photo-quick="all"]').getAttribute('aria-pressed'),'true','Language switch retains active filter status');
  assert.equal(await page.locator('#photoQuickbar [data-photo-quick="all"]').getAttribute('aria-label'),'전체: '+initialCount,'Accessible all filter count translated to Korean');
  await page.locator('#query').fill('NO_SUCH_PLACE_12345');
- assert((await page.locator('#photoQuickbar [data-photo-quick="venue"]').textContent()).includes('(0)'),'Photo totals recalculate after search change');
+ await page.waitForFunction(()=>document.querySelector('#photoQuickbar [data-photo-quick="venue"]').textContent.includes('(0)'),null,{timeout:5000});
+ assert((await page.locator('#photoQuickbar [data-photo-quick="venue"]').textContent()).includes('(0)'),'Photo totals recalculate after debounced search');
  await page.locator('#query').fill('');
+ await page.waitForFunction(()=>document.querySelector('#photoQuickbar [data-photo-quick="all"]').textContent.includes('('+document.querySelectorAll('#cards .card').length+')'),null,{timeout:5000});
 
  assert((await page.locator('#photoQuickbar').evaluate(el=>el.scrollWidth))>=0,'Quick photo chips have contained horizontal scrolling');
  assert((await page.locator('body').evaluate(el=>el.scrollWidth))<=405,'Photo shortcuts do not cause horizontal page overflow');
