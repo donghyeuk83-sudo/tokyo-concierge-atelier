@@ -74,6 +74,8 @@ function startLocalServer(){
   // Verify the actual generated file BYTES and a visible human-tappable fallback,
   // not merely that Chromium's automatic download event happens in WebKit.
   const dl=page.waitForEvent('download',{timeout:3500}).catch(()=>null);
+  assert(await page.locator('#download').evaluate(el=>typeof el.onclick==='function'),'CSV export button must have registered click handler in WebKit');
+  const errorsBefore=jsErrors.length;
   await page.locator('#download').click();
   const fallback=page.locator('#csvDirectDownload');
   // A scripted Blob click must NOT navigate iOS Safari away from the guest guide.
@@ -85,9 +87,12 @@ function startLocalServer(){
       items:document.querySelectorAll('#guide .guide-item').length,
       fallbackClasses:document.querySelector('#csvDownloadFallback')?.className,
       directHref:document.querySelector('#csvDirectDownload')?.getAttribute('href'),
-      status:document.querySelector('#interactionStatus')?.textContent
+      status:document.querySelector('#interactionStatus')?.textContent,
+      handler:typeof document.querySelector('#download')?.onclick,
+      urlCreator:typeof URL.createObjectURL,
+      activeElement:document.activeElement?.id
     }));
-    console.error('WEBKIT_CSV_DIAGNOSTIC',JSON.stringify(state));
+    console.error('WEBKIT_CSV_DIAGNOSTIC',JSON.stringify({...state,newPageErrors:jsErrors.slice(errorsBefore)}));
   }
   await fallback.waitFor({state:'visible',timeout:5000});
   assert.equal(await fallback.getAttribute('download'),'tokyo-concierge-shortlist.csv','Direct CSV has a real download filename');
