@@ -61,11 +61,15 @@ function startLocalServer(){
   await page.locator('#cards .card button[data-id="'+targetID+'"]').first().click();
   await twin.waitForFunction(id=>document.querySelector('#guide .guide-item')?.textContent.includes(document.querySelector('[data-detail="'+id+'"]')?.closest('.card')?.querySelector('h3')?.textContent||'__never__'),targetID,{timeout:10000});
   assert.equal(await twin.locator('#guide .guide-item').count(),1,'Real two-tab shortlist storage sync');
+  // Complete the two-tab scenario before export: later storage events must not
+  // invalidate a CSV generated in this independent single-tab scenario.
+  await twin.close();
   await page.reload({waitUntil:'domcontentloaded'});
   assert.equal(await page.locator('#guide .guide-item').count(),1,'iPhone WebKit shortlist survives reload');
   await page.locator('#language').selectOption('ko');
   await page.reload({waitUntil:'domcontentloaded'});
   assert.equal(await page.locator('html').getAttribute('lang'),'ko','Korean locale persists after reload');
+  assert.equal(await page.locator('#guide .guide-item').count(),1,'Shortlist remains populated after locale change and reload');
   // iPhone Safari may open a blob instead of producing a Playwright download event.
   // Verify the actual generated file BYTES and a visible human-tappable fallback,
   // not merely that Chromium's automatic download event happens in WebKit.
@@ -74,7 +78,18 @@ function startLocalServer(){
   const fallback=page.locator('#csvDirectDownload');
   // A scripted Blob click must NOT navigate iOS Safari away from the guest guide.
   assert(page.url().startsWith(target),'iPhone Safari stays on the guide after preparing CSV');
-  assert(await fallback.isVisible(),'iPhone Safari provides an accessible direct file link');
+  if(!await fallback.isVisible()){
+    const state=await page.evaluate(()=>({
+      url:location.href,userAgent:navigator.userAgent,
+      selected:JSON.parse(localStorage.getItem('atelier-shortlist-v2')||'[]'),
+      items:document.querySelectorAll('#guide .guide-item').length,
+      fallbackClasses:document.querySelector('#csvDownloadFallback')?.className,
+      directHref:document.querySelector('#csvDirectDownload')?.getAttribute('href'),
+      status:document.querySelector('#interactionStatus')?.textContent
+    }));
+    console.error('WEBKIT_CSV_DIAGNOSTIC',JSON.stringify(state));
+  }
+  await fallback.waitFor({state:'visible',timeout:5000});
   assert.equal(await fallback.getAttribute('download'),'tokyo-concierge-shortlist.csv','Direct CSV has a real download filename');
   assert((await fallback.textContent()).includes('CSV'),'Language-aware CSV fallback label');
   const csvFile=await page.evaluate(async()=>{
