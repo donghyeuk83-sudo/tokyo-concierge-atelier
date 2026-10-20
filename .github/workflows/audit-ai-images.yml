@@ -4,6 +4,10 @@ on:
     branches: [main]
     paths:
       - 'index.html'
+      - 'assets/atelier-catalog.js'
+      - 'assets/atelier-media.js'
+      - 'audits/stage01-original-data-snapshot.json'
+      - 'tests/atelier-source-registry.cjs'
       - 'assets/photos/**'
       - 'tests/audit-ai-image-uniqueness.cjs'
       - '.github/workflows/audit-ai-images.yml'
