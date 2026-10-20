@@ -1,11 +1,10 @@
 // Find Commons photo candidates for all catalog venues without publishing unverified images.
 // Runs in GitHub Actions. Wikimedia API metadata is not a substitute for visual venue matching.
 const fs=require('node:fs');
-const html=fs.readFileSync('index.html','utf8');
-const data=html.split('const DATA=[')[1]?.split('].map(')[0];
+const {catalogueSection:data,licensedSection:registry,verifyExtractedSnapshot}=require('./atelier-source-registry.cjs');
+verifyExtractedSnapshot();
 if(!data)throw Error('Catalog missing');
 const venues=[...data.matchAll(/^\[("(?:[^"\\]|\\.)*"(?:,\s*"(?:[^"\\]|\\.)*"){6})\],?$/gm)].map(m=>JSON.parse('['+m[1]+']'));
-const registry=html.split('const LICENSED_VENUE_PHOTOS={')[1]?.split('};')[0]||'';
 const registered=new Set([...registry.matchAll(/^([a-z]\d+):\{/gm)].map(m=>m[1]));
 const esc=s=>'"'+String(s??'').replace(/"/g,'""')+'"';
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
