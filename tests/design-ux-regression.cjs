@@ -11,7 +11,7 @@ async function baseUrl(){
    const target=path.resolve(process.cwd(),'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname==='/'
     ?'/index.html':new URL(req.url,'http://localhost').pathname));
    if(!target.startsWith(process.cwd()+path.sep)){res.writeHead(403).end();return}
-   const type=target.endsWith('.html')?'text/html;charset=utf-8':target.endsWith('.webp')?'image/webp':target.endsWith('.jpg')?'image/jpeg':target.endsWith('.svg')?'image/svg+xml':'text/plain';
+   const type=target.endsWith('.html')?'text/html;charset=utf-8':target.endsWith('.css')?'text/css;charset=utf-8':target.endsWith('.webp')?'image/webp':target.endsWith('.jpg')?'image/jpeg':target.endsWith('.svg')?'image/svg+xml':'text/plain';
    fs.readFile(target,(e,data)=>{if(e){res.writeHead(404).end();return}res.writeHead(200,{'content-type':type}).end(data)});
   }).listen(0,'127.0.0.1',()=>resolve('http://127.0.0.1:'+server.address().port+'/'));
  });
