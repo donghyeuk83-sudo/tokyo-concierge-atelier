@@ -11,6 +11,17 @@ const assert=require('assert');
  assert((await page.locator('.card').count())>0,'catalogue cards render');
  assert.equal(await page.evaluate(()=>typeof illustration),'function','Separate illustrative renderer is initialized before catalogue cards');
  assert((await page.locator('#cards .card-art').count())>0,'Unlicensed venue slots still render the existing illustrative artwork');
+ // Prove that cached category partitions are identical, in the same order,
+ // to the old full-catalogue filter for each of the five tabs.
+ const categoriesMatch=await page.evaluate(()=>{
+  const expected=CATS.every(cat=>{
+   const originals=DATA.filter(r=>r.category===cat);
+   const cached=ROWS_BY_CATEGORY.get(cat);
+   return Array.isArray(cached)&&cached.length===originals.length&&cached.every((r,i)=>r===originals[i]);
+  });
+  return {expected,allCategories:ROWS_BY_CATEGORY.size,total:[...ROWS_BY_CATEGORY.values()].reduce((n,rows)=>n+rows.length,0),languageKeys:Object.keys(I18N).sort()};
+ });
+ assert.deepEqual(categoriesMatch,{expected:true,allCategories:5,total:131,languageKeys:['en','ja','ko']},'Rendering category partitions and all three locale dictionaries preserve original site data');
  // Every venue's new cached search string must be exactly identical to the
  // original uncached EN/JA/KO indexing formula (all 131 entries, original case
  // folding and aliases). This guards search behavior during modularization.
