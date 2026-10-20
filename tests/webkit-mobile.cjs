@@ -32,6 +32,16 @@ function startLocalServer(){
   assert((await page.locator('html').getAttribute('lang'))==='en','Language defaults to English');
   const viewport=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth}));
   assert(viewport.scroll<=viewport.width+2,'No sideways iPhone viewport overflow: '+JSON.stringify(viewport));
+  // Multilingual aliases are loaded before the catalogue and remain searchable
+  // on iPhone WebKit; return to Restaurants to preserve every existing test.
+  await page.locator('#tabs [data-cat="attraction"]').click();
+  for(const query of ['도쿄타워','東京タワー']){
+   await page.locator('#query').fill(query);
+   await page.waitForFunction(()=>document.querySelectorAll('#cards [data-detail="a01"]').length===1);
+   assert.equal(await page.locator('#cards .card').count(),1,'Tokyo Tower search alias on iPhone: '+query);
+  }
+  await page.locator('#query').fill('');
+  await page.locator('#tabs [data-cat="restaurant"]').click();
   await page.locator('#query').fill('Udatsu');
   await page.waitForFunction(()=>document.querySelectorAll('#cards .card').length>0);
   assert((await page.locator('#cards').textContent()).includes('Udatsu'),'iPhone keyword search');
