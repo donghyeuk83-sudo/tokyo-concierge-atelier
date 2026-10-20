@@ -1,15 +1,11 @@
-name: Publish raster AI photo assets
+name: Preview raster AI photo conversion (manual review only)
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - '.github/workflows/publish-ai-raster.yml'
-      - 'assets/photos/ai-sushi-concept.svg'
 jobs:
   convert:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - name: Extract embedded photographic raster (no vector conversion)
@@ -36,12 +32,11 @@ jobs:
               raise SystemExit('AI sushi reference missing')
           p.write_text(s.replace(old,new))
           PY
-      - name: Commit image and reference
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html assets/photos/ai-sushi-concept.webp
-          if ! git diff --cached --quiet; then
-            git commit -m "Use embedded AI photo raster instead of SVG for sushi card"
-            git push
-          fi
+      - name: Upload raster conversion for review without modifying main
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-raster-review-only
+          path: |
+            assets/photos/ai-sushi-concept.webp
+            index.html
+          retention-days: 7
