@@ -91,6 +91,8 @@ function startLocalServer(){
     assert(native.suggestedFilename().endsWith('.csv'),'Native WebKit auto-download uses the correct filename');
     assert(fs.readFileSync(await native.path()).length>3,'Native file download is not empty');
   }else console.log('INFO iPhone WebKit emulation suppressed automatic download; the complete CSV Blob and visible manual download link were verified');
+  await page.evaluate(()=>window.dispatchEvent(new StorageEvent('storage',{key:'atelier-shortlist-v2',newValue:'[]'})));
+  assert(!await page.locator('#csvDownloadFallback').isVisible(),'Previously generated CSV is invalidated when guest selection changes in another tab');
   await page.locator('#tabs [data-cat="attraction"]').click();
   const studio=page.locator('#cards .card').filter({has:page.locator('[data-detail="a32"]')});
   assert.equal(await studio.count(),1,'Correct Meguro studio still indexed');
