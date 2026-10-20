@@ -41,7 +41,7 @@ MORE_PROMPTS={
 'a36':'Illustrative Ginza sumo cultural event, demonstration ring and guest seating, no identifiable actual participants',
 'a37':'Illustrative Tokyo traditional artisan cultural workshop with handmade craft objects, not a particular Wabunka partner venue',
 'a38':'Illustrative Tokyo hands-on traditional culture class using ceramics and textiles, not an actual Deeper Japan workshop',
-'a39':'Illustrative Japanese traditional crafts workshop with artisans' tools, location unspecified; avoid representing Kyoto facilities as Tokyo',
+'a39':'Illustrative Japanese traditional crafts workshop with handmade crafting tools, location unspecified; avoid representing Kyoto facilities as Tokyo',
 'a40':'Illustrative Tokyo sightseeing tour departure point with coach and city map, without depicting an exact Sunrise Tours itinerary',
 's15':'Illustrative Ryogoku sumo memorabilia shop shelf with miniature ring figurines and souvenir textiles, not Ueno park',
 'r45':'Japanese fishing restaurant with indoor fish pond and tables, lively Tokyo atmosphere',
