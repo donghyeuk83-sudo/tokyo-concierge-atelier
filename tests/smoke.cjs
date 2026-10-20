@@ -151,7 +151,7 @@ const assert=require('assert');
    r40:'/tokyo/A1307/A130703/13149832/dtlphotolst/4/smp2/',
    r41:'/tokyo/A1303/A130302/13260579/dtlphotolst/4/smp2/',
    r43:'/tokyo/A1303/A130302/13286155/dtlphotolst/1/smp2/',
-   r44:'/ebisu/about/',
+   r44:'/ebisu/space/',
    r51:'/tokyo/A1302/A130202/13219884/dtlphotolst/smp2/'
  };
  for(const [id,expectedPath] of Object.entries(galleryPaths)){
@@ -290,10 +290,39 @@ const assert=require('assert');
    await page.locator('#detailClose').click();
  }
 
+
+ // Batch 11: per-venue original operator photo links must be real, correctly typed, and NOT unlicensed embedded images.
+ const batch11=[
+   ['restaurant','r44','shiorian-yamashiro.com','/ebisu/space/','operator'],
+   ['attraction','a26','shizukokoro.com','/chado-workshop','operator'],
+   ['attraction','a30','bub-activitycenter.com','/','operator']
+ ];
+ for(const [category,id,host,path,kind] of batch11){
+   const row=publicPhotoSourceBlock.split(String.fromCharCode(10)).find(line=>line.trim().startsWith(id+':'));
+   assert(row,'Existing pending-photo source record for '+id);
+   const parsed=row.match(/url:"([^"]+)",kind:"([^"]+)"/);
+   assert(parsed,'Correct source registry entry '+id);
+   const u=new URL(parsed[1]);
+   assert.equal(u.hostname,host,'Exact source hostname and venue operator '+id);
+   assert.equal(u.pathname,path,'Official detailed photo page '+id);
+   assert.equal(parsed[2],kind,'No press-media source mislabeled as operator '+id);
+   assert(!expectedPhotos.includes(id),'Keep unlicensed photo off hotel web pages '+id);
+   await page.locator('#tabs [data-cat="'+category+'"]').click();
+   const card=page.locator('article.card').filter({has:page.locator('.detail-trigger[data-detail="'+id+'"]')});
+   const link=card.locator('a.venue-photo-source');
+   assert.equal(await link.count(),1,'Original image link visible on actual card '+id);
+   assert.equal(await link.getAttribute('href'),parsed[1],'Source link matches audited original URL '+id);
+   assert((await link.locator('small').textContent()).includes('Venue / operator website'),'Correct photo provenance badge '+id);
+   assert.equal(await card.locator('img[data-venue-photo]').count(),0,'No copyrighted image rehosted '+id);
+   await card.locator('.detail-trigger').click();
+   assert.equal(await page.locator('#detailActions .detail-photo-source').getAttribute('href'),parsed[1],'Detail photo source matches catalog card '+id);
+   await page.locator('#detailClose').click();
+ }
+
  const checkedPhotoRefs=[
    ['restaurant','r06','tabelog.com'],
    ['wellness','w05','www.shimizuyu.com'],
-   ['attraction','a30','prtimes.jp'],
+   ['attraction','a30','bub-activitycenter.com'],
    ['shopping','s15','www.gotokyo.org']
  ];
  for(const [category,id,host] of checkedPhotoRefs){
@@ -304,7 +333,7 @@ const assert=require('assert');
    assert.equal(new URL(await link.getAttribute('href')).hostname,host,'Original-source hostname '+id);
    if(id==='r06')assert.equal(new URL(await link.getAttribute('href')).pathname,'/tokyo/A1317/A131701/13003188/dtlphotolst/4/smp2/','Seirinkan reference links directly to genuine Nakameguro exterior photographs');
 
-   const provenance=(await link.locator('small').textContent()),provenanceType={r06:'Independent photo listing',w05:'Venue / operator website',a30:'Press or media page',s15:'Official Tokyo tourism guide'}[id];assert(provenance.includes(provenanceType),'Source accurately distinguishes operator, press and third-party photo pages '+id);
+   const provenance=(await link.locator('small').textContent()),provenanceType={r06:'Independent photo listing',w05:'Venue / operator website',a30:'Venue / operator website',s15:'Official Tokyo tourism guide'}[id];assert(provenance.includes(provenanceType),'Source accurately distinguishes operator, press and third-party photo pages '+id);
    assert.equal(await link.getAttribute('target'),'_blank','External source opens independently '+id);
    assert((await link.getAttribute('rel')).includes('noopener'),'External source protects opener '+id);
    assert.equal(await card.locator('img[data-venue-photo]').count(),0,'Original third-party photography not embedded '+id);
