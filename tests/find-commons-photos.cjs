@@ -18,7 +18,8 @@ const priority=new Set(PRIORITY_RETRY_IDS);
 async function queryCommons(query,retryOn429){
  const api=new URL('https://commons.wikimedia.org/w/api.php');
  for(const [k,val] of Object.entries({action:'query',generator:'search',gsrsearch:'filetype:bitmap '+query,gsrnamespace:'6',gsrlimit:'5',prop:'imageinfo',iiprop:'url|extmetadata',iiurlwidth:'900',format:'json',origin:'*'}))api.searchParams.set(k,val);
- const attempts=retryOn429?2:1;
+ // One request only. A 429 triggers a run-wide circuit breaker below.
+ const attempts=1;
  for(let attempt=0;attempt<attempts;attempt++){
   try{
    const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),20000);
@@ -26,8 +27,7 @@ async function queryCommons(query,retryOn429){
    try{response=await fetch(api,{signal:controller.signal,headers:{'user-agent':'TokyoConciergeAtelierPhotoResearch/1.1 (github.com/donghyeuk83-sudo/tokyo-concierge-atelier)'}})}
    finally{clearTimeout(timer)}
    if(response.status===429){
-    if(attempt+1<attempts){await sleep(12000);continue}
-    return {status:'RATE_LIMITED_RETRY_LATER',candidates:[]};
+    return {status:'RATE_LIMITED_RETRY_LATER',candidates:[],error:'Wikimedia HTTP 429; stop this research run'};
    }
    if(!response.ok)return {status:'API_HTTP_'+response.status,candidates:[]};
    const json=await response.json();
@@ -67,11 +67,20 @@ async function search(v){
   const rank=v=>priority.has(v[0])?0:registered.has(v[0])?2:1;
   return rank(a)-rank(b);
  });
+ let pauseForRateLimit=false;
  for(let i=0;i<ordered.length;i++){
-  const v=ordered[i];results.push(await search(v));
+  const v=ordered[i];
+  if(pauseForRateLimit&&!registered.has(v[0])){
+   results.push({id:v[0],name:v[2],area:v[4],status:'DEFERRED_API_RATE_LIMIT',candidate_count:0,reason:'API requested fewer queries after Wikimedia 429'});
+  }else{
+   const record=await search(v);
+   results.push(record);
+   // Respect Wikimedia's 429. Do not turn deferred queries into "no eligible file" claims.
+   if(record.status==='RATE_LIMITED_RETRY_LATER')pauseForRateLimit=true;
+  }
   if(i%10===0)console.log('Photo candidates checked',i+1,'/',ordered.length);
-  // Skip throttling registered locations: network queries are only needed for the missing 42.
-  if(!registered.has(v[0]))await sleep(2500);
+  // Throttle only actual queries for the 42 unphotographed venues; no throttling once paused.
+  if(!pauseForRateLimit&&!registered.has(v[0]))await sleep(2500);
  }
  // Keep the legacy catalogue order in the CSV/JSON even when the seven searches run first.
  const orderIndex=new Map(venues.map((v,i)=>[v[0],i]));
