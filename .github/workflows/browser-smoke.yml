@@ -5,6 +5,13 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+  # Run the existing full Chromium + iPhone-WebKit + photo + link QA daily.
+  # 00:23 UTC = 09:23 Tokyo; GitHub scheduled runs may start later.
+  schedule:
+    - cron: '23 0 * * *'
+permissions:
+  contents: read
+  issues: write
 # A newer main push supersedes older Pages revisions. Avoid stale jobs racing deployment.
 concurrency:
   group: atelier-browser-${{ github.ref }}
@@ -53,6 +60,8 @@ jobs:
           node --check tests/find-commons-photos.cjs
           node tests/audit-pipeline-safety.cjs
           python -m py_compile scripts/generate-venue-ai-images.py scripts/validate-venue-photos.py
+      - name: Validate automatic production health notifier
+        run: node tests/health-issue.cjs --self-test
       - name: Wait for current revision on GitHub Pages
         if: github.event_name != 'pull_request'
         id: pages_ready
@@ -85,3 +94,11 @@ jobs:
           node tests/smoke.cjs
           node tests/state-regression.cjs
           node tests/webkit-mobile.cjs
+      - name: Maintain one actionable automatic health issue
+        if: ${{ always() && github.event_name != 'pull_request' }}
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          HEALTH_OUTCOME: ${{ job.status }}
+        run: |
+          node tests/health-issue.cjs
