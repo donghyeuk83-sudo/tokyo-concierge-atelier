@@ -152,7 +152,6 @@ const assert=require('assert');
    r41:'/tokyo/A1303/A130302/13260579/dtlphotolst/4/smp2/',
    r43:'/tokyo/A1303/A130302/13286155/dtlphotolst/1/smp2/',
    r44:'/ebisu/space/',
-   r51:'/tokyo/A1302/A130202/13219884/dtlphotolst/smp2/'
  };
  for(const [id,expectedPath] of Object.entries(galleryPaths)){
    const match=publicPhotoSourceBlock.match(new RegExp('^'+id+':\\{url:"([^"]+)",kind:"(listing|operator)"\\}', 'm'));
@@ -171,7 +170,6 @@ const assert=require('assert');
   r09:'/tokyo/A1303/A130303/13003356/dtlphotolst/3/smp2/',
   r11:'/tokyo/A1306/A130602/13042979/dtlphotolst/3/smp2/',
   r29:'/tokyo/A1317/A131701/13301330/dtlphotolst/3/smp2/',
-  r36:'/tokyo/A1311/A131102/13075573/dtlphotolst/smp2/',
   r45:'/tokyo/A1303/A130301/13180300/dtlphotolst/smp2/'
  };
  await page.locator('#tabs [data-cat="restaurant"]').click();
@@ -342,6 +340,37 @@ const assert=require('assert');
  assert(discoverySource.includes('eligibleLicense(p.license)'),'Commercial-only CC filter remains enabled');
  assert(discoverySource.includes("venue_match:'UNVERIFIED',reuse_approved:false"),'Original-file candidates remain unapproved');
  assert(discoverySource.includes("if(!registered.has(v[0]))await sleep(2500)"),'Skip research throttle for all 89 registered venues');
+
+
+ // Priority batch: the named original venue photography pages stay offsite.
+ const operatorGalleries=[
+  ['r36','hinatomaru.com','/asakusa/'],
+  ['r51','suigian.jp','/heritage/']
+ ];
+ for(const [id,host,path] of operatorGalleries){
+  const row=publicPhotoSourceBlock.split(String.fromCharCode(10)).find(line=>line.trim().startsWith(id+':'));
+  assert(row,'Exact venue source mapped '+id);
+  const m=row.match(/url:"([^"]+)",kind:"([^"]+)"/);
+  assert(m,'Valid original source metadata '+id);
+  const u=new URL(m[1]);
+  assert.equal(u.hostname,host,'Exact original operator domain '+id);
+  assert.equal(u.pathname,path,'Correct flagship photo section '+id);
+  assert.equal(m[2],'operator','Operator publisher accurately attributed '+id);
+  assert(!expectedPhotos.includes(id),'No uncleared hosted image '+id);
+  await page.locator('#tabs [data-cat="restaurant"]').click();
+  const card=page.locator('article.card').filter({has:page.locator('.detail-trigger[data-detail="'+id+'"]')});
+  assert.equal(await card.locator('a.venue-photo-source').getAttribute('href'),m[1],'Card points to exact original '+id);
+  assert((await card.locator('a.venue-photo-source small').textContent()).includes('Venue / operator website'),'Photo provenance visible '+id);
+  assert.equal(await card.locator('img[data-venue-photo]').count(),0,'No third-party photo copied '+id);
+  await card.locator('.detail-trigger').click();
+  assert.equal(await page.locator('#detailActions .detail-photo-source').getAttribute('href'),m[1],'Detail preserves official gallery '+id);
+  await page.locator('#detailClose').click();
+ }
+ // Seven previously rate-limited Commons queries are scheduled before general missing-location scans.
+ const photoDiscovery=require('fs').readFileSync('tests/find-commons-photos.cjs','utf8');
+ for(const id of ['r33','r36','r37','r50','r51','a34','a37'])assert(photoDiscovery.includes("'"+id+"'"),'Priority scan includes '+id);
+ assert(photoDiscovery.includes('results.sort((a,b)=>orderIndex.get(a.id)-orderIndex.get(b.id))'),'Full 131-row report remains in catalogue order');
+ assert(photoDiscovery.includes("venue_match:'UNVERIFIED',reuse_approved:false"),'Do not approve photos from automated search alone');
 
  const checkedPhotoRefs=[
    ['restaurant','r06','tabelog.com'],
