@@ -24,7 +24,7 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          p=Path('index.html')
+          p=Path('assets/atelier-media.js')
           s=p.read_text()
           old="assets/photos/ai-sushi-concept.svg"
           new="assets/photos/ai-sushi-concept.webp"
@@ -38,5 +38,5 @@ jobs:
           name: ai-raster-review-only
           path: |
             assets/photos/ai-sushi-concept.webp
-            index.html
+            assets/atelier-media.js
           retention-days: 7
