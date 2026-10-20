@@ -1,0 +1,24 @@
+# Tokyo Concierge Atelier — structure and safe change rules
+
+Updated 2026-10-20. Site: `https://donghyeuk83-sudo.github.io/tokyo-concierge-atelier/`.
+
+## Architecture
+
+- `index.html`: static HTML shell plus catalogue dataset, multilingual strings, localStorage shortlist, guest-guide sharing, CSV export, source verification labels, photo source/approval registry, and interactive UI JavaScript. The JavaScript remains inline intentionally: the 131-place and 89-photo quality gates currently inspect the registry in this file.
+- `assets/atelier.css`: the original complete CSS moved without a visual redesign. HTML uses a same-origin **versioned link** (`?v=20261020-a`). When updating styles, bump the version string in `index.html` so repeat visitors receive current CSS. Do not silently change the layout during refactors.
+- `assets/photos/`: existing approved venue-image assets and explanatory/AI illustrations. Editorial reference photos and third-party operator galleries **must not** be relabeled as original venue photos.
+- `tests/`: state, privacy, search, design, Chromium/WebKit iPhone, photo provenance and external link audits.
+- `.github/workflows/browser-smoke.yml`: on PR, main, or the daily scheduled run, audits data, checks links, runs local browser regressions and validates the deployed revision on main.
+- `audits/`: rights/provenance metadata, pending photo queue and local/CI-generated links requiring review.
+
+## Current invariants
+
+- Preserve all **131 venue records**, **89 registered approved-image mappings**, **50 pre-existing AI illustrations**, the **42 unresolved photo-rights slots**, all three languages, filter semantics, mobile layout, and existing photography/source attribution. Never imply that a photograph is from a particular interior when it depicts a host building or illustration.
+- Keep the external-link audit focused on the **actual guest-facing URL**, selected from `VERIFIED_SOURCES[id]?.url || DATA[id].url`, and retain `reference_url` in the report. HTTP 403/429 and transient 5xx must not be treated as venue closure. HTTP 200 is not evidence that details, price, reservations or business status are current.
+- The photo approval ledger must document per-file identity, exact venue and rights for commercial display **before** any new or replaced venue photo is published. Do not automatically scrape or rehost operator, Tabelog or Commons images without qualifying rights. The pending 42 have not been cleared merely by listing source URLs.
+- Share links contain only public shortlist venue IDs. Never leak arbitrary URL query parameters or persist guest PII. When shortlist selection **or locale** changes, invalidate previously prepared CSV export blobs.
+- Protect production with branch/PR checks before merging. Review test results for real Chromium and iPhone WebKit, not only syntax checks. Distinguish emulator/Playwright behavior from a physical iPhone Safari hardware test.
+
+## Next modularization step (not performed in this change)
+
+The 131-place data, verified-source notes, and translation strings still live in `index.html`. Extract them only after tests and audits are reworked to consume canonical JSON/module data without silently duplicating information, or changing offline/file:// access behavior. Avoid a wholesale rewrite in a single PR.
