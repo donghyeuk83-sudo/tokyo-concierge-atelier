@@ -66,14 +66,31 @@ function startLocalServer(){
   await page.locator('#language').selectOption('ko');
   await page.reload({waitUntil:'domcontentloaded'});
   assert.equal(await page.locator('html').getAttribute('lang'),'ko','Korean locale persists after reload');
-  // Confirm actual WebKit CSV download, BOM, guest place and basic structure.
-  const dl=page.waitForEvent('download',{timeout:15000});
+  // iPhone Safari may open a blob instead of producing a Playwright download event.
+  // Verify the actual generated file BYTES and a visible human-tappable fallback,
+  // not merely that Chromium's automatic download event happens in WebKit.
+  const dl=page.waitForEvent('download',{timeout:3500}).catch(()=>null);
   await page.locator('#download').click();
-  const download=await dl;
-  assert(download.suggestedFilename().endsWith('.csv'),'iPhone WebKit CSV filename');
-  const body=fs.readFileSync(await download.path(),'utf8');
-  assert(body.startsWith('\uFEFF'),'CSV uses UTF-8 BOM for Excel');
-  assert(body.includes('Name')&&body.includes('Category')&&body.split(/\r?\n/).length>=2,'CSV has header and selected place');
+  const fallback=page.locator('#csvDirectDownload');
+  assert(await fallback.isVisible(),'iPhone Safari provides an accessible direct file link');
+  assert.equal(await fallback.getAttribute('download'),'tokyo-concierge-shortlist.csv','Direct CSV has a real download filename');
+  assert((await fallback.textContent()).includes('CSV'),'Language-aware CSV fallback label');
+  const csvFile=await page.evaluate(async()=>{
+    const url=document.querySelector('#csvDirectDownload').href;
+    const response=await fetch(url);
+    if(!response.ok)throw new Error('Generated CSV Blob is inaccessible');
+    const buffer=await response.arrayBuffer();
+    const bytes=new Uint8Array(buffer);
+    return {url,bom:Array.from(bytes.slice(0,3)),text:new TextDecoder('utf-8').decode(bytes)};
+  });
+  assert(csvFile.url.startsWith('blob:'),'The accessible fallback points at a live CSV Blob');
+  assert.deepEqual(csvFile.bom,[239,187,191],'CSV includes actual UTF-8 BOM bytes for Excel');
+  assert(csvFile.text.includes('Name')&&csvFile.text.includes('Category')&&csvFile.text.split(/\r?\n/).length>=2,'CSV Blob contains expected heading and shortlisted venue row');
+  const native=await dl;
+  if(native){
+    assert(native.suggestedFilename().endsWith('.csv'),'Native WebKit auto-download uses the correct filename');
+    assert(fs.readFileSync(await native.path()).length>3,'Native file download is not empty');
+  }else console.log('INFO iPhone WebKit emulation suppressed automatic download; the complete CSV Blob and visible manual download link were verified');
   await page.locator('#tabs [data-cat="attraction"]').click();
   const studio=page.locator('#cards .card').filter({has:page.locator('[data-detail="a32"]')});
   assert.equal(await studio.count(),1,'Correct Meguro studio still indexed');
@@ -111,7 +128,7 @@ function startLocalServer(){
   assert.deepEqual(blockedErrors,[],'No blocked-storage WebKit runtime errors: '+blockedErrors);
   await blockedContext.close();
   await context.close();
-  console.log('PASS WebKit iPhone '+target+': mobile width/search, photos and source quick-filters, EN/JA/KO persistence, actual cross-tab storage, CSV, detail/photo dialogs, safe blocked storage');
+  console.log('PASS WebKit iPhone '+target+': mobile width/search, photos and source quick-filters, EN/JA/KO persistence, actual cross-tab storage, CSV bytes and Safari fallback, detail/photo dialogs, safe blocked storage');
  }finally{
   if(context)await context.close().catch(()=>{});
   if(browser)await browser.close().catch(()=>{});
