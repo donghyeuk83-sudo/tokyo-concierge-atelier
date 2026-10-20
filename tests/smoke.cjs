@@ -9,6 +9,8 @@ const assert=require('assert');
  assert((await page.title()).includes('Tokyo Concierge Atelier'),'site title');
  await page.waitForSelector('.card',{timeout:15000});
  assert((await page.locator('.card').count())>0,'catalogue cards render');
+ assert.equal(await page.evaluate(()=>typeof illustration),'function','Separate illustrative renderer is initialized before catalogue cards');
+ assert((await page.locator('#cards .card-art').count())>0,'Unlicensed venue slots still render the existing illustrative artwork');
  // Exact labels distinguish third-party references from official operator links.
  const seirinkan=page.locator('article.card').filter({has:page.locator('[data-detail="r06"]')});
  const sourceLink=seirinkan.locator('.actions a').filter({hasText:/^Reference website$/});

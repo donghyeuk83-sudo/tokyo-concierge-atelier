@@ -36,6 +36,34 @@ const assert=require('node:assert/strict');
  assert.equal(await page.locator('#shortlistBadge').textContent(),'0','Cleared shortlist count is synchronized');
  await add.click();
  assert.equal(await page.locator('#guide .guide-item').count(),1,'Shortlist still works after remote clear');
+ // A malformed guest guide hash must not destroy a concierge's existing picks.
+ // A valid guide continues importing normally. replaceState avoids unrelated
+ // hashchange/navigation timing so this is a deterministic parser regression.
+ const invalidGuide=await page.evaluate(()=>{
+  history.replaceState(null,'',location.pathname+location.search+'#guide=NOT_A_REAL_VENUE');
+  return importShortlistHash();
+ });
+ assert.equal(invalidGuide,false,'Reject a guest guide hash containing zero valid venue IDs');
+ assert.equal(await page.locator('#guide .guide-item').count(),1,'Invalid guest guide hash does not erase existing shortlist');
+ assert((await page.locator('#guide').textContent()).includes('Kimono Photo Studio WA'),'Existing selection stays intact after malformed link');
+ const emptyGuide=await page.evaluate(()=>{
+  history.replaceState(null,'',location.pathname+location.search+'#guide=');
+  return importShortlistHash();
+ });
+ assert.equal(emptyGuide,false,'Empty link is not silently treated as a delete-all shortlist command');
+ assert.equal(await page.locator('#guide .guide-item').count(),1,'Empty guide hash does not erase existing recommendations');
+ const validGuide=await page.evaluate(()=>{
+  history.replaceState(null,'',location.pathname+location.search+'#guide=a01');
+  const loaded=importShortlistHash();
+  if(loaded)render(); // hashchange listener also renders after successful import.
+  return loaded;
+ });
+ assert.equal(validGuide,true,'Valid guest link remains importable');
+ assert((await page.locator('#guide').textContent()).includes('Tokyo Tower'),'Valid guest link changes selected places as intended');
+ await page.evaluate(()=>{
+  history.replaceState(null,'',location.pathname+location.search+'#guide=a32');
+  if(importShortlistHash())render();
+ });
  const shared=new URL(await page.evaluate(()=>shortlistUrl()));
  assert.equal(shared.search,'','Public shortlist URL must remove all arbitrary query parameters, not only cache-busting v');
  assert.equal(shared.hash,'#guide=a32','Public shortlist still contains the selected venue ID');
