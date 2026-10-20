@@ -8,7 +8,7 @@ from io import BytesIO
 from PIL import Image, ImageEnhance, ImageOps
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 OUT=ROOT/'assets/photos'
-HTML=ROOT/'index.html'
+HTML=ROOT/'assets/atelier-media.js'
 PROMPTS={
 'r01':'Photorealistic Japanese omakase sushi counter, chef preparing delicate nigiri, intimate wooden counter, no logos, no text',
 'r02':'Photorealistic boutique sushi restaurant in Daikanyama Tokyo, chef arranging seasonal nigiri on ceramics, no text',
