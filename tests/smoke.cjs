@@ -9,6 +9,16 @@ const assert=require('assert');
  assert((await page.title()).includes('Tokyo Concierge Atelier'),'site title');
  await page.waitForSelector('.card',{timeout:15000});
  assert((await page.locator('.card').count())>0,'catalogue cards render');
+ // Tabelog is an independent review/listing site, not the venue's official homepage.
+ // Retain its existing outbound reference but never misrepresent provenance.
+ const seirinkan=page.locator('article.card').filter({has:page.locator('[data-detail="r06"]')});
+ const sourceLink=seirinkan.locator('.actions a').filter({hasText:'Reference website'});
+ assert.equal(await sourceLink.count(),1,'Third-party Tabelog reference is truthfully labelled');
+ assert((await sourceLink.getAttribute('href')).includes('tabelog.com/'),'Keep the same original reference destination');
+ for(const [locale,label] of [['ja','参考サイト'],['ko','참고 사이트'],['en','Reference website']]){
+  await page.locator('#language').selectOption(locale);
+  assert.equal(await seirinkan.locator('.actions a').filter({hasText:label}).count(),1,'Reference label translated accurately: '+locale);
+ }
  await page.locator('#query').fill('Udatsu');
  assert((await page.locator('.card').count())>=1,'search returns results');
  await page.locator('#query').fill('NO_SUCH_VENUE_123');
