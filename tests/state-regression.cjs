@@ -54,13 +54,15 @@ const assert=require('node:assert/strict');
  assert.equal(await page.locator('#guide .guide-item').count(),1,'Empty guide hash does not erase existing recommendations');
  const validGuide=await page.evaluate(()=>{
   history.replaceState(null,'',location.pathname+location.search+'#guide=a01');
-  return importShortlistHash();
+  const loaded=importShortlistHash();
+  if(loaded)render(); // hashchange listener also renders after successful import.
+  return loaded;
  });
  assert.equal(validGuide,true,'Valid guest link remains importable');
  assert((await page.locator('#guide').textContent()).includes('Tokyo Tower'),'Valid guest link changes selected places as intended');
  await page.evaluate(()=>{
   history.replaceState(null,'',location.pathname+location.search+'#guide=a32');
-  importShortlistHash();
+  if(importShortlistHash())render();
  });
  const shared=new URL(await page.evaluate(()=>shortlistUrl()));
  assert.equal(shared.search,'','Public shortlist URL must remove all arbitrary query parameters, not only cache-busting v');
