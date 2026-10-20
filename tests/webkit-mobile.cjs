@@ -76,6 +76,7 @@ function startLocalServer(){
   const dl=page.waitForEvent('download',{timeout:3500}).catch(()=>null);
   assert(await page.locator('#download').evaluate(el=>typeof el.onclick==='function'),'CSV export button must have registered click handler in WebKit');
   const errorsBefore=jsErrors.length;
+  await page.evaluate(()=>{window.__csvClickSeen=0;document.querySelector('#download').addEventListener('click',()=>{window.__csvClickSeen++},{capture:true})});
   await page.locator('#download').click();
   const fallback=page.locator('#csvDirectDownload');
   // A scripted Blob click must NOT navigate iOS Safari away from the guest guide.
@@ -90,7 +91,8 @@ function startLocalServer(){
       status:document.querySelector('#interactionStatus')?.textContent,
       handler:typeof document.querySelector('#download')?.onclick,
       urlCreator:typeof URL.createObjectURL,
-      activeElement:document.activeElement?.id
+      activeElement:document.activeElement?.id,
+      clickEvents:window.__csvClickSeen
     }));
     console.error('WEBKIT_CSV_DIAGNOSTIC',JSON.stringify({...state,newPageErrors:jsErrors.slice(errorsBefore)}));
   }
