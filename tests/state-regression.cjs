@@ -5,10 +5,13 @@ const assert=require('node:assert/strict');
 (async()=>{
  const browser=await chromium.launch({headless:true});
  const target=process.env.TEST_URL||'file://'+process.cwd()+'/index.html';
+ const testUrl=new URL(target);
+ testUrl.searchParams.set('guest','PRIVATE_TEST_GUEST');
+ testUrl.searchParams.set('v','cache-test');
  const context=await browser.newContext({viewport:{width:390,height:844}});
  const page=await context.newPage();const errors=[];
  page.on('pageerror',e=>errors.push(e.message));
- await page.goto(target,{waitUntil:'domcontentloaded',timeout:45000});
+ await page.goto(testUrl.toString(),{waitUntil:'domcontentloaded',timeout:45000});
  await page.locator('.card').first().waitFor();
  await page.locator('#tabs [data-cat="attraction"]').click();
  const area=page.locator('#area');
@@ -26,6 +29,10 @@ const assert=require('node:assert/strict');
  const add=page.locator('article.card').filter({has:page.locator('.detail-trigger[data-detail="a32"]')}).locator('button[data-id="a32"]');
  await add.click();
  assert.equal(await page.locator('#guide .guide-item').count(),1,'Shortlist selected successfully');
+ const shared=new URL(await page.evaluate(()=>shortlistUrl()));
+ assert.equal(shared.search,'','Public shortlist URL must remove all arbitrary query parameters, not only cache-busting v');
+ assert.equal(shared.hash,'#guide=a32','Public shortlist still contains the selected venue ID');
+ assert(!shared.href.includes('PRIVATE_TEST_GUEST'),'Guest-like query data must never leak into a copied guide');
  await page.locator('#share').evaluate(el=>el.textContent='Link copied');
  await add.click();
  assert.equal(await page.locator('#share').textContent(),'Copy guide link','Share-button copied status clears when shortlist changes');
@@ -40,7 +47,17 @@ const assert=require('node:assert/strict');
  await page.locator('#detailClose').click();
  await page.evaluate(()=>window.dispatchEvent(new StorageEvent('storage',{key:'atelier-shortlist-v2',newValue:'{bad-json'})));
  assert.equal(await page.locator('#guide .guide-item').count(),0,'Corrupt stored shortlist safely clears without crashing');
- assert.deepEqual(errors,[],'No JS errors during bad-storage, area or tab sync');
+ // A prepared CSV contains localized concierge notes; a later language switch
+ // must never offer a stale file with text from the previous language.
+ await add.click();
+ await page.locator('#download').click();
+ assert(await page.locator('#csvDownloadFallback').isVisible(),'Prepared CSV has a visible manual fallback');
+ const preparedHref=await page.locator('#csvDirectDownload').getAttribute('href');
+ assert(preparedHref?.startsWith('blob:'),'Prepared CSV fallback points to the current Blob');
+ await page.locator('#language').selectOption('ja');
+ assert(!await page.locator('#csvDownloadFallback').isVisible(),'Changing language invalidates the previously prepared CSV');
+ assert.equal(await page.locator('#csvDirectDownload').getAttribute('href'),null,'Old-language CSV blob is no longer offered');
+ assert.deepEqual(errors,[],'No JS errors during bad-storage, area, language or tab sync');
 
  const deniedContext=await browser.newContext({viewport:{width:390,height:844}});
  const denied=await deniedContext.newPage();const deniedErrors=[];
