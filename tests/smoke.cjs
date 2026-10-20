@@ -9,6 +9,15 @@ const assert=require('assert');
  assert((await page.title()).includes('Tokyo Concierge Atelier'),'site title');
  await page.waitForSelector('.card',{timeout:15000});
  assert((await page.locator('.card').count())>0,'catalogue cards render');
+ // Exact labels distinguish third-party references from official operator links.
+ const seirinkan=page.locator('article.card').filter({has:page.locator('[data-detail="r06"]')});
+ const sourceLink=seirinkan.locator('.actions a').filter({hasText:/^Reference website$/});
+ assert.equal(await sourceLink.count(),1,'Third-party Tabelog reference is truthfully labelled');
+ assert((await sourceLink.getAttribute('href')).includes('tabelog.com/'),'Keep the same Tabelog link');
+ for(const [locale,label] of [['ja','参考サイト'],['ko','참고 사이트'],['en','Reference website']]){
+  await page.locator('#language').selectOption(locale);
+  assert.equal(await seirinkan.locator('.actions a').filter({hasText:new RegExp('^'+label+'$')}).count(),1,'Exact source label translated: '+locale);
+ }
  await page.locator('#query').fill('Udatsu');
  assert((await page.locator('.card').count())>=1,'search returns results');
  await page.locator('#query').fill('NO_SUCH_VENUE_123');
@@ -69,6 +78,18 @@ const assert=require('assert');
  const privateOuka=page.locator('article.card').filter({has:page.locator('.detail-trigger[data-detail="r52"]')});
  assert((await privateOuka.locator('.venue-alert').textContent()).includes('INVITATION-ONLY'),'Nagatacho Ouka is not presented as an ordinary publicly bookable restaurant');
  assert.equal(await privateOuka.locator('img[data-venue-photo]').count(),0,'Do not embed unrelated photos for private Nagatacho Ouka');
+ // Existing venue alerts must survive shortlisting, printing, and CSV export.
+ const closedRestaurant=page.locator('article.card').filter({has:page.locator('.detail-trigger[data-detail="r31"]')});
+ await closedRestaurant.locator('button[data-id="r31"]').click();
+ assert((await page.locator('#guide .guide-item .venue-alert').textContent()).includes('PERMANENTLY CLOSED September 30, 2026'),'Guest print guide contains existing closure warning');
+ await page.locator('#download').click();
+ const safetyCsv=await page.evaluate(async()=>await (await fetch(document.querySelector('#csvDirectDownload').href)).text());
+ assert(safetyCsv.includes('PERMANENTLY CLOSED September 30, 2026'),'CSV retains existing closure warning');
+ await page.locator('#guide [data-id="r31"]').click();
+ await privateOuka.locator('button[data-id="r52"]').click();
+ assert((await page.locator('#guide .guide-item .venue-alert').textContent()).includes('INVITATION-ONLY'),'Guide retains invitation-only caution');
+ await page.locator('#guide [data-id="r52"]').click();
+ assert.equal(await page.locator('#guide .guide-item').count(),0,'Warning regressions do not alter later shortlist expectations');
  await page.locator('.card button[data-id]').first().click();
  assert((await page.locator('#guide .guide-item').count())>0,'shortlist add');
  await page.locator('#share').click();

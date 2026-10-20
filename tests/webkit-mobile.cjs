@@ -61,6 +61,14 @@ function startLocalServer(){
   await page.locator('#cards .card button[data-id="'+targetID+'"]').first().click();
   await twin.waitForFunction(id=>document.querySelector('#guide .guide-item')?.textContent.includes(document.querySelector('[data-detail="'+id+'"]')?.closest('.card')?.querySelector('h3')?.textContent||'__never__'),targetID,{timeout:10000});
   assert.equal(await twin.locator('#guide .guide-item').count(),1,'Real two-tab shortlist storage sync');
+  // Real WebKit multi-tab clear sends a storage event with key === null.
+  // Reproduces an otherwise invisible stale-shortlist defect.
+  await twin.evaluate(()=>localStorage.clear());
+  await page.waitForFunction(()=>document.querySelectorAll('#guide .guide-item').length===0);
+  assert.equal(await page.locator('#shortlistBadge').textContent(),'0','Real cross-tab localStorage.clear refreshes the shortlist badge');
+  await page.locator('#cards .card button[data-id="'+targetID+'"]').first().click();
+  await twin.waitForFunction(()=>document.querySelectorAll('#guide .guide-item').length===1);
+  assert.equal(await page.locator('#guide .guide-item').count(),1,'Guest can add again after another tab cleared storage');
   // Complete the two-tab scenario before export: later storage events must not
   // invalidate a CSV generated in this independent single-tab scenario.
   await twin.close();

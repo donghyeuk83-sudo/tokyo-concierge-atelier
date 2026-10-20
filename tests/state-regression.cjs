@@ -29,6 +29,13 @@ const assert=require('node:assert/strict');
  const add=page.locator('article.card').filter({has:page.locator('.detail-trigger[data-detail="a32"]')}).locator('button[data-id="a32"]');
  await add.click();
  assert.equal(await page.locator('#guide .guide-item').count(),1,'Shortlist selected successfully');
+ // A separate tab calling localStorage.clear() sends key=null (not the
+ // shortlist key). A stale selection must not remain visible in this tab.
+ await page.evaluate(()=>window.dispatchEvent(new StorageEvent('storage',{key:null,newValue:null,storageArea:localStorage})));
+ assert.equal(await page.locator('#guide .guide-item').count(),0,'Cross-tab localStorage.clear removes stale recommendations');
+ assert.equal(await page.locator('#shortlistBadge').textContent(),'0','Cleared shortlist count is synchronized');
+ await add.click();
+ assert.equal(await page.locator('#guide .guide-item').count(),1,'Shortlist still works after remote clear');
  const shared=new URL(await page.evaluate(()=>shortlistUrl()));
  assert.equal(shared.search,'','Public shortlist URL must remove all arbitrary query parameters, not only cache-busting v');
  assert.equal(shared.hash,'#guide=a32','Public shortlist still contains the selected venue ID');
