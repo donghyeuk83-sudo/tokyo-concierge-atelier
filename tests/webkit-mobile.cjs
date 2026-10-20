@@ -72,6 +72,8 @@ function startLocalServer(){
   const dl=page.waitForEvent('download',{timeout:3500}).catch(()=>null);
   await page.locator('#download').click();
   const fallback=page.locator('#csvDirectDownload');
+  // A scripted Blob click must NOT navigate iOS Safari away from the guest guide.
+  assert(page.url().startsWith(target),'iPhone Safari stays on the guide after preparing CSV');
   assert(await fallback.isVisible(),'iPhone Safari provides an accessible direct file link');
   assert.equal(await fallback.getAttribute('download'),'tokyo-concierge-shortlist.csv','Direct CSV has a real download filename');
   assert((await fallback.textContent()).includes('CSV'),'Language-aware CSV fallback label');

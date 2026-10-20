@@ -27,6 +27,8 @@ jobs:
           node-version: '22'
       - run: npm install --no-save playwright
       - run: npx playwright install --with-deps chromium webkit
+      - name: Catch broken inline JavaScript before network and browser QA
+        run: node tests/check-inline-js.cjs
       - name: Ensure missing-photo queue is current
         run: |
           node tests/photo-queue.cjs
