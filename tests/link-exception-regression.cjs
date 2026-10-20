@@ -23,4 +23,11 @@ const checker=fs.readFileSync('tests/check-venue-links.cjs','utf8');
 assert(checker.includes("res.status>=500?'UPSTREAM_UNAVAILABLE':'HTTP_ERROR'"),'HTTP 5xx and actual bad path are distinct');
 assert(checker.includes("res.status===403||res.status===429?'ACCESS_RESTRICTED'"),'403/429 not proof of closure');
 assert(checker.includes('HEAD')&&checker.includes('GET'),'HEAD false negatives checked with GET');
+assert(checker.includes('reviewedUrls.get(id)||reference_url'),'Audit actual reviewed source URL shown on guest card, not only the original catalogue link');
+assert(checker.includes("'reference_url','reviewed_url_used'"),'Retain original reference and source-override provenance for manual review');
+// The exact Meguro studio URL is an important example of an on-card source
+// that is different from the static catalogue's original generic reference.
+const verified=html.slice(html.indexOf('const VERIFIED_SOURCES='),html.indexOf('const LICENSED_VENUE_PHOTOS='));
+const studioReviewed=[...verified.matchAll(/(?:^|\n)a32:\{url:"([^"]+)",checked:"([^"]+)"/gm)].at(-1);
+assert(studioReviewed&&studioReviewed[1]==='https://kimono-wa.com/en/access.html','Guest-facing Meguro source remains the correct official access link');
 console.log('PASS official external link audit: five exact venue identities preserved, four bot access cases and server 503 classified separately');
