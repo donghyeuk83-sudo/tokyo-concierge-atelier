@@ -33,7 +33,9 @@ jobs:
       - name: Audit all 131 venue records and photo provenance
         run: node tests/audit-venues.cjs
       - name: Check reachability of 131 venue URLs
-        run: node tests/check-venue-links.cjs
+        run: |
+          node tests/link-exception-regression.cjs
+          node tests/check-venue-links.cjs
       - name: Upload venue photo audit
         uses: actions/upload-artifact@v4
         with:
