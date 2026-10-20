@@ -4,12 +4,8 @@ concurrency:
   group: tokyo-concierge-commons-photo-research
   cancel-in-progress: true
 on:
+  # This candidate search can exhaust Commons API capacity; execute only on explicit request.
   workflow_dispatch:
-  push:
-    paths:
-      - '.github/workflows/photo-candidate-research.yml'
-      - 'scripts/find-photo-candidates.mjs'
-      - 'audits/missing-photo-queue.csv'
 jobs:
   collect:
     runs-on: ubuntu-latest
