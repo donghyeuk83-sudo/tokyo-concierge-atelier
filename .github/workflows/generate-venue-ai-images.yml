@@ -28,5 +28,5 @@ jobs:
           name: venue-ai-concepts-review-only
           path: |
             assets/photos/ai-unique-*.webp
-            index.html
+            assets/atelier-media.js
           retention-days: 7
