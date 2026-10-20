@@ -20,5 +20,17 @@ assert(html.includes(searchTag),'Versioned external multilingual search index mi
 assert(html.indexOf(illustrationTag)<html.indexOf(searchTag)&&html.indexOf(searchTag)<html.indexOf('<script>'),'Illustration and search assets must load before inline catalogue initialization');
 const searchSource=fs.readFileSync(searchPath,'utf8');
 new vm.Script(searchSource,{filename:searchPath});
+const localePath='assets/atelier-i18n.js';
+const localeTag='<script src="'+localePath+'?v=20261021-a"></script>';
+const searchTagPos=html.indexOf(searchTag),localeTagPos=html.indexOf(localeTag),inlineTagPos=html.indexOf('<script>');
+assert(localeTagPos>searchTagPos&&localeTagPos<inlineTagPos,'Locales must be loaded after search and before main catalogue script');
+const localeJS=fs.readFileSync(localePath,'utf8');
+new vm.Script(localeJS,{filename:localePath});
+const originalLocale=localeJS.slice(localeJS.indexOf('const I18N='));
+assert(originalLocale.startsWith('const I18N='),'Locale translation literal must exist');
+let h=2166136261;
+for(let i=0;i<originalLocale.length;i++){h^=originalLocale.charCodeAt(i);h=Math.imul(h,16777619)}
+assert.equal((h>>>0).toString(16),'a7fb4a39','Original three-language copy changed unexpectedly');
+assert(!html.includes('const I18N='),'Locale definitions must have exactly one source of truth');
 assert(searchSource.includes('function searchText(r)'),'Dedicated search index must define searchText');
-console.log('PASS',blocks.length,'inline syntax block(s) and illustration + multilingual search assets');
+console.log('PASS',blocks.length,'inline and three extracted JS assets with original translations');
