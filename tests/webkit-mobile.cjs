@@ -1,0 +1,117 @@
+// iPhone Safari-compatible WebKit end-to-end regressions.
+// Uses HTTP even for the checked-out repo: file:// storage behavior differs from HTTPS.
+const {webkit,devices}=require('playwright');
+const assert=require('node:assert/strict');
+const http=require('node:http'),fs=require('node:fs'),path=require('node:path');
+const root=process.cwd();
+let server;
+function startLocalServer(){
+ return new Promise(resolve=>{
+  server=http.createServer((req,res)=>{
+   try{
+    const pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
+    const name=pathname==='/'?'/index.html':pathname;
+    const filepath=path.resolve(root,'.'+name);
+    if(!filepath.startsWith(root+path.sep)){res.writeHead(403).end();return}
+    const type=filepath.endsWith('.html')?'text/html; charset=utf-8':filepath.endsWith('.webp')?'image/webp':filepath.endsWith('.jpg')?'image/jpeg':filepath.endsWith('.svg')?'image/svg+xml':filepath.endsWith('.json')?'application/json':'text/plain';
+    fs.readFile(filepath,(err,body)=>{if(err){res.writeHead(404).end();return}res.writeHead(200,{'content-type':type,'cache-control':'no-store'}).end(body)});
+   }catch(e){res.writeHead(400).end()}
+  }).listen(0,'127.0.0.1',()=>resolve('http://127.0.0.1:'+server.address().port+'/'));
+ });
+}
+(async()=>{
+ let browser,context;
+ try{
+  const target=process.env.TEST_URL||await startLocalServer();
+  browser=await webkit.launch({headless:true});
+  context=await browser.newContext({...devices['iPhone 13'],acceptDownloads:true});
+  const page=await context.newPage(),jsErrors=[];
+  page.on('pageerror',e=>jsErrors.push(e.message));
+  await page.goto(target,{waitUntil:'domcontentloaded',timeout:45000});
+  await page.locator('#cards .card').first().waitFor({timeout:20000});
+  assert((await page.locator('html').getAttribute('lang'))==='en','Language defaults to English');
+  const viewport=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth}));
+  assert(viewport.scroll<=viewport.width+2,'No sideways iPhone viewport overflow: '+JSON.stringify(viewport));
+  await page.locator('#query').fill('Udatsu');
+  await page.waitForFunction(()=>document.querySelectorAll('#cards .card').length>0);
+  assert((await page.locator('#cards').textContent()).includes('Udatsu'),'iPhone keyword search');
+  await page.locator('#query').fill('NO_SUCH_RESTAURANT_123');
+  await page.waitForFunction(()=>document.querySelectorAll('#cards .card').length===0);
+  await page.locator('#query').fill('');
+  await page.waitForFunction(()=>document.querySelectorAll('#cards .card').length>0);
+  const photo=page.locator('#photoFilter');
+  await photo.selectOption('venue');
+  const filtered=await page.locator('#cards .card').count();
+  assert(filtered>0,'Venue photo filtering on iPhone');
+  assert.equal(await page.locator('#cards img[data-venue-photo]').count(),filtered,'No illustrations mixed into venue-only filter');
+  await photo.selectOption('source');
+  assert((await page.locator('#cards a.venue-photo-source').count())>0,'Source-only photo filter on iPhone');
+  await page.locator('#photoQuickbar [data-photo-quick="all"]').click();
+  assert.equal(await photo.inputValue(),'all','Quick filter and dropdown synchronized');
+  for(const language of ['ja','ko','en']){
+   await page.locator('#language').selectOption(language);
+   assert.equal(await page.locator('html').getAttribute('lang'),language,'iPhone language '+language);
+   assert(await page.locator('#tabs .tab.active').count()===1,'One active translated category');
+  }
+  // Cross-tab synchronization uses a real WebKit storage event, not a synthetic JS event.
+  const twin=await context.newPage();
+  await twin.goto(target,{waitUntil:'domcontentloaded',timeout:45000});
+  await twin.locator('#cards .card').first().waitFor();
+  const targetID=await page.locator('#cards .card button[data-id]').first().getAttribute('data-id');
+  await page.locator('#cards .card button[data-id="'+targetID+'"]').first().click();
+  await twin.waitForFunction(id=>document.querySelector('#guide .guide-item')?.textContent.includes(document.querySelector('[data-detail="'+id+'"]')?.closest('.card')?.querySelector('h3')?.textContent||'__never__'),targetID,{timeout:10000});
+  assert.equal(await twin.locator('#guide .guide-item').count(),1,'Real two-tab shortlist storage sync');
+  await page.reload({waitUntil:'domcontentloaded'});
+  assert.equal(await page.locator('#guide .guide-item').count(),1,'iPhone WebKit shortlist survives reload');
+  await page.locator('#language').selectOption('ko');
+  await page.reload({waitUntil:'domcontentloaded'});
+  assert.equal(await page.locator('html').getAttribute('lang'),'ko','Korean locale persists after reload');
+  // Confirm actual WebKit CSV download, BOM, guest place and basic structure.
+  const dl=page.waitForEvent('download',{timeout:15000});
+  await page.locator('#download').click();
+  const download=await dl;
+  assert(download.suggestedFilename().endsWith('.csv'),'iPhone WebKit CSV filename');
+  const body=fs.readFileSync(await download.path(),'utf8');
+  assert(body.startsWith('\uFEFF'),'CSV uses UTF-8 BOM for Excel');
+  assert(body.includes('Name')&&body.includes('Category')&&body.split(/\r?\n/).length>=2,'CSV has header and selected place');
+  await page.locator('#tabs [data-cat="attraction"]').click();
+  const studio=page.locator('#cards .card').filter({has:page.locator('[data-detail="a32"]')});
+  assert.equal(await studio.count(),1,'Correct Meguro studio still indexed');
+  await page.locator('#area').selectOption('Meguro');
+  assert.equal(await studio.count(),1,'Meguro area filter in WebKit');
+  await page.locator('#area').selectOption('Asakusa');
+  assert.equal(await page.locator('[data-detail="a32"]').count(),0,'Asakusa does not include Meguro studio');
+  await page.locator('#area').selectOption('Meguro');
+  await page.locator('#language').selectOption('en');
+  await studio.locator('.detail-trigger').click();
+  assert(await page.locator('#detailDialog').evaluate(el=>el.open),'iPhone WebKit detail modal');
+  await page.locator('#detailClose').click();
+  await page.locator('#area').selectOption('');
+  // Photo viewer needs to open/close at mobile width with attribution intact.
+  const trigger=page.locator('[data-view-photo="a01"]');
+  await trigger.click();
+  assert(await page.locator('#photoDialog').evaluate(el=>el.open),'iPhone WebKit venue photo modal');
+  assert.equal(await page.locator('#photoAttribution a').count(),2,'Photo credit and license present in Safari');
+  assert((await page.locator('#photoDialog').boundingBox()).width<=390,'Photo modal fits iPhone');
+  await page.locator('#photoClose').click();
+  assert(!await page.locator('#photoDialog').evaluate(el=>el.open),'Photo modal closes in WebKit');
+  // Simulated Safari private browsing / quota exhaustion: clear warning, session still works.
+  const blocked=await context.newPage(),blockedErrors=[];
+  blocked.on('pageerror',e=>blockedErrors.push(e.message));
+  await blocked.addInitScript(()=>{Storage.prototype.setItem=function(){throw new DOMException('Storage blocked','QuotaExceededError')}});
+  await blocked.goto(target,{waitUntil:'domcontentloaded',timeout:45000});
+  await blocked.locator('#cards .card').first().waitFor();
+  await blocked.locator('#clear').click();
+  await blocked.locator('#cards .card button[data-id]').first().click();
+  assert((await blocked.locator('#interactionStatus').textContent()).includes('storage is blocked')|| (await blocked.locator('#interactionStatus').textContent()).includes('保存機能')|| (await blocked.locator('#interactionStatus').textContent()).includes('저장소'),'Safari blocked storage warning');
+  assert.equal(await blocked.locator('#guide .guide-item').count(),1,'Blocked storage still allows temporary shortlist');
+  assert.deepEqual(jsErrors,[],'No iPhone WebKit page errors: '+jsErrors);
+  assert.deepEqual(blockedErrors,[],'No blocked-storage WebKit runtime errors: '+blockedErrors);
+  await context.close();
+  console.log('PASS WebKit iPhone '+target+': mobile width/search, photos and source quick-filters, EN/JA/KO persistence, actual cross-tab storage, CSV, detail/photo dialogs, safe blocked storage');
+ }finally{
+  if(context)await context.close().catch(()=>{});
+  if(browser)await browser.close().catch(()=>{});
+  if(server)await new Promise(resolve=>server.close(resolve));
+ }
+})().catch(e=>{console.error(e);process.exitCode=1});
