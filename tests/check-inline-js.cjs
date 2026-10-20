@@ -8,4 +8,9 @@ for(const [i,match] of blocks.entries()){
  if(!match[1].trim())continue;
  new vm.Script(match[1],{filename:'index.html inline script '+(i+1)});
 }
-console.log('PASS',blocks.length,'inline JavaScript syntax block(s)');
+const illustrationPath='assets/atelier-illustration.js';
+assert(html.includes('<script src="'+illustrationPath+'?v=20261021-a"></script>'),'Venue illustration renderer must load before catalogue inline script');
+const externalJS=fs.readFileSync(illustrationPath,'utf8');
+assert(externalJS.includes('function illustration(r){'),'Venue artwork function missing from extracted asset');
+new vm.Script(externalJS,{filename:illustrationPath});
+console.log('PASS',blocks.length,'inline JavaScript syntax block(s) and external illustration renderer');
