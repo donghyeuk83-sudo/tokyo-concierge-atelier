@@ -1250,11 +1250,12 @@ const mobileConciergeMedia=window.matchMedia('(max-width:720px)');
 function prioritizeConciergeOnMobile(){
  const main=document.querySelector('main'),intro=document.querySelector('.magazine-intro'),end=document.querySelector('.atelier-note');
  if(!main||!intro||!end)return;
- if(mobileConciergeMedia.matches)intro.insertAdjacentElement('afterend',main);
- else end.insertAdjacentElement('afterend',main);
+ if(mobileConciergeMedia.matches&&main.previousElementSibling!==intro)intro.insertAdjacentElement('afterend',main);
+ else if(!mobileConciergeMedia.matches&&main.previousElementSibling!==end)end.insertAdjacentElement('afterend',main);
 }
 if(mobileConciergeMedia.addEventListener)mobileConciergeMedia.addEventListener('change',prioritizeConciergeOnMobile);
 else if(mobileConciergeMedia.addListener)mobileConciergeMedia.addListener(prioritizeConciergeOnMobile);
+window.addEventListener('resize',prioritizeConciergeOnMobile,{passive:true});
 prioritizeConciergeOnMobile();
 const VISUAL_COPY={
  en:{gallery:"Tokyo, vividly.",galleryNote:"From glowing skylines to quiet shrines — discover a city of contrasts.",areas:"Tokyo, one district at a time.",story:"Curated inspiration for exploring Tokyo — from intimate dining to memorable city views.",storyLink:"DISCOVER PLACES"},
