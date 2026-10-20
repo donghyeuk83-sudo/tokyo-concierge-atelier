@@ -8,7 +8,8 @@ from collections import defaultdict
 from PIL import Image
 
 root = pathlib.Path(__file__).resolve().parents[1]
-html = (root / "index.html").read_text(encoding="utf-8")
+html = (root / "assets/atelier-media.js").read_text(encoding="utf-8")
+catalogue = (root / "assets/atelier-catalog.js").read_text(encoding="utf-8")
 match = re.search(r"const LICENSED_VENUE_PHOTOS=\{(.*?)\};", html, re.S)
 if not match:
     sys.exit("ERROR: licensed venue photo registry missing")
@@ -47,9 +48,9 @@ for venue_id, fields in metadata_entries:
         if value and not value.group(1).startswith("https://"):
             issues.append(f"{venue_id}: {field} must use HTTPS")
 # Every licensed photo must point to an actual card in the published DATA registry.
-data_match = re.search(r"const DATA=\[(.*?)\]\.map\(", html, re.S)
+data_match = re.search(r"const DATA=\[(.*?)\]\.map\(", catalogue, re.S)
 if not data_match:
-    data_match = re.search(r"const DATA=\[(.*?)\];", html, re.S)
+    data_match = re.search(r"const DATA=\[(.*?)\];", catalogue, re.S)
 if not data_match:
     issues.append("Could not locate venue DATA registry")
 else:
