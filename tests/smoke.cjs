@@ -405,6 +405,21 @@ const assert=require('assert');
  assert(safeResearch.includes("status:'DEFERRED_API_RATE_LIMIT'"),'Unsearched files cannot be reported as absent');
  assert(safeResearch.includes("const attempts=1"),'Only one API attempt per query when rate limited');
 
+
+ // Rights audit is a queue, NOT an image-clearance ledger.
+ const permissionsCsv=require('fs').readFileSync('audits/commons-18-rights-and-contact-triage-2026-10-20.csv','utf8');
+ const pendingRows=permissionsCsv.trim().split(String.fromCharCode(10)).slice(1);
+ assert.equal(pendingRows.length,18,'All 18 previous Wikimedia rate-limited places audited');
+ const pendingPermissionIds=pendingRows.map(s=>s.match(/^"([^"]+)"/)?.[1]);
+ assert.equal(new Set(pendingPermissionIds).size,18,'No duplicate original-file right inquiries');
+ for(const id of ['r11','r29','r31','r38','r39','r40','r41','r42','r43','r44','a30','a31','a32','a34','a38','a39','a40','s15']){
+  assert(pendingPermissionIds.includes(id),'Previously blocked venue has an image-use contact/rights disposition: '+id);
+  assert(!expectedPhotos.includes(id),'Blocked original file cannot bypass clearance for '+id);
+ }
+ assert(permissionsCsv.includes('NO_WRITTEN_COMMERCIAL_REUSE_PERMISSION'),'No external contact is mislabeled as a grant');
+ assert(permissionsCsv.includes('CLOSED_SEIBU_SHIBUYA_BRANCH_NO_ACTIVE_MARKETING_REQUEST'),'Do not solicit a photo for closed restaurant as active');
+ assert(permissionsCsv.includes('OFFICIAL_STUDIO_IS_KAMIOSAKI_MEGURO_NOT_ASAKUSA_FIX_CATALOGUE_FIRST'),'Precise location mismatch preserved');
+
  const checkedPhotoRefs=[
    ['restaurant','r06','tabelog.com'],
    ['wellness','w05','www.shimizuyu.com'],
