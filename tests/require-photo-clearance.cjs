@@ -4,8 +4,8 @@
 // Usage: node tests/require-photo-clearance.cjs
 const fs=require('node:fs');
 const assert=require('node:assert/strict');
-const html=fs.readFileSync('index.html','utf8');
-const block=html.split('const LICENSED_VENUE_PHOTOS={')[1]?.split('};')[0];
+const {catalogue,licensedSection:block,verifyExtractedSnapshot}=require('./atelier-source-registry.cjs');
+verifyExtractedSnapshot();
 assert(block,'Missing published photo registry');
 const pattern=/^([a-z]\d+):\{url:"([^"]+)",source:"([^"]+)",credit:"([^"]+)",license:"([^"]+)",licenseUrl:"([^"]+)"\}/gm;
 const photos=[...block.matchAll(pattern)].map(m=>({id:m[1],url:m[2],source:m[3],credit:m[4],license:m[5],licenseUrl:m[6]}));
@@ -29,7 +29,7 @@ for(const [id,photo] of current){
   // Any future a32 photograph still needs a distinct, exact-site image/rights approval.
   const review=approvals.get(id);
   if(id==='a32'){
-   assert(html.includes('["a32","attraction","Kimono Photo Studio WA","着物フォトスタジオ和","Meguro"'),'Kimono WA must keep its verified Meguro area before photography is published');
+   assert(catalogue.includes('["a32","attraction","Kimono Photo Studio WA","着物フォトスタジオ和","Meguro"'),'Kimono WA must keep its verified Meguro area before photography is published');
    assert(review&&/Meguro|Kamiosaki|上大崎/i.test(review.venueIdentityExplanation||''),'Any a32 approval must identify the current Kamiosaki/Meguro studio location');
   }
   assert(review,'New or replaced photo '+id+' needs approval record before publication');
