@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 const folder=process.argv[2];if(!folder)throw Error('Provide extracted WebP folder');
 const mapping={r06:'seirinkan-concept.webp',r45:'zauo-concept.webp'};
-const dest='assets/photos';let html=fs.readFileSync('index.html','utf8');
+const dest='assets/photos';const registryPath='assets/atelier-media.js';let html=fs.readFileSync(registryPath,'utf8');
 for(const [id,file] of Object.entries(mapping)){
  const source=path.join(folder,file),target=path.join(dest,'ai-'+id+'-photo.webp');
  if(!fs.existsSync(source))throw Error('Missing '+source);
@@ -18,5 +18,5 @@ for(const [id,file] of Object.entries(mapping)){
  else html=html.replace('const AI_VENUE_VISUALS={','const AI_VENUE_VISUALS={'+id+":{url:'"+target+"'},");
  console.log(id+' -> '+target+' ('+bytes.length+' bytes)');
 }
-fs.writeFileSync('index.html',html);
-console.log('Updated index.html; review the visual disclosure and commit assets.');
+fs.writeFileSync(registryPath,html);
+console.log('Updated '+registryPath+'; review the visual disclosure and commit assets.');
