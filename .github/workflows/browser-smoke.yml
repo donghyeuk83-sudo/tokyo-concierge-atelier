@@ -43,10 +43,12 @@ jobs:
         run: node tests/smoke.cjs
       - name: Regress shortlist, venue location and blocked storage
         run: node tests/state-regression.cjs
-      - name: Check research scripts without calling Commons
+      - name: Audit all image-generation and research safety gates
         run: |
           node --check scripts/find-photo-candidates.mjs
           node --check tests/find-commons-photos.cjs
+          node tests/audit-pipeline-safety.cjs
+          python -m py_compile scripts/generate-venue-ai-images.py scripts/validate-venue-photos.py
       - name: Wait for current revision on GitHub Pages
         if: github.event_name != 'pull_request'
         id: pages_ready
