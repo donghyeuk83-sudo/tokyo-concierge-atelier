@@ -1,4 +1,5 @@
 // Tokyo Concierge Atelier artwork renderer, extracted unchanged from the original inline script.
+"use strict";
 // Classic script loaded synchronously before the catalogue script; resolves esc() and lang at call time.
 // Illustrations are NOT approved photographs of their venues.
 function illustration(r){
