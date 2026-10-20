@@ -13,7 +13,7 @@ function startLocalServer(){
     const name=pathname==='/'?'/index.html':pathname;
     const filepath=path.resolve(root,'.'+name);
     if(!filepath.startsWith(root+path.sep)){res.writeHead(403).end();return}
-    const type=filepath.endsWith('.html')?'text/html; charset=utf-8':filepath.endsWith('.webp')?'image/webp':filepath.endsWith('.jpg')?'image/jpeg':filepath.endsWith('.svg')?'image/svg+xml':filepath.endsWith('.json')?'application/json':'text/plain';
+    const type=filepath.endsWith('.html')?'text/html; charset=utf-8':filepath.endsWith('.css')?'text/css;charset=utf-8':filepath.endsWith('.webp')?'image/webp':filepath.endsWith('.jpg')?'image/jpeg':filepath.endsWith('.svg')?'image/svg+xml':filepath.endsWith('.json')?'application/json':'text/plain';
     fs.readFile(filepath,(err,body)=>{if(err){res.writeHead(404).end();return}res.writeHead(200,{'content-type':type,'cache-control':'no-store'}).end(body)});
    }catch(e){res.writeHead(400).end()}
   }).listen(0,'127.0.0.1',()=>resolve('http://127.0.0.1:'+server.address().port+'/'));
