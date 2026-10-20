@@ -12,33 +12,70 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 // Only CC0, CC BY, or CC BY-SA are accepted for commercial photo review.
 // Excludes CC BY-NC, CC BY-ND, public-domain tags not explicitly requested, and missing license labels.
 const eligibleLicense=v=>/^CC0(?:[ -]+\d+(?:\.\d+)?)?$|^CC BY(?:-SA)?(?:[ -]+\d+(?:\.\d+)?)?$/i.test(String(v||'').trim());
+// Recheck the seven previously rate-limited venues before exhausting Commons quotas.
+const PRIORITY_RETRY_IDS=['r33','r36','r37','r50','r51','a34','a37'];
+const priority=new Set(PRIORITY_RETRY_IDS);
+async function queryCommons(query,retryOn429){
+ const api=new URL('https://commons.wikimedia.org/w/api.php');
+ for(const [k,val] of Object.entries({action:'query',generator:'search',gsrsearch:'filetype:bitmap '+query,gsrnamespace:'6',gsrlimit:'5',prop:'imageinfo',iiprop:'url|extmetadata',iiurlwidth:'900',format:'json',origin:'*'}))api.searchParams.set(k,val);
+ const attempts=retryOn429?2:1;
+ for(let attempt=0;attempt<attempts;attempt++){
+  try{
+   const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),20000);
+   let response;
+   try{response=await fetch(api,{signal:controller.signal,headers:{'user-agent':'TokyoConciergeAtelierPhotoResearch/1.1 (github.com/donghyeuk83-sudo/tokyo-concierge-atelier)'}})}
+   finally{clearTimeout(timer)}
+   if(response.status===429){
+    if(attempt+1<attempts){await sleep(12000);continue}
+    return {status:'RATE_LIMITED_RETRY_LATER',candidates:[]};
+   }
+   if(!response.ok)return {status:'API_HTTP_'+response.status,candidates:[]};
+   const json=await response.json();
+   const pages=Object.values(json.query?.pages||{});
+   const candidates=pages.map(p=>{const i=p.imageinfo?.[0]||{},m=i.extmetadata||{};return{file:p.title,source:i.descriptionurl||'',thumb:i.thumburl||'',license:m.LicenseShortName?.value||'',license_url:m.LicenseUrl?.value||'',artist_html:m.Artist?.value||'',restrictions:m.Restrictions?.value||'',description_html:m.ImageDescription?.value||'',attribution_required:m.AttributionRequired?.value||''}})
+    .filter(p=>p.thumb&&p.source&&eligibleLicense(p.license))
+    .map(p=>({...p,venue_match:'UNVERIFIED',reuse_approved:false}));
+   return {status:candidates.length?'CANDIDATES_REQUIRE_REVIEW':'NO_ELIGIBLE_CANDIDATE_FOUND',candidates};
+  }catch(e){return {status:'SEARCH_ERROR',candidates:[],error:String(e).slice(0,120)}}
+ }
+ return {status:'RATE_LIMITED_RETRY_LATER',candidates:[]};
+}
 async function search(v){
  const [id,category,name,nameJa,area]=v;
  if(registered.has(id))return {id,name,area,status:'REGISTERED',candidate_count:0};
- const query=(category==='restaurant'?name+' Tokyo':name+' '+area+' Tokyo');
- const api=new URL('https://commons.wikimedia.org/w/api.php');
- for(const [k,val] of Object.entries({action:'query',generator:'search',gsrsearch:'filetype:bitmap '+query,gsrnamespace:'6',gsrlimit:'5',prop:'imageinfo',iiprop:'url|extmetadata',iiurlwidth:'900',format:'json',origin:'*'}))api.searchParams.set(k,val);
- try{
-  const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),20000);
-  let response;try{response=await fetch(api,{signal:controller.signal,headers:{'user-agent':'TokyoConciergeAtelierPhotoResearch/1.0 (github.com/donghyeuk83-sudo/tokyo-concierge-atelier)'}})}finally{clearTimeout(timer)}
-  if(response.status===429){await sleep(12000);return{id,name,area,status:'RATE_LIMITED_RETRY_LATER',candidate_count:0}}
-  if(!response.ok)return{id,name,area,status:'API_HTTP_'+response.status,candidate_count:0};
-  const json=await response.json();
-  const pages=Object.values(json.query?.pages||{});
-  const candidates=pages.map(p=>{const i=p.imageinfo?.[0]||{},m=i.extmetadata||{};return{file:p.title,source:i.descriptionurl||'',thumb:i.thumburl||'',license:m.LicenseShortName?.value||'',license_url:m.LicenseUrl?.value||'',artist_html:m.Artist?.value||'',restrictions:m.Restrictions?.value||'',description_html:m.ImageDescription?.value||'',attribution_required:m.AttributionRequired?.value||''}})
-    .filter(p=>p.thumb&&p.source&&eligibleLicense(p.license))
-    .map(p=>({...p,venue_match:'UNVERIFIED',reuse_approved:false}));
-  return{id,name,area,status:candidates.length?'CANDIDATES_REQUIRE_REVIEW':'NO_ELIGIBLE_CANDIDATE_FOUND',candidate_count:candidates.length,candidates};
- }catch(e){return{id,name,area,status:'SEARCH_ERROR',candidate_count:0,error:String(e).slice(0,120)}}
+ const englishQuery=category==='restaurant'?name+' Tokyo':name+' '+area+' Tokyo';
+ // Add original Japanese venue spelling only for the seven previously throttled venues.
+ const queries=[englishQuery,...(priority.has(id)&&nameJa?[nameJa+' '+area+' 東京']:[])];
+ let candidates=[],status='NO_ELIGIBLE_CANDIDATE_FOUND';
+ for(const q of queries){
+  const result=await queryCommons(q,priority.has(id));
+  status=result.status;
+  if(result.candidates?.length){
+   const existing=new Set(candidates.map(x=>x.file));
+   for(const v of result.candidates)if(!existing.has(v.file))candidates.push(v);
+  }
+  if(status!=='NO_ELIGIBLE_CANDIDATE_FOUND'&&status!=='CANDIDATES_REQUIRE_REVIEW')break;
+ }
+ return{id,name,area,status:candidates.length?'CANDIDATES_REQUIRE_REVIEW':status,
+  candidate_count:candidates.length,...(candidates.length?{candidates}:{}),
+  ...(priority.has(id)?{priority_retry:true,queries_attempted:queries.length}:{})};
 }
 (async()=>{
  const results=[];
- for(let i=0;i<venues.length;i++){
-  const v=venues[i];results.push(await search(v));
-  if(i%10===0)console.log('Photo candidates checked',i+1,'/',venues.length);
+ // Seven prior rate-limit cases run first, then 35 other missing locations; do not re-query 89 approved photos.
+ const ordered=[...venues].sort((a,b)=>{
+  const rank=v=>priority.has(v[0])?0:registered.has(v[0])?2:1;
+  return rank(a)-rank(b);
+ });
+ for(let i=0;i<ordered.length;i++){
+  const v=ordered[i];results.push(await search(v));
+  if(i%10===0)console.log('Photo candidates checked',i+1,'/',ordered.length);
   // Skip throttling registered locations: network queries are only needed for the missing 42.
   if(!registered.has(v[0]))await sleep(2500);
  }
+ // Keep the legacy catalogue order in the CSV/JSON even when the seven searches run first.
+ const orderIndex=new Map(venues.map((v,i)=>[v[0],i]));
+ results.sort((a,b)=>orderIndex.get(a.id)-orderIndex.get(b.id));
  fs.mkdirSync('audits',{recursive:true});
  fs.writeFileSync('audits/commons-photo-candidates.json',JSON.stringify({generated_at:new Date().toISOString(),warning:'Candidates are NOT verified venue photographs and MUST NOT be automatically published. Review actual image, exact branch/location, author, license and restrictions.',venues:results},null,2)+'\n');
  const rows=[['id','name','area','status','candidate_count','first_candidate_file','first_candidate_source','first_candidate_license'],...results.map(r=>[r.id,r.name,r.area,r.status,r.candidate_count,r.candidates?.[0]?.file||'',r.candidates?.[0]?.source||'',r.candidates?.[0]?.license||''])];
