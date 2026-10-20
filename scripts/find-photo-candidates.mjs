@@ -2,6 +2,10 @@
 // This file only generates a research artifact. It NEVER publishes image assets.
 // Usage: node scripts/find-photo-candidates.mjs
 import fs from 'node:fs/promises';
+import {createRequire} from 'node:module';
+const require=createRequire(import.meta.url);
+const {catalogueSection:canonicalCatalog,licensedSection:canonicalPhotos,verifyExtractedSnapshot}=require('../tests/atelier-source-registry.cjs');
+verifyExtractedSnapshot();
 
 const csv=await fs.readFile('audits/missing-photo-queue.csv','utf8');
 const rows=csv.trim().split(/\r?\n/).slice(1).map(line=>{
@@ -11,9 +15,8 @@ const rows=csv.trim().split(/\r?\n/).slice(1).map(line=>{
 });
 // Derive the live missing-photo ID list from the actual site. It shrinks as cleared
 // exact-site images are added, unlike the dated historical 48-venue research sheets.
-const html=await fs.readFile('index.html','utf8');
-const catalogue=html.split('const DATA=[')[1]?.split('].map(')[0];
-const published=html.split('const LICENSED_VENUE_PHOTOS={')[1]?.split('};')[0];
+const catalogue=canonicalCatalog;
+const published=canonicalPhotos;
 if(!catalogue||!published)throw Error('Cannot locate actual venue/photo catalog');
 const venueIds=[...catalogue.matchAll(/^\["([a-z]\d+)","(?:restaurant|attraction|shopping|wellness|transport)"/gm)].map(m=>m[1]);
 const photoIds=new Set([...published.matchAll(/^([a-z]\d+):\{/gm)].map(m=>m[1]));
