@@ -95,18 +95,21 @@ function startLocalServer(){
   assert((await page.locator('#photoDialog').boundingBox()).width<=390,'Photo modal fits iPhone');
   await page.locator('#photoClose').click();
   assert(!await page.locator('#photoDialog').evaluate(el=>el.open),'Photo modal closes in WebKit');
-  // Simulated Safari private browsing / quota exhaustion: clear warning, session still works.
-  const blocked=await context.newPage(),blockedErrors=[];
+  // New isolated browser context: a simulated fresh Safari private session must
+  // not inherit a previous tab's storage or receive stale cross-tab storage events.
+  const blockedContext=await browser.newContext({...devices['iPhone 13'],acceptDownloads:true});
+  const blocked=await blockedContext.newPage(),blockedErrors=[];
   blocked.on('pageerror',e=>blockedErrors.push(e.message));
   await blocked.addInitScript(()=>{Storage.prototype.setItem=function(){throw new DOMException('Storage blocked','QuotaExceededError')}});
   await blocked.goto(target,{waitUntil:'domcontentloaded',timeout:45000});
   await blocked.locator('#cards .card').first().waitFor();
-  await blocked.locator('#clear').click();
+  assert.equal(await blocked.locator('#guide .guide-item').count(),0,'Isolated private Safari session starts empty');
   await blocked.locator('#cards .card button[data-id]').first().click();
   assert((await blocked.locator('#interactionStatus').textContent()).includes('storage is blocked')|| (await blocked.locator('#interactionStatus').textContent()).includes('保存機能')|| (await blocked.locator('#interactionStatus').textContent()).includes('저장소'),'Safari blocked storage warning');
-  assert.equal(await blocked.locator('#guide .guide-item').count(),1,'Blocked storage still allows temporary shortlist');
+  assert.equal(await blocked.locator('#guide .guide-item').count(),1,'Blocked storage still allows temporary shortlist in the independent session');
   assert.deepEqual(jsErrors,[],'No iPhone WebKit page errors: '+jsErrors);
   assert.deepEqual(blockedErrors,[],'No blocked-storage WebKit runtime errors: '+blockedErrors);
+  await blockedContext.close();
   await context.close();
   console.log('PASS WebKit iPhone '+target+': mobile width/search, photos and source quick-filters, EN/JA/KO persistence, actual cross-tab storage, CSV, detail/photo dialogs, safe blocked storage');
  }finally{
