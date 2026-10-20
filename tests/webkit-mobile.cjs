@@ -37,7 +37,7 @@ function startLocalServer(){
   await page.locator('#tabs [data-cat="attraction"]').click();
   for(const query of ['도쿄타워','東京タワー']){
    await page.locator('#query').fill(query);
-   await page.waitForFunction(()=>document.querySelectorAll('#cards [data-detail="a01"]').length===1);
+   await page.waitForFunction(()=>document.querySelectorAll('#cards .card').length===1&&document.querySelector('#cards [data-detail="a01"]')!==null);
    assert.equal(await page.locator('#cards .card').count(),1,'Tokyo Tower search alias on iPhone: '+query);
   }
   await page.locator('#query').fill('');
