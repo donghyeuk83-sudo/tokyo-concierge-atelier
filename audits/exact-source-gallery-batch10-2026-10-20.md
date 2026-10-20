@@ -3,13 +3,12 @@ Reviewed 2026-10-20 · base main `bdac0d576beda495e8d1a96c9847e9452c51c87c`
 
 ## Dataset and licensing guarantee
 
-Existing **131 venue records, 89 image mappings, 42 missing-photo illustrations, 46 linked photo sources, EN/JA/KO, design and venue alerts** must remain unchanged. Only four photo-source records and regression tests are modified. Source pages are **links**, not per-file redistribution permission. Neither image URLs nor file binaries were copied to the hotel website.
+Existing **131 venue records, 89 image mappings, 42 missing-photo illustrations, 46 linked photo sources, EN/JA/KO, design and venue alerts** must remain unchanged. Only three **pending-photo** source records and regression tests are modified. The r32 Shibuya PARCO venue already has a correctly licensed published photo and was explicitly excluded after the PR regression caught an attempted source-link change. Source pages are **links**, not per-file redistribution permission. Neither image URLs nor file binaries were copied to the hotel website.
 
 ## Confirmed exact venues and updated links
 
 | ID | Exact documented subject | New source (not a cleared upload) | Evidence / why |
 |---|---|---|---|
-| `r32` | Kanazawa Maimon Sushi Shibuya PARCO branch, 7F, 15-1 Udagawacho, Shibuya | https://tabelog.com/tokyo/A1303/A130301/13240931/dtlphotolst/3/smp2/ | Tabelog interior photo tab: 34 images (including five by venue), address and branch label match; previous chain operator branch page was less photo-focused. The gallery includes third-party guest photos, so `listing` provenance is mandatory. |
 | `r47` | Roppongi Robataya, 1F Kyowa Building Nishikan, Roppongi 4-4-3 | https://tabelog.com/tokyo/A1307/A130701/13025665/dtlphotolst/3/smp2/ | Tabelog interior tab shows **11 interior images**, some venue-provided. Original `https://www.roppongi-robataya.com/information/` was mostly an access/seat-info page; restaurant's own access page and Tabelog show matching business and address. |
 | `a34` | THE SUMO LIVE RESTAURANT HIRAKUZA GINZA TOKYO, 1-9-13 Ginza, B1 | https://hirakuza.net/tokyo/news/202601113508/ | **Original official operator report of the January 7, 2026 Ginza branch opening**, containing real launch-day sumo performance and guest photos. Unlike the broad homepage, documented live photographs identify the exact venue, not Osaka HIRAKUZA. No implicit person/press reuse consent. |
 | `a27` | MAIKOYA tea ceremonies in Tokyo (Asakusa and Shinjuku operator, multi-site concept) | https://mai-ko.com/culture/tea-ceremony/tokyo.html?locale=en | MAIKOYA original Tokyo-only tea-ceremony overview has specific experience photographs and booking paths for Asakusa and Shinjuku; the catalogue is for the combined Tokyo provider, not an invented single location. Retain `operator` provenance. |
@@ -25,4 +24,4 @@ Existing **131 venue records, 89 image mappings, 42 missing-photo illustrations,
 
 ## QA contract
 
-PR Chromium checks source URLs/hosts/paths/optional locale parameter; correctly labels `listing` vs `operator`; card link, modal link, pending illustrated state and no new photo mapping. Existing 131 venue rights, 89 image loading, iPhone width, EN/JA/KO, search, filters, shortlist, CSV and JavaScript runtime smoke retained. Commit/merge only on success, then verify deployed Pages exact commit and 178 of 178 photo loads (local + public).
+PR Chromium checks source URLs/hosts/paths/optional locale parameter and explicitly asserts pre-existing licensed r32 remains published; correctly labels `listing` vs `operator`; card link, modal link, pending illustrated state and no new photo mapping. Existing 131 venue rights, 89 image loading, iPhone width, EN/JA/KO, search, filters, shortlist, CSV and JavaScript runtime smoke retained. Commit/merge only on success, then verify deployed Pages exact commit and 178 of 178 photo loads (local + public).
