@@ -4,6 +4,11 @@ on:
     branches: [main]
     paths:
       - 'index.html'
+      - 'assets/atelier-catalog.js'
+      - 'assets/atelier-sources.js'
+      - 'assets/atelier-media.js'
+      - 'audits/stage01-original-data-snapshot.json'
+      - 'tests/atelier-source-registry.cjs'
       - 'assets/photos/**'
       - 'scripts/validate-venue-photos.py'
       - '.github/workflows/verify-venue-photos.yml'
@@ -33,6 +38,7 @@ jobs:
           pathlib.Path("/tmp/atelier-inline.js").write_text(scripts[0], encoding="utf-8")
           PY
           node --check /tmp/atelier-inline.js
+          node tests/check-inline-js.cjs
       - name: Validate currently displayed licensed venue photos
         id: photo_validation
         run: |
