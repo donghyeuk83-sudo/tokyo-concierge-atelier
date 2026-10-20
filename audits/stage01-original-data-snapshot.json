@@ -1,0 +1,17 @@
+{
+  "baseline_commit": "3672a1da50048bbf0fbf81f181646d5fc1583b6a",
+  "baseline_index_blob_sha": "9aec4e5094a3a7a0a0689964a67e39b3e4ebe8fa",
+  "description": "Byte-exact Git blob SHA-1 fingerprints of declarations cut from the approved main HTML; source extraction is not a venue, source, rights or image-data edit.",
+  "git_blob_sha1": {
+    "assets/atelier-catalog.js": "a5e9723c600ffb2164733c6442c5d077469ec5ef",
+    "assets/atelier-sources.js": "92ae3c3deef3ed1931fb57ac5b0ce1771b7e1581",
+    "assets/atelier-media.js": "bc1b177bf9fd5793c8299f636d2fb3515ec27e42"
+  },
+  "expected": {
+    "places": 131,
+    "licensed_venue_photo_entries": 89,
+    "ai_visual_mappings": 50,
+    "pending_photo_rights_slots": 42,
+    "category_count": 5
+  }
+}

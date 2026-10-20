@@ -1,10 +1,10 @@
 // Generate a conservative 131-venue photo/source audit. No guessed rights or images.
 const fs=require('node:fs');
 const assert=require('node:assert/strict');
-const html=fs.readFileSync('index.html','utf8');
+const {html,catalogueSection:dataSection,licensedSection,verifyExtractedSnapshot}=require('./atelier-source-registry.cjs');
+verifyExtractedSnapshot();
 const localPhotos=JSON.parse(fs.readFileSync('assets/photos/sources.json','utf8'));
 assert.equal(new Set(localPhotos.map(p=>p.id)).size,localPhotos.length,'Duplicate local source review');
-const dataSection=html.split('const DATA=[')[1]?.split('].map(')[0];
 assert(dataSection,'DATA catalog section missing');
 const entries=[...dataSection.matchAll(/^\[("(?:[^"\\]|\\.)*"(?:,\s*"(?:[^"\\]|\\.)*"){6})\],?$/gm)]
  .map(m=>JSON.parse('['+m[1]+']'));
@@ -15,7 +15,6 @@ const kimonoWA=entries.find(v=>v[0]==='a32');
 assert(kimonoWA&&kimonoWA[4]==='Meguro','Kimono Photo Studio WA must be catalogued in verified Meguro, not Asakusa');
 const ids=entries.map(x=>x[0]);
 assert.equal(new Set(ids).size,131,'Duplicate venue ID');
-const licensedSection=html.split('const LICENSED_VENUE_PHOTOS={')[1]?.split('};')[0];
 assert(licensedSection,'Licensed photos registry missing');
 const licensed=[...licensedSection.matchAll(/^([a-z]\d+):\{url:"([^"]+)",source:"([^"]+)",credit:"([^"]+)",license:"([^"]+)",licenseUrl:"([^"]+)"\}/gm)]
  .map(m=>({id:m[1],url:m[2],source:m[3],credit:m[4],license:m[5],licenseUrl:m[6]}));

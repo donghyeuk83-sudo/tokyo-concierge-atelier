@@ -2,9 +2,8 @@
 // Usage: node tests/photo-queue.cjs
 const fs = require('node:fs');
 const assert = require('node:assert/strict');
-const html = fs.readFileSync('index.html','utf8');
-const data = html.split('const DATA=[')[1]?.split('].map(')[0];
-const photoSection = html.split('const LICENSED_VENUE_PHOTOS={')[1]?.split('};')[0];
+const {catalogueSection:data,licensedSection:photoSection,verifyExtractedSnapshot}=require('./atelier-source-registry.cjs');
+verifyExtractedSnapshot();
 assert(data && photoSection, 'Missing catalogue or photo registry');
 const venues = [...data.matchAll(/^\[("(?:[^"\\]|\\.)*"(?:,\s*"(?:[^"\\]|\\.)*"){6})\],?$/gm)].map(m=>JSON.parse('['+m[1]+']'));
 const registered = new Set([...photoSection.matchAll(/^([a-z]\d+):\{/gm)].map(m=>m[1]));

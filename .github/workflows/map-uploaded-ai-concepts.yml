@@ -17,5 +17,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: atelier-concept-mapping-review
-          path: index.html
+          path: assets/atelier-media.js
           retention-days: 7

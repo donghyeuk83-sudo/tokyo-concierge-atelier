@@ -177,13 +177,13 @@ const assert=require('assert');
  await page.locator('#query').fill('');
  await page.locator('#tabs [data-cat="attraction"]').click();
  const fs=require('node:fs');
- const html=fs.readFileSync('index.html','utf8');
+ const {html,catalogueSection,licensedSection,publicPhotoSourceBlock,photoContextBlock,verifyExtractedSnapshot}=require('./atelier-source-registry.cjs');
+ verifyExtractedSnapshot();
  const localPhotos=JSON.parse(fs.readFileSync('assets/photos/sources.json','utf8'));
  const localPhotoById=new Map(localPhotos.map(photo=>[photo.id,photo]));
- const registry=html.split('const LICENSED_VENUE_PHOTOS={')[1]?.split('};')[0]||'';
+ const registry=licensedSection;
  const expectedPhotos=[...registry.matchAll(/^([a-z]\d+):\{/gm)].map(m=>m[1]);
- const publicPhotoSourceBlock=html.split('const VENUE_PHOTO_SOURCE_LINKS={')[1]?.split('};')[0]||'';
- const externalPhotoIds=[...publicPhotoSourceBlock.matchAll(/^([a-z]\d+):\{url:/gm)].map(m=>m[1]);
+  const externalPhotoIds=[...publicPhotoSourceBlock.matchAll(/^([a-z]\d+):\{url:/gm)].map(m=>m[1]);
  assert.equal(externalPhotoIds.length,46,'46 original venue photo/information links expected');
  assert.equal(new Set(externalPhotoIds).size,externalPhotoIds.length,'Duplicate external source ID');
  // Every new source is an independently verified exact-branch gallery, not a photo reuse permission.
@@ -509,8 +509,7 @@ const assert=require('assert');
  assert(expectedPhotos.length>=24,'Photo registry unexpectedly shrank');
  assert.equal(expectedPhotos.length,89,'Expected 89 original images including six licensed host-building exteriors');
  // Six of the 89 mapped photos depict host shopping/hotel buildings, not the venue itself.
- const photoContextBlock=html.split('const VENUE_PHOTO_CONTEXT={')[1]?.split('};')[0]||'';
- const buildingPhotoIds=[...photoContextBlock.matchAll(/^([a-z]\d+):\{([^\n]+)\}/gm)].filter(m=>!m[2].includes('kind:"venue"')).map(m=>m[1]);
+  const buildingPhotoIds=[...photoContextBlock.matchAll(/^([a-z]\d+):\{([^\n]+)\}/gm)].filter(m=>!m[2].includes('kind:"venue"')).map(m=>m[1]);
  assert.deepEqual(buildingPhotoIds.slice().sort(),['r18','r21','r32','r34','r48','a36','r30','w02','w07'].sort(),'Nine photograph labels accurately identify host-building exteriors');
 
  for(const [id,filename] of [['r32','Shibuya_Parco.jpg'],['r34','Omotesando-Harajuku-Tokyo---2024-06-15_010.jpg'],['r18','Pacific Century Place Marunouchi.jpg'],['r21','Nihonbashi Mitsui Tower @ Nihonbashi (9044324513).jpg'],['r48','新大手町ビル.jpg'],['a36','Ginza INZ.jpg']]){
@@ -559,7 +558,7 @@ const assert=require('assert');
    assert.equal(new URL(licenseUrl).hostname,'creativecommons.org','License must link to Creative Commons: '+id);
  }
 
- const catalog=html.split('const DATA=[')[1]?.split('].map(')[0]||'';
+ const catalog=catalogueSection;
  const categoryById=new Map([...catalog.matchAll(/^\["([a-z]\d+)","(restaurant|attraction|shopping|wellness|transport)"/gm)].map(m=>[m[1],m[2]]));
  const failedPhotos=[];
  // The catalogue renders only one category at a time. Visit each category before asserting its photos.

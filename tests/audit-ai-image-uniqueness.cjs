@@ -1,9 +1,8 @@
 // Check every AI photo card and publish a precise duplicate-image audit.
 // Does not mistake a reused filename for a venue-specific photograph.
 const fs=require('node:fs');
-const html=fs.readFileSync('index.html','utf8');
-const catalog=html.split('const DATA=[')[1]?.split('].map(')[0];
-const registry=html.split('const AI_VENUE_VISUALS={')[1]?.split('};')[0];
+const {catalogueSection:catalog,aiSection:registry,verifyExtractedSnapshot}=require('./atelier-source-registry.cjs');
+verifyExtractedSnapshot();
 if(!catalog||!registry)throw Error('Catalogue or AI image registry missing');
 const venues=[...catalog.matchAll(/^\[("(?:[^"\\]|\\.)*"(?:,\s*"(?:[^"\\]|\\.)*"){6})\],?$/gm)].map(m=>JSON.parse('['+m[1]+']'));
 const photos=[...registry.matchAll(/([a-z]\d+):\{url:'([^']+)'/g)].map(m=>({id:m[1],file:m[2]}));
