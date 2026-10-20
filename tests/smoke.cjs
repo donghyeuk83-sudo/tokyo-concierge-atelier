@@ -257,6 +257,39 @@ const assert=require('assert');
  await page.locator('#language').selectOption('ja');
  assert((await officialPhoto.locator('.venue-photo-source small').textContent()).includes('東京都の公式観光ガイド'),'Japanese official tourism source provenance');
  await page.locator('#language').selectOption('en');
+
+ // Batch 10: independently verify exact-branch photo listings and original operator reportage.
+ // These external images must not appear on hotel-hosted cards without individual commercial CC clearance.
+ // Existing registered photographs must remain registered: r32 is already photographed.
+ assert(expectedPhotos.includes('r32'),'Licensed Kanazawa Maimon Sushi Shibuya PARCO photo preserved');
+ const batch10=[
+   ['restaurant','r47','tabelog.com','/tokyo/A1307/A130701/13025665/dtlphotolst/3/smp2/','listing','Independent photo listing',''],
+   ['attraction','a34','hirakuza.net','/tokyo/news/202601113508/','operator','Venue / operator website',''],
+   ['attraction','a27','mai-ko.com','/culture/tea-ceremony/tokyo.html','operator','Venue / operator website','?locale=en']
+ ];
+ for(const [category,id,host,path,kind,provenance,query] of batch10){
+   const entry=publicPhotoSourceBlock.split(String.fromCharCode(10)).find(line=>line.trim().startsWith(id+':'));
+   assert(entry,'Source reference exists for '+id);
+   const match=entry.match(/url:"([^"]+)",kind:"([^"]+)"/);
+   assert(match,'Expected source object '+id);
+   const url=new URL(match[1]);
+   assert.equal(url.hostname,host,'Venue-specific image source host '+id);
+   assert.equal(url.pathname,path,'Venue-specific gallery or actual opening photography path '+id);
+   assert.equal(url.search,query,'Preserve relevant language parameters '+id);
+   assert.equal(match[2],kind,'Independent vs venue-operator photo rights classification '+id);
+   assert(!expectedPhotos.includes(id),'No copyright-unverified photo promoted '+id);
+   await page.locator('#tabs [data-cat="'+category+'"]').click();
+   const card=page.locator('article.card').filter({has:page.locator('.detail-trigger[data-detail="'+id+'"]')});
+   const link=card.locator('a.venue-photo-source');
+   assert.equal(await link.count(),1,'Gallery source rendered on venue card '+id);
+   assert.equal(await link.getAttribute('href'),match[1],'Guest card link matches exact original '+id);
+   assert((await link.locator('small').textContent()).includes(provenance),'Accurate external-photo provenance visible '+id);
+   assert.equal(await card.locator('img[data-venue-photo]').count(),0,'Do not falsely depict a CC-cleared photo '+id);
+   await card.locator('.detail-trigger').click();
+   assert.equal(await page.locator('#detailActions .detail-photo-source').getAttribute('href'),match[1],'Venue details preserve exact source URL '+id);
+   await page.locator('#detailClose').click();
+ }
+
  const checkedPhotoRefs=[
    ['restaurant','r06','tabelog.com'],
    ['wellness','w05','www.shimizuyu.com'],
