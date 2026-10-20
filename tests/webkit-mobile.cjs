@@ -74,6 +74,9 @@ function startLocalServer(){
   // Verify the actual generated file BYTES and a visible human-tappable fallback,
   // not merely that Chromium's automatic download event happens in WebKit.
   const dl=page.waitForEvent('download',{timeout:3500}).catch(()=>null);
+  assert(await page.locator('#download').evaluate(el=>typeof el.onclick==='function'),'CSV export button must have registered click handler in WebKit');
+  const errorsBefore=jsErrors.length;
+  await page.evaluate(()=>{window.__csvClickSeen=0;document.querySelector('#download').addEventListener('click',()=>{window.__csvClickSeen++},{capture:true})});
   await page.locator('#download').click();
   const fallback=page.locator('#csvDirectDownload');
   // A scripted Blob click must NOT navigate iOS Safari away from the guest guide.
@@ -85,9 +88,13 @@ function startLocalServer(){
       items:document.querySelectorAll('#guide .guide-item').length,
       fallbackClasses:document.querySelector('#csvDownloadFallback')?.className,
       directHref:document.querySelector('#csvDirectDownload')?.getAttribute('href'),
-      status:document.querySelector('#interactionStatus')?.textContent
+      status:document.querySelector('#interactionStatus')?.textContent,
+      handler:typeof document.querySelector('#download')?.onclick,
+      urlCreator:typeof URL.createObjectURL,
+      activeElement:document.activeElement?.id,
+      clickEvents:window.__csvClickSeen
     }));
-    console.error('WEBKIT_CSV_DIAGNOSTIC',JSON.stringify(state));
+    console.error('WEBKIT_CSV_DIAGNOSTIC',JSON.stringify({...state,newPageErrors:jsErrors.slice(errorsBefore)}));
   }
   await fallback.waitFor({state:'visible',timeout:5000});
   assert.equal(await fallback.getAttribute('download'),'tokyo-concierge-shortlist.csv','Direct CSV has a real download filename');
@@ -108,6 +115,13 @@ function startLocalServer(){
     assert(native.suggestedFilename().endsWith('.csv'),'Native WebKit auto-download uses the correct filename');
     assert(fs.readFileSync(await native.path()).length>3,'Native file download is not empty');
   }else console.log('INFO iPhone WebKit emulation suppressed automatic download; the complete CSV Blob and visible manual download link were verified');
+  // A no-op storage update from another tab must never revoke a valid CSV Blob.
+  await page.evaluate(()=>{
+    const unchanged=localStorage.getItem('atelier-shortlist-v2');
+    window.dispatchEvent(new StorageEvent('storage',{key:'atelier-shortlist-v2',newValue:unchanged}));
+  });
+  assert(await fallback.isVisible(),'Unchanged external shortlist event must preserve Safari CSV fallback');
+  assert.equal(await fallback.getAttribute('href'),csvFile.url,'Unchanged shortlist event must preserve the existing CSV Blob URL');
   await page.evaluate(()=>window.dispatchEvent(new StorageEvent('storage',{key:'atelier-shortlist-v2',newValue:'[]'})));
   assert(!await page.locator('#csvDownloadFallback').isVisible(),'Previously generated CSV is invalidated when guest selection changes in another tab');
   await page.locator('#tabs [data-cat="attraction"]').click();

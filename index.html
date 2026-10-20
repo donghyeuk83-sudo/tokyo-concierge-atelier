@@ -1209,8 +1209,12 @@ document.addEventListener("click",e=>{const photoButton=e.target.closest("[data-
 $("photoClose").onclick=()=>$("photoDialog").close();
 window.addEventListener("storage",event=>{
  if(event.key==="atelier-shortlist-v2"){
+  const incoming=parseSavedShortlist(event.newValue);
+  // Repeated cross-tab writes of the same venue IDs are not selection changes.
+  // Preserve a still-valid Safari manual CSV link in this no-op case.
+  if(incoming.size===selected.size&&[...incoming].every(id=>selected.has(id)))return;
   invalidateCsvDownload();
-  selected=parseSavedShortlist(event.newValue);
+  selected=incoming;
   render();
   const dialog=$("detailDialog");
   if(dialog.open){const button=dialog.querySelector("[data-id]");if(button)button.textContent=selected.has(button.dataset.id)?tr().remove:tr().add}
