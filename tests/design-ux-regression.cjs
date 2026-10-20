@@ -11,7 +11,7 @@ async function baseUrl(){
    const target=path.resolve(process.cwd(),'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname==='/'
     ?'/index.html':new URL(req.url,'http://localhost').pathname));
    if(!target.startsWith(process.cwd()+path.sep)){res.writeHead(403).end();return}
-   const type=target.endsWith('.html')?'text/html;charset=utf-8':target.endsWith('.webp')?'image/webp':target.endsWith('.jpg')?'image/jpeg':target.endsWith('.svg')?'image/svg+xml':'text/plain';
+   const type=target.endsWith('.html')?'text/html;charset=utf-8':target.endsWith('.css')?'text/css;charset=utf-8':target.endsWith('.webp')?'image/webp':target.endsWith('.jpg')?'image/jpeg':target.endsWith('.svg')?'image/svg+xml':'text/plain';
    fs.readFile(target,(e,data)=>{if(e){res.writeHead(404).end();return}res.writeHead(200,{'content-type':type}).end(data)});
   }).listen(0,'127.0.0.1',()=>resolve('http://127.0.0.1:'+server.address().port+'/'));
  });
@@ -24,6 +24,15 @@ async function verify(browserType,label,dimensions,url){
   page.on('pageerror',e=>errors.push(e.message));
   await page.goto(url,{waitUntil:'domcontentloaded',timeout:45000});
   await page.locator('#cards .card').first().waitFor({timeout:20000});
+  // A linked stylesheet can silently fail (MIME, 404, CSP) while JS still renders cards.
+  // Assert real parsed CSS rules, not merely the presence of a <link> tag.
+  const stylesheetRules=await page.evaluate(()=>{
+   const sheet=[...document.styleSheets].find(s=>s.href?.includes('/assets/atelier.css'));
+   if(!sheet)return 0;
+   try{return sheet.cssRules.length}catch(e){return 0}
+  });
+  assert(stylesheetRules>50,'Published external stylesheet must load and parse at '+label+': '+stylesheetRules);
+  assert.equal(await page.locator('#cards .card').first().evaluate(el=>getComputedStyle(el).boxSizing),'border-box','Original card sizing must survive CSS extraction');
   const positions=()=>page.evaluate(()=>{
    const main=document.querySelector('main'),visual=document.querySelector('.cinematic-gallery');
    return {mainBeforeStories:!!(main.compareDocumentPosition(visual)&Node.DOCUMENT_POSITION_FOLLOWING),
