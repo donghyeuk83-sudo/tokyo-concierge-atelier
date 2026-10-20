@@ -9,7 +9,7 @@ const mapping={
  r49:'omoide-yokocho.webp',r50:'tokyo-tower-night.webp',
  r51:'hamarikyu-gardens.webp',r52:'matcha-experience.webp'
 };
-let html=fs.readFileSync('index.html','utf8'),count=0;
+const registryPath='assets/atelier-media.js';let html=fs.readFileSync(registryPath,'utf8'),count=0;
 for(const [id,file] of Object.entries(mapping)){
  const asset='assets/photos/'+file;
  if(!fs.existsSync(asset))continue;
@@ -22,5 +22,5 @@ for(const [id,file] of Object.entries(mapping)){
  else html=html.slice(0,begin+'const AI_VENUE_VISUALS={'.length)+value+','+html.slice(begin+'const AI_VENUE_VISUALS={'.length);
  count++;
 }
-fs.writeFileSync('index.html',html);
+fs.writeFileSync(registryPath,html);
 console.log('Mapped '+count+' AI image cards from uploaded assets');
