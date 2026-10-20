@@ -29,7 +29,7 @@ new vm.Script(localeJS,{filename:localePath});
 const originalLocale=localeJS.slice(localeJS.indexOf('const I18N='));
 assert(originalLocale.startsWith('const I18N='),'Locale translation literal must exist');
 let h=2166136261;
-for(const ch of originalLocale){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}
+for(let i=0;i<originalLocale.length;i++){h^=originalLocale.charCodeAt(i);h=Math.imul(h,16777619)}
 assert.equal((h>>>0).toString(16),'a7fb4a39','Original three-language copy changed unexpectedly');
 assert(!html.includes('const I18N='),'Locale definitions must have exactly one source of truth');
 assert(searchSource.includes('function searchText(r)'),'Dedicated search index must define searchText');
