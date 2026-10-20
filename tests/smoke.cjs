@@ -260,8 +260,9 @@ const assert=require('assert');
 
  // Batch 10: independently verify exact-branch photo listings and original operator reportage.
  // These external images must not appear on hotel-hosted cards without individual commercial CC clearance.
+ // Existing registered photographs must remain registered: r32 is already photographed.
+ assert(expectedPhotos.includes('r32'),'Licensed Kanazawa Maimon Sushi Shibuya PARCO photo preserved');
  const batch10=[
-   ['restaurant','r32','tabelog.com','/tokyo/A1303/A130301/13240931/dtlphotolst/3/smp2/','listing','Independent photo listing',''],
    ['restaurant','r47','tabelog.com','/tokyo/A1307/A130701/13025665/dtlphotolst/3/smp2/','listing','Independent photo listing',''],
    ['attraction','a34','hirakuza.net','/tokyo/news/202601113508/','operator','Venue / operator website',''],
    ['attraction','a27','mai-ko.com','/culture/tea-ceremony/tokyo.html','operator','Venue / operator website','?locale=en']
