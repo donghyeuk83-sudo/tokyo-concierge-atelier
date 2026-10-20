@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: '22'
       - run: npm install --no-save playwright
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps chromium webkit
       - name: Ensure missing-photo queue is current
         run: |
           node tests/photo-queue.cjs
@@ -43,6 +43,8 @@ jobs:
         run: node tests/smoke.cjs
       - name: Regress shortlist, venue location and blocked storage
         run: node tests/state-regression.cjs
+      - name: Test iPhone Safari-style WebKit mobile UX and CSV
+        run: node tests/webkit-mobile.cjs
       - name: Audit all image-generation and research safety gates
         run: |
           node --check scripts/find-photo-candidates.mjs
@@ -80,3 +82,4 @@ jobs:
         run: |
           node tests/smoke.cjs
           node tests/state-regression.cjs
+          node tests/webkit-mobile.cjs
