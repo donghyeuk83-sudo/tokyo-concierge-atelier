@@ -54,10 +54,12 @@ async function verify(browserType,label,dimensions,url){
   assert.equal(await page.locator('#guide .guide-item').count(),1,'Moving main does not erase guest selections');
   if(dimensions==='desktop'){
    await page.setViewportSize({width:390,height:844});
+   await page.waitForFunction(()=>!!(document.querySelector('main').compareDocumentPosition(document.querySelector('.cinematic-gallery'))&Node.DOCUMENT_POSITION_FOLLOWING),null,{timeout:7000});
    state=await positions();
    assert.equal(state.mainBeforeStories,true,'Live resize to mobile prioritizes tools');
    assert.equal(await page.locator('#guide .guide-item').count(),1,'Selection survives responsive reorder');
    await page.setViewportSize({width:1366,height:900});
+   await page.waitForFunction(()=>!!(document.querySelector('.cinematic-gallery').compareDocumentPosition(document.querySelector('main'))&Node.DOCUMENT_POSITION_FOLLOWING),null,{timeout:7000});
    state=await positions();
    assert.equal(state.mainBeforeStories,false,'Desktop editorial layout restored after resize');
   }
