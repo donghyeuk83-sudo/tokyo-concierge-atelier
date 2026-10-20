@@ -1,17 +1,11 @@
-name: Generate unique venue AI photo concepts
+name: Generate venue AI concepts (manual review only)
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/generate-venue-ai-images.yml'
-      - 'scripts/generate-venue-ai-images.py'
-      - 'scripts/validate-venue-photos.py'
   workflow_dispatch:
 permissions:
-  contents: write
+  contents: read
 concurrency:
-  group: venue-photo-publisher-main
-  cancel-in-progress: false
+  group: venue-concept-review
+  cancel-in-progress: true
 jobs:
   generate:
     runs-on: ubuntu-latest
@@ -22,20 +16,17 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install Pillow
-      - name: Compile Python generation and QA scripts
+      - name: Compile generation and photo audit
         run: python -m py_compile scripts/generate-venue-ai-images.py scripts/validate-venue-photos.py
-      - name: Fetch unique photorealistic AI images and map successful files
+      - name: Generate illustrative AI concepts for manual review only
         run: python scripts/generate-venue-ai-images.py
-      - name: Validate generated WebP files and all 50 card links
+      - name: Validate images, file identity and design
         run: python scripts/validate-venue-photos.py
-      - name: Commit generated venue photo files
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html
-          git add -A assets/photos/
-          if ! git diff --cached --quiet; then
-            git commit -m "Publish generated venue photo WebP assets and update site cards"
-            git pull --rebase origin main
-            git push origin HEAD:main
-          fi
+      - name: Upload draft image concepts without editing main or publishing
+        uses: actions/upload-artifact@v4
+        with:
+          name: venue-ai-concepts-review-only
+          path: |
+            assets/photos/ai-unique-*.webp
+            index.html
+          retention-days: 7

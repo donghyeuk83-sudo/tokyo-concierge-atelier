@@ -41,6 +41,14 @@ jobs:
           path: audits/
       - name: Test repository HTML in Chromium
         run: node tests/smoke.cjs
+      - name: Regress shortlist, venue location and blocked storage
+        run: node tests/state-regression.cjs
+      - name: Audit all image-generation and research safety gates
+        run: |
+          node --check scripts/find-photo-candidates.mjs
+          node --check tests/find-commons-photos.cjs
+          node tests/audit-pipeline-safety.cjs
+          python -m py_compile scripts/generate-venue-ai-images.py scripts/validate-venue-photos.py
       - name: Wait for current revision on GitHub Pages
         if: github.event_name != 'pull_request'
         id: pages_ready
@@ -69,4 +77,6 @@ jobs:
         if: steps.pages_ready.outputs.ready == 'true'
         env:
           TEST_URL: https://donghyeuk83-sudo.github.io/tokyo-concierge-atelier/
-        run: node tests/smoke.cjs
+        run: |
+          node tests/smoke.cjs
+          node tests/state-regression.cjs

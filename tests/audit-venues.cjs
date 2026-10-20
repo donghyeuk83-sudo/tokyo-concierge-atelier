@@ -10,6 +10,9 @@ const entries=[...dataSection.matchAll(/^\[("(?:[^"\\]|\\.)*"(?:,\s*"(?:[^"\\]|\
  .map(m=>JSON.parse('['+m[1]+']'));
 assert.equal(entries.length,131,'Expected exactly 131 venue records');
 for(const e of entries){assert.equal(e.length,7,'Venue must have seven fields');assert(e[0]&&e[1]&&e[2]&&e[3]&&e[4]&&e[5],'Venue missing required identity fields: '+e[0]);assert(!e[6]||/^https:\/\//.test(e[6]),'Venue reference URL invalid: '+e[0]);}
+// Audit source identity and catalogue filter area together, not just Google Maps.
+const kimonoWA=entries.find(v=>v[0]==='a32');
+assert(kimonoWA&&kimonoWA[4]==='Meguro','Kimono Photo Studio WA must be catalogued in verified Meguro, not Asakusa');
 const ids=entries.map(x=>x[0]);
 assert.equal(new Set(ids).size,131,'Duplicate venue ID');
 const licensedSection=html.split('const LICENSED_VENUE_PHOTOS={')[1]?.split('};')[0];
