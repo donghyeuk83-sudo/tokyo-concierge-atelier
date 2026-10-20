@@ -1,17 +1,16 @@
 // Non-destructive network check of the 131 venue reference links.
 // A 403, bot challenge or timeout does not prove a venue is closed.
 const fs=require('node:fs');
-const html=fs.readFileSync('index.html','utf8');
-const dataSection=html.split('const DATA=[')[1]?.split('].map(')[0];
+const {catalogueSection:dataSection,sources,verifyExtractedSnapshot}=require('./atelier-source-registry.cjs');
+verifyExtractedSnapshot();
 if(!dataSection)throw Error('DATA section missing');
 const venues=[...dataSection.matchAll(/^\[("(?:[^"\\]|\\.)*"(?:,\s*"(?:[^"\\]|\\.)*"){6})\],?$/gm)].map(m=>JSON.parse('['+m[1]+']'));
 if(venues.length!==131)throw Error('Expected 131 venues, got '+venues.length);
 // Audit the actual guest-visible URL, which prefers a manually reviewed source
 // over the original catalogue link. Keep both URLs for human review.
-const reviewStart=html.indexOf('const VERIFIED_SOURCES=');
-const reviewEnd=html.indexOf('const LICENSED_VENUE_PHOTOS=',reviewStart);
-if(reviewStart<0||reviewEnd<reviewStart)throw Error('Verified venue sources block missing');
-const sourceMatches=[...html.slice(reviewStart,reviewEnd).matchAll(/(?:^|\n)([a-z]\d+):\{url:"(https:[^"]+)",checked:"(\d{4}-\d{2}-\d{2})"/gm)];
+const reviewStart=sources.indexOf('const VERIFIED_SOURCES=');
+if(reviewStart<0)throw Error('Verified venue sources block missing');
+const sourceMatches=[...sources.slice(reviewStart).matchAll(/(?:^|\n)([a-z]\d+):\{url:"(https:[^"]+)",checked:"(\d{4}-\d{2}-\d{2})"/gm)];
 const reviewedUrls=new Map(sourceMatches.map(m=>[m[1],m[2]]));
 if(reviewedUrls.size<120)throw Error('Unexpected verified-source coverage: '+reviewedUrls.size);
 const results=new Array(venues.length);
