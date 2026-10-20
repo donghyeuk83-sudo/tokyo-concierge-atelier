@@ -115,6 +115,13 @@ function startLocalServer(){
     assert(native.suggestedFilename().endsWith('.csv'),'Native WebKit auto-download uses the correct filename');
     assert(fs.readFileSync(await native.path()).length>3,'Native file download is not empty');
   }else console.log('INFO iPhone WebKit emulation suppressed automatic download; the complete CSV Blob and visible manual download link were verified');
+  // A no-op storage update from another tab must never revoke a valid CSV Blob.
+  await page.evaluate(()=>{
+    const unchanged=localStorage.getItem('atelier-shortlist-v2');
+    window.dispatchEvent(new StorageEvent('storage',{key:'atelier-shortlist-v2',newValue:unchanged}));
+  });
+  assert(await fallback.isVisible(),'Unchanged external shortlist event must preserve Safari CSV fallback');
+  assert.equal(await fallback.getAttribute('href'),csvFile.url,'Unchanged shortlist event must preserve the existing CSV Blob URL');
   await page.evaluate(()=>window.dispatchEvent(new StorageEvent('storage',{key:'atelier-shortlist-v2',newValue:'[]'})));
   assert(!await page.locator('#csvDownloadFallback').isVisible(),'Previously generated CSV is invalidated when guest selection changes in another tab');
   await page.locator('#tabs [data-cat="attraction"]').click();
