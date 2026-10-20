@@ -4,7 +4,12 @@ Updated 2026-10-21. Site: `https://donghyeuk83-sudo.github.io/tokyo-concierge-at
 
 ## Architecture
 
-- `index.html`: static HTML shell plus catalogue dataset, multilingual strings, localStorage shortlist, guest-guide sharing, CSV export, source verification labels, photo source/approval registry, and interactive UI JavaScript. The JavaScript remains inline intentionally: the 131-place and 89-photo quality gates currently inspect the registry in this file.
+- `index.html`: the original static HTML layout and remaining inline **state, UI rendering, CSV and event** script. Stage 0–1 extracted canonical data without changing its values; stages 2–4 are NOT performed yet.
+- `assets/atelier-catalog.js`: byte-preserved 131-record `DATA` registry and the original five-category order/cache.
+- `assets/atelier-sources.js`: byte-preserved `VERIFIED_SOURCES`, pending source reviews and exact official-vs-reference provenance.
+- `assets/atelier-media.js`: byte-preserved 89 CC photo mappings, 50 AI concept mappings, host-building photo disclosures and external photo-source metadata.
+- `audits/stage01-original-data-snapshot.json`: pinned original main commit / source blob SHA-1s, so a one-byte change to extracted data fails the QA gate until explicitly reviewed.
+- `tests/atelier-source-registry.cjs`: strict shared parser for the three deployed JS assets, including all venue/photo counts, exact Git blob hashes and loader ordering. Audit tools no longer scrape data from inline HTML. Canonical extraction intentionally uses classic synchronous <script src> tags to preserve file:// behavior.
 - `assets/atelier.css`: the original complete CSS moved without a visual redesign. HTML uses a same-origin **versioned link** (`?v=20261020-a`). When updating styles, bump the version string in `index.html` so repeat visitors receive current CSS. Do not silently change the layout during refactors.
 - `assets/atelier-illustration.js`: the **unchanged** ~9.7kB pure venue illustration renderer, loaded as a synchronous classic script immediately before the existing catalogue inline script. It resolves `esc()` and `lang` when called, preserving the original fallback images, labels, and localized names. The versioned link is `?v=20261021-a` and must be bumped if the asset changes. The syntax gate checks both scripts.
 - `assets/atelier-search.js`: original district and venue multilingual aliases plus the original EN/JA/KO indexing formula, now memoized in a `WeakMap` by the immutable venue object. The versioned synchronous classic script loads between illustration renderer and catalogue script. The index must match the previous uncached formula for all **131** venues; the browser test checks exact text equivalence. No catalogue source of truth is duplicated.
@@ -24,6 +29,6 @@ Updated 2026-10-21. Site: `https://donghyeuk83-sudo.github.io/tokyo-concierge-at
 - Share links contain only public shortlist venue IDs. Never leak arbitrary URL query parameters or persist guest PII. When shortlist selection **or locale** changes, invalidate previously prepared CSV export blobs.
 - Protect production with branch/PR checks before merging. Review test results for real Chromium and iPhone WebKit, not only syntax checks. Distinguish emulator/Playwright behavior from a physical iPhone Safari hardware test.
 
-## Next modularization step (not performed in this change)
+## Next modularization step — Stage 2–4 (not performed in this PR)
 
-The 131-place data, verified-source notes, and translation strings still live in `index.html`. Extract them only after tests and audits are reworked to consume canonical JSON/module data without silently duplicating information, or changing offline/file:// access behavior. Avoid a wholesale rewrite in a single PR.
+The 131-place catalogue, source notes and 89-photo licensed registry are now canonical external JS. Next isolate guest-facing guidance/common helpers/state, then editorial/rendering and CSV/boot code in separate reviewed PRs. Retain file:// functionality, exact legacy translation copy and all existing safety and photo-approval gates. Do not mutate the stage 0–1 snapshot to conceal unreviewed data changes.
