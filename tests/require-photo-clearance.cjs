@@ -25,10 +25,13 @@ let newOrChanged=0;
 for(const [id,photo] of current){
   if(baseline[id]&&JSON.stringify(photo)===JSON.stringify(baseline[id]))continue;
   newOrChanged++;
-  // Official operator lists Kimono Photo Studio WA in Meguro, while the venue catalogue says Asakusa.
-  // Do not approve a photo against a misidentified location until the catalogue is reconciled.
-  assert.notEqual(id,'a32','a32 studio area mismatch (Meguro vs Asakusa) must be resolved before photo publication');
+  // The Kimono Photo Studio WA area was corrected to Meguro on 2026-10-20.
+  // Any future a32 photograph still needs a distinct, exact-site image/rights approval.
   const review=approvals.get(id);
+  if(id==='a32'){
+   assert(html.includes('["a32","attraction","Kimono Photo Studio WA","着物フォトスタジオ和","Meguro"'),'Kimono WA must keep its verified Meguro area before photography is published');
+   assert(review&&/Meguro|Kamiosaki|上大崎/i.test(review.venueIdentityExplanation||''),'Any a32 approval must identify the current Kamiosaki/Meguro studio location');
+  }
   assert(review,'New or replaced photo '+id+' needs approval record before publication');
   for(const key of ['url','source','credit','license','licenseUrl']){
     assert.equal(review[key],photo[key],'Approval metadata mismatch '+id+' '+key);
