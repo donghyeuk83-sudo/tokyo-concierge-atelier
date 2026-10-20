@@ -1,8 +1,8 @@
 // Keep five bot-blocked/upstream-error links anchored to the original venue identity.
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
-const html=fs.readFileSync('index.html','utf8');
-const section=html.split('const DATA=[')[1]?.split('].map(')[0];
+const {catalogueSection:section,sources,verifyExtractedSnapshot}=require('./atelier-source-registry.cjs');
+verifyExtractedSnapshot();
 assert(section,'Read catalog venue records');
 const rows=[...section.matchAll(/^\[("(?:[^"\\]|\\.)*"(?:,\s*"(?:[^"\\]|\\.)*"){6})\],?$/gm)].map(m=>JSON.parse('['+m[1]+']'));
 assert.equal(rows.length,131,'Catalogue count unchanged');
@@ -27,7 +27,7 @@ assert(checker.includes('reviewedUrls.get(id)||reference_url'),'Audit actual rev
 assert(checker.includes("'reference_url','reviewed_url_used'"),'Retain original reference and source-override provenance for manual review');
 // The exact Meguro studio URL is an important example of an on-card source
 // that is different from the static catalogue's original generic reference.
-const verified=html.slice(html.indexOf('const VERIFIED_SOURCES='),html.indexOf('const LICENSED_VENUE_PHOTOS='));
+const verified=sources.slice(sources.indexOf('const VERIFIED_SOURCES='));
 const studioReviewed=[...verified.matchAll(/(?:^|\n)a32:\{url:"([^"]+)",checked:"([^"]+)"/gm)].at(-1);
 assert(studioReviewed&&studioReviewed[1]==='https://kimono-wa.com/en/access.html','Guest-facing Meguro source remains the correct official access link');
 console.log('PASS official external link audit: five exact venue identities preserved, four bot access cases and server 503 classified separately');
