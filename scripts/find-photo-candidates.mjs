@@ -29,7 +29,7 @@ if(!Number.isFinite(minIntervalMs)||minIntervalMs<6000)
 let lastRequest=0;
 let cooldownUntil=0;
 let requestCount=0;
-const allowedLicense=/^(CC0|CC BY(?:-SA|-ND)?(?: 2\.0| 2\.5| 3\.0| 4\.0)|Public domain)/i;
+const allowedLicense=/^CC0(?:[ -]+\d+(?:\.\d+)?)?$|^CC BY(?:-SA)?(?:[ -]+\d+(?:\.\d+)?)?$/i;
 const rasterPhoto=/\.(?:jpe?g|png|webp)$/i;
 
 async function pacedRequest(url){
@@ -45,55 +45,45 @@ async function pacedRequest(url){
     }});
   }finally{clearTimeout(timeout);}
 }
+let commonsRateLimited=false;
 async function lookup(query){
+  if(commonsRateLimited)return {error:'DEFERRED_API_RATE_LIMIT',candidates:[]};
   const u=new URL('https://commons.wikimedia.org/w/api.php');
   for(const [k,v] of Object.entries({
     action:'query',generator:'search',gsrsearch:query,
     gsrnamespace:'6',gsrlimit:'8',prop:'imageinfo',
     iiprop:'url|mime|extmetadata',format:'json',formatversion:'2'
   }))u.searchParams.set(k,v);
-
-  for(let attempt=1;attempt<=4;attempt++){
-    try{
-      const res=await pacedRequest(u);
-      if(res.status===429||res.status===503){
-        const header=Number(res.headers.get('retry-after'));
-        const cooldown=Math.min(120000,Math.max(
-          Number.isFinite(header)&&header>0?header*1000:0,
-          Math.min(120000,15000*attempt)
-        ));
-        cooldownUntil=Math.max(cooldownUntil,Date.now()+cooldown);
-        if(attempt===4)return {error:'HTTP '+res.status+' (rate limited after 4 attempts)',candidates:[]};
-        console.warn('Commons HTTP '+res.status+'; waiting '+Math.ceil(cooldown/1000)+'s before retry '+attempt+'/4');
-        continue;
-      }
-      if(!res.ok)return {error:'HTTP '+res.status,candidates:[]};
-      const json=await res.json();
-      if(json.error)return {error:'Commons API: '+(json.error.code||'unknown'),candidates:[]};
-      const pages=json.query?.pages||[];
-      const candidates=pages.flatMap(p=>{
-        const info=p.imageinfo?.[0]||{},meta=info.extmetadata||{};
-        const get=k=>(meta[k]?.value||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
-        const photo={
-          file:p.title,url:info.descriptionurl||'',image:info.url||'',
-          artist:get('Artist'),license:get('LicenseShortName'),
-          licenseUrl:get('LicenseUrl'),credit:get('Credit'),
-          mime:info.mime||'',
-          rightsCandidate:allowedLicense.test(get('LicenseShortName'))&&!/\bNC\b|\/by-nc/i.test(get('LicenseShortName')+' '+get('LicenseUrl'))
-        };
-        // Search often retrieves unrelated PDFs and GIFs; only plausible still photos
-        // belong in the review queue. Identity itself must be checked by a person.
-        if(!rasterPhoto.test(photo.file)||!photo.image||!photo.url)return [];
-        return [photo];
-      });
-      return {error:null,candidates};
-    }catch(e){
-      if(attempt===4)return {error:String(e),candidates:[]};
-      cooldownUntil=Math.max(cooldownUntil,Date.now()+Math.min(30000,5000*attempt));
+  try{
+    const res=await pacedRequest(u);
+    if(res.status===429||res.status===503){
+      commonsRateLimited=true;
+      return {error:'HTTP '+res.status+' — stop requests and defer remaining venues',candidates:[]};
     }
+    if(!res.ok)return {error:'HTTP '+res.status,candidates:[]};
+    const json=await res.json();
+    if(json.error)return {error:'Commons API: '+(json.error.code||'unknown'),candidates:[]};
+    const pages=json.query?.pages||[];
+    const candidates=pages.flatMap(p=>{
+      const info=p.imageinfo?.[0]||{},meta=info.extmetadata||{};
+      const get=k=>(meta[k]?.value||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
+      const photo={
+        file:p.title,url:info.descriptionurl||'',image:info.url||'',
+        artist:get('Artist'),license:get('LicenseShortName'),
+        licenseUrl:get('LicenseUrl'),credit:get('Credit'),mime:info.mime||'',
+        rightsCandidate:allowedLicense.test(get('LicenseShortName')),
+        venueMatch:'UNVERIFIED',reuseApproved:false
+      };
+      // Never publish from a metadata match; image subject and exact physical branch
+      // must still be independently checked against an original source.
+      if(!rasterPhoto.test(photo.file)||!photo.image||!photo.url)return [];
+      return [photo];
+    });
+    return {error:null,candidates};
+  }catch(e){
+    return {error:String(e),candidates:[]};
   }
 }
-
 const venues=[];
 let failed=0;
 const researchDeadline=Date.now()+18*60*1000;
@@ -107,7 +97,7 @@ for(const venue of rows){
   if(result.error)failed++;
   const candidates=[...new Map(result.candidates.map(p=>[p.file,p])).values()];
   venues.push({...venue,query,error:result.error,candidates,
-    status:result.error?'SEARCH_FAILED_NOT_A_NEGATIVE_PHOTO_FINDING':
+    status:result.error?(String(result.error).includes('DEFERRED_API_RATE_LIMIT')?'DEFERRED_API_RATE_LIMIT':'SEARCH_FAILED_NOT_A_NEGATIVE_PHOTO_FINDING'):
       'UNVERIFIED_REQUIRES_EXACT_VENUE_AND_FILE_LICENSE_REVIEW'});
   console.log(venue.id+' '+venue.en+': '+candidates.length+' still-image candidates'+(result.error?' (ERROR '+result.error+')':''));
 }
