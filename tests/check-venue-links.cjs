@@ -21,8 +21,8 @@ async function checkOne(v){
    record.http_status=String(res.status);record.final_url=res.url;
    if(res.ok){record.result='HTTP_OK';record.note='Link responds; venue identity and current operations NOT verified';return record}
    if(attempt===0)continue; // HEAD may return misleading 4xx/5xx; verify with GET before classification.
-   record.result=res.status===403||res.status===429?'ACCESS_RESTRICTED':'HTTP_ERROR';
-   record.note='Manual venue review needed; not proof of closure';return record;
+   record.result=res.status===403||res.status===429?'ACCESS_RESTRICTED':res.status>=500?'UPSTREAM_UNAVAILABLE':'HTTP_ERROR';
+   record.note=res.status>=500?'Upstream provider/server unavailable at check time; retry manually, NOT proof of closure':'Manual venue review needed; not proof of closure';return record;
   }catch(e){
    record.note=String(e?.name==='AbortError'?'TIMEOUT':e?.message||e).slice(0,180);
    if(attempt===0)continue;
