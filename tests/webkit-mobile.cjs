@@ -77,7 +77,15 @@ function startLocalServer(){
   assert(await page.locator('#download').evaluate(el=>typeof el.onclick==='function'),'CSV export button must have registered click handler in WebKit');
   const errorsBefore=jsErrors.length;
   await page.evaluate(()=>{window.__csvClickSeen=0;document.querySelector('#download').addEventListener('click',()=>{window.__csvClickSeen++},{capture:true})});
-  await page.locator('#download').click();
+  // Mobile WebKit needs a real touch path; mouse click can focus the button
+  // without dispatching click during scroll/layout transitions on deployed Pages.
+  await page.evaluate(()=>{
+    window.__csvTouchStart=0;window.__csvTouchEnd=0;
+    const button=document.querySelector('#download');
+    button.addEventListener('touchstart',()=>{window.__csvTouchStart++},{capture:true});
+    button.addEventListener('touchend',()=>{window.__csvTouchEnd++},{capture:true});
+  });
+  await page.locator('#download').tap();
   const fallback=page.locator('#csvDirectDownload');
   // A scripted Blob click must NOT navigate iOS Safari away from the guest guide.
   assert(page.url().startsWith(target),'iPhone Safari stays on the guide after preparing CSV');
@@ -92,10 +100,13 @@ function startLocalServer(){
       handler:typeof document.querySelector('#download')?.onclick,
       urlCreator:typeof URL.createObjectURL,
       activeElement:document.activeElement?.id,
-      clickEvents:window.__csvClickSeen
+      clickEvents:window.__csvClickSeen,
+      touchStarts:window.__csvTouchStart,
+      touchEnds:window.__csvTouchEnd
     }));
     console.error('WEBKIT_CSV_DIAGNOSTIC',JSON.stringify({...state,newPageErrors:jsErrors.slice(errorsBefore)}));
   }
+  assert((await page.evaluate(()=>window.__csvClickSeen))>0,'iPhone WebKit touch must dispatch a real export click event');
   await fallback.waitFor({state:'visible',timeout:5000});
   assert.equal(await fallback.getAttribute('download'),'tokyo-concierge-shortlist.csv','Direct CSV has a real download filename');
   assert((await fallback.textContent()).includes('CSV'),'Language-aware CSV fallback label');
