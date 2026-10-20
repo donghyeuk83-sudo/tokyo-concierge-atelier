@@ -148,8 +148,8 @@ const assert=require('assert');
    r05:'/tokyo/A1317/A131701/13304124/dtlphotolst/smp2/',
    r08:'/tokyo/A1317/A131701/13021093/dtlphotolst/4/smp2/',
    r39:'/tokyo/A1303/A130302/13310768/dtlphotolst/smp2/',
-   r40:'/tokyo/A1307/A130703/13149832/dtlphotolst/4/smp2/',
-   r41:'/tokyo/A1303/A130302/13260579/dtlphotolst/4/smp2/',
+   r40:'/gallery',
+   r41:'/shoplist/ebisu/',
    r43:'/tokyo/A1303/A130302/13286155/dtlphotolst/1/smp2/',
    r44:'/ebisu/space/',
  };
@@ -158,7 +158,7 @@ const assert=require('assert');
    assert(match,'Venue '+id+' retains an externally linked original-source entry');
    const url=new URL(match[1]);
    assert.equal(url.pathname,expectedPath,'Exact venue and gallery path for '+id);
-   assert.equal(match[2],id==='r44'?'operator':'listing','Accurate published origin type '+id);
+   assert.equal(match[2],['r40','r41','r44'].includes(id)?'operator':'listing','Accurate published origin type '+id);
    assert(!expectedPhotos.includes(id),'Uncleared image cannot be introduced into published photo registry '+id);
  }
 
@@ -339,7 +339,7 @@ const assert=require('assert');
  const discoverySource=require('fs').readFileSync('tests/find-commons-photos.cjs','utf8');
  assert(discoverySource.includes('eligibleLicense(p.license)'),'Commercial-only CC filter remains enabled');
  assert(discoverySource.includes("venue_match:'UNVERIFIED',reuse_approved:false"),'Original-file candidates remain unapproved');
- assert(discoverySource.includes("if(!registered.has(v[0]))await sleep(2500)"),'Skip research throttle for all 89 registered venues');
+ assert(discoverySource.includes("if(!pauseForRateLimit&&!registered.has(v[0]))await sleep(2500)"),'Skip research throttle for all 89 registered venues');
 
 
  // Priority batch: the named original venue photography pages stay offsite.
@@ -371,6 +371,39 @@ const assert=require('assert');
  for(const id of ['r33','r36','r37','r50','r51','a34','a37'])assert(photoDiscovery.includes("'"+id+"'"),'Priority scan includes '+id);
  assert(photoDiscovery.includes('results.sort((a,b)=>orderIndex.get(a.id)-orderIndex.get(b.id))'),'Full 131-row report remains in catalogue order');
  assert(photoDiscovery.includes("venue_match:'UNVERIFIED',reuse_approved:false"),'Do not approve photos from automated search alone');
+
+
+ // Two exact operator-hosted venue photo galleries are NOT commercial redistribution licenses.
+ for(const [id,host,path] of [
+   ['r40','ikinasushidokoroabe-hiroobekkan.owst.jp','/gallery'],
+   ['r41','www.tsukiji-sushiko.com','/shoplist/ebisu/']
+ ]){
+  const row=publicPhotoSourceBlock.split(String.fromCharCode(10)).find(line=>line.trim().startsWith(id+':'));
+  assert(row,'Official original gallery registered '+id);
+  const parsed=row.match(/url:"([^"]+)",kind:"([^"]+)"/);
+  assert(parsed,'Parse official source '+id);
+  const url=new URL(parsed[1]);
+  assert.equal(url.hostname,host,'Verified operator-hosted original gallery '+id);
+  assert.equal(url.pathname,path,'Exact restaurant branch photo page '+id);
+  assert.equal(parsed[2],'operator','Correct operator gallery provenance '+id);
+  assert(!expectedPhotos.includes(id),'Original publisher photography is not a clearance '+id);
+  await page.locator('#tabs [data-cat="restaurant"]').click();
+  const card=page.locator('article.card').filter({has:page.locator('.detail-trigger[data-detail="'+id+'"]')});
+  assert.equal(await card.locator('a.venue-photo-source').getAttribute('href'),parsed[1],'Guest gallery source opens exactly '+id);
+  assert((await card.locator('a.venue-photo-source small').textContent()).includes('Venue / operator website'),'Operator photo source label visible '+id);
+  assert.equal(await card.locator('img[data-venue-photo]').count(),0,'Do not rehost unlicensed photos '+id);
+  await card.locator('.detail-trigger').click();
+  assert.equal(await page.locator('#detailActions .detail-photo-source').getAttribute('href'),parsed[1],'Detail retains official gallery '+id);
+  await page.locator('#detailClose').click();
+ }
+ // Prevent daily GitHub Actions 429 floods and preserve missing-vs-deferred distinctions.
+ const discoveryWorkflow=require('fs').readFileSync('.github/workflows/photo-discovery.yml','utf8');
+ assert(discoveryWorkflow.includes("cron: '25 1 * * 1'"),'Commons schedule limited to once weekly');
+ assert(!discoveryWorkflow.includes('  push:'),'No automatic search for each source push');
+ const safeResearch=require('fs').readFileSync('tests/find-commons-photos.cjs','utf8');
+ assert(safeResearch.includes('let pauseForRateLimit=false'),'Wikimedia throttle circuit breaker exists');
+ assert(safeResearch.includes("status:'DEFERRED_API_RATE_LIMIT'"),'Unsearched files cannot be reported as absent');
+ assert(safeResearch.includes("const attempts=1"),'Only one API attempt per query when rate limited');
 
  const checkedPhotoRefs=[
    ['restaurant','r06','tabelog.com'],
