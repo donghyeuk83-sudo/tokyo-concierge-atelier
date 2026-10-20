@@ -424,6 +424,46 @@ html:has(#photoDialog[open]){overflow:hidden}
  .photo-quickbar button[aria-pressed="true"]{background:#18584d;border-color:#18584d;color:#fff;box-shadow:0 2px 6px rgba(8,57,50,.16)}
  .photo-quickbar button:focus-visible{outline:3px solid #b77a39;outline-offset:2px}
 }
+
+/* Concierge workflow-first mobile composition. Editorial visual assets remain unchanged. */
+@media screen and (max-width:720px){
+  header{min-height:0;padding-top:20px;padding-bottom:67px;border-bottom-width:6px}
+  header .toolbar{padding-bottom:12px}
+  header .toolbar small{font-size:10px;letter-spacing:.08em;line-height:1.45}
+  header .toolbar .right{gap:6px}
+  header .toolbar .right label{font-size:11px}
+  header #language{font-size:14px;max-width:112px;min-height:44px}
+  header h1{font-size:clamp(44px,11vw,65px);line-height:1.01;margin:30px 0 12px;max-width:100%;letter-spacing:-.055em}
+  header p{font-size:15px;line-height:1.55;max-width:93%}
+  header .hero-kicker{margin-top:22px;max-width:100%;font-size:10px;letter-spacing:.075em}
+  header .hero-cta{min-height:48px;margin-top:13px;padding:12px 16px;box-shadow:4px 4px 0 #0c293d88;font-size:14px}
+  header .hero-micro{display:none}
+  header .hero-art{width:116%;height:215px;right:-57%;bottom:5px;opacity:.22}
+  .magazine-intro{margin:-38px auto 18px;padding:0 13px;width:100%}
+  .magazine-strip{grid-template-columns:repeat(3,minmax(0,1fr));border-width:2px;border-radius:9px;box-shadow:0 10px 26px #173c352b}
+  .magazine-lead{grid-column:1/-1;padding:16px 18px}
+  .magazine-lead strong{font-size:clamp(25px,6.2vw,32px);margin:5px 0}
+  .magazine-lead p{font-size:12px;line-height:1.5;margin:4px 0}
+  .magazine-tile{min-width:0;min-height:88px;padding:10px 8px;gap:5px;flex-direction:column;justify-content:center;align-items:center;text-align:center;border-top:2px solid #fffaf1;border-left:1px solid #fffaf1}
+  .magazine-tile .emoji{font-size:25px}
+  .magazine-tile b{font-family:system-ui,-apple-system,"Noto Sans JP","Noto Sans KR",sans-serif;font-size:clamp(11px,3vw,13px);line-height:1.25;overflow-wrap:anywhere}
+  .magazine-tile small{font-size:10px;line-height:1.25;overflow-wrap:anywhere}
+  main{width:100%;margin:0 auto}
+  #catalogPanel{padding-top:0}
+  #catalogPanel h2{font-size:clamp(29px,8vw,40px)}
+  .cinematic-gallery{margin-top:40px}
+  .area-explore,.story-feature{margin-bottom:42px}
+}
+@media screen and (max-width:360px){
+  .magazine-tile{padding:9px 5px}
+  .magazine-tile small{font-size:9px}
+}
+
+/* Safari/iPhone downloadable CSV fallback stays tappable if the browser blocks auto-download. */
+.csv-download-fallback{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:13px 0;padding:12px 14px;border:1px solid #bbd4c7;border-left:4px solid #23786a;background:#f1f8f4;color:#1c5448;border-radius:7px;font-size:13px;line-height:1.5}
+.csv-download-fallback a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:9px 15px;border:1px solid #1f675b;border-radius:5px;background:#1c675b;color:#fff;text-decoration:none;font-weight:750}
+.csv-download-fallback a:hover{background:#124f46}
+@media(max-width:550px){.csv-download-fallback{align-items:stretch;flex-direction:column}.csv-download-fallback a{width:100%}}
 </style></head><body>
 <a class="skip-link" href="#catalogPanel">Skip to places</a>
 <header><div class="toolbar"><small>THE WESTIN TOKYO · CONCIERGE OPERATIONS</small><div class="right"><label for="language">Language</label><select id="language"><option value="en">English</option><option value="ja">日本語</option><option value="ko">한국어</option></select></div></div><div class="hero-kicker">TOKYO CITY GUIDE · CINEMATIC ATELIER 11.5 RC</div><h1>Tokyo<br><em>Concierge</em><br>Atelier.</h1><div class="hero-art" aria-hidden="true"><svg viewBox="0 0 560 250" xmlns="http://www.w3.org/2000/svg"><circle cx="440" cy="52" r="42" fill="#ffd78d" opacity=".95"/><path d="M0 230 Q110 195 200 229 T390 224 T560 230V250H0Z" fill="#0c514d"/><g fill="#d7efe0"><rect x="14" y="130" width="66" height="100" rx="4"/><rect x="86" y="112" width="58" height="118" rx="4"/><rect x="150" y="148" width="49" height="82" rx="4"/><rect x="355" y="135" width="80" height="95" rx="5"/><rect x="443" y="155" width="52" height="75" rx="5"/><rect x="505" y="125" width="46" height="105" rx="5"/></g><g fill="#78b7a5"><rect x="26" y="145" width="8" height="11"/><rect x="47" y="145" width="8" height="11"/><rect x="26" y="170" width="8" height="11"/><rect x="47" y="170" width="8" height="11"/><rect x="99" y="130" width="10" height="12"/><rect x="120" y="130" width="10" height="12"/><rect x="99" y="155" width="10" height="12"/><rect x="120" y="155" width="10" height="12"/><rect x="372" y="154" width="11" height="11"/><rect x="396" y="154" width="11" height="11"/><rect x="372" y="181" width="11" height="11"/><rect x="396" y="181" width="11" height="11"/></g><path d="M258 230V68l-12 0 12-28 12 28h-12M226 230l32-162 32 162M239 158h38M232 194h52M249 40l9-22 9 22" fill="none" stroke="#f6c478" stroke-width="8" stroke-linejoin="round"/><path d="M205 230h106M217 215h83" stroke="#f6c478" stroke-width="10"/><path d="M328 230V92l-13-12 13-10 13 10-13 12M305 230l23-138 23 138M313 166h31M318 126h21" stroke="#a6d8c9" fill="none" stroke-width="7"/><path d="M0 225 Q100 205 200 225 T400 220 T560 225" fill="none" stroke="#f6c478" stroke-width="5"/></svg></div><p id="subtitle">A practical Tokyo discovery and guest recommendation workspace.</p><a class="hero-cta" href="#catalogPanel">EXPLORE THE CITY ↗</a><div class="hero-micro"><span>THE WESTIN TOKYO</span><span>CURATED CITY RESEARCH</span><span>EN · JP · KR</span></div></header>
@@ -435,7 +475,7 @@ html:has(#photoDialog[open]){overflow:hidden}
 <div id="interactionStatus" class="interaction-status no-print" role="status" aria-live="polite" aria-atomic="true"></div>
 <main><nav class="tabs no-print" id="tabs" aria-label="Place categories"></nav>
 <section class="panel" id="catalogPanel"><div class="toolbar"><div><span class="section-eyebrow">CURATED PLACES · TOKYO</span><h2 id="sectionTitle">Discover Tokyo</h2><p id="sectionDesc" class="muted"></p></div><span id="count" class="stat" role="status" aria-live="polite" aria-atomic="true"></span></div><div class="filters"><input id="query" aria-label="Search" placeholder="Search by name, area or type"><select id="area" aria-label="Area"></select><select id="type" aria-label="Type"></select><select id="sort" aria-label="Sort places"><option value="default">Curated order</option><option value="name">Name A–Z</option><option value="area">Area A–Z</option></select><select id="photoFilter" aria-label="Photo availability"><option value="all">All visuals</option><option value="photo">Places with photos</option><option value="venue">Photos (exclude host-building exteriors)</option><option value="building">Host building exteriors</option><option value="source">Places with source links</option></select><button class="filter-reset" id="resetFilters" type="button">Reset filters</button></div><div class="photo-quickbar no-print" id="photoQuickbar" role="group" aria-label="Quick photo filters"><button type="button" data-photo-quick="all" aria-pressed="true">All places</button><button type="button" data-photo-quick="venue" aria-pressed="false">Venue photos</button><button type="button" data-photo-quick="building" aria-pressed="false">Building exteriors</button><button type="button" data-photo-quick="source" aria-pressed="false">Photo sources</button></div><div class="source-explainer"><strong>Research catalogue · Verification required</strong><div class="status-key"><span class="pill">NEEDS CONFIRMATION</span><span>Official links are reference starting points, not evidence of current availability or opening hours.</span></div></div><div id="cards" class="cards" aria-label="Filtered places"></div></section>
-<section class="panel"><div class="toolbar"><h2 id="shortlistTitle" aria-live="polite"></h2><div class="right no-print"><button class="mini" id="share">Copy guide link</button><button class="mini" id="print">Print guide</button><button class="mini" id="download">Export CSV</button><button class="mini" id="clear">Clear</button></div></div><p id="shortlistNote" class="muted">Only confirmed venue details should be shared as facts with guests.</p><p class="shortlist-help no-print">Share a selection of public places by link. No guest name, reservation details or payment information is included.</p><div class="print-brand">TOKYO CONCIERGE ATELIER · GUEST GUIDE</div><div id="guide" aria-label="Selected guest recommendations"></div></section>
+<section class="panel"><div class="toolbar"><h2 id="shortlistTitle" aria-live="polite"></h2><div class="right no-print"><button class="mini" id="share">Copy guide link</button><button class="mini" id="print">Print guide</button><button class="mini" id="download">Export CSV</button><button class="mini" id="clear">Clear</button></div></div><p id="csvDownloadFallback" class="csv-download-fallback no-print hidden" role="status"><span id="csvFallbackText">If the download does not start:</span> <a id="csvDirectDownload" download="tokyo-concierge-shortlist.csv" href="#">Open CSV file ↓</a></p><p id="shortlistNote" class="muted">Only confirmed venue details should be shared as facts with guests.</p><p class="shortlist-help no-print">Share a selection of public places by link. No guest name, reservation details or payment information is included.</p><div class="print-brand">TOKYO CONCIERGE ATELIER · GUEST GUIDE</div><div id="guide" aria-label="Selected guest recommendations"></div></section>
 <section class="panel no-print"><h2 id="hotelTitle">Return to The Westin Tokyo</h2><p><strong>The Westin Tokyo</strong><br>1-4-1 Mita, Meguro-ku, Tokyo 153-8580<br>〒153-8580 東京都目黒区三田1-4-1</p><p>Taxi: <strong>ウェスティンホテル東京までお願いします。</strong></p><div class="notice" id="disclaimer">Research catalogue, not a booking system. Hours, availability, pricing, age policies, cancellations, accessibility and seasonal dates must be checked with official sources. Map links are searches, not verified directions. Do not enter guest personal or payment data.</div></section>
 </main><button class="shortlist-sticky no-print" id="shortlistJump" type="button">✦ Guest shortlist <span id="shortlistBadge">0</span></button><dialog class="photo-viewer" id="photoDialog" aria-labelledby="photoTitle"><div class="photo-viewer-head"><h2 id="photoTitle"></h2><button type="button" id="photoClose" aria-label="Close photo">×</button></div><img id="photoLarge" alt=""><div class="photo-viewer-caption"><p id="photoContext"></p><p id="photoStatus" role="status"></p><div id="photoAttribution"></div></div></dialog><dialog class="detail-dialog" id="detailDialog" aria-labelledby="detailName"><div class="detail-head"><button class="detail-close" id="detailClose" aria-label="Close">×</button><span class="section-eyebrow" style="color:#f5ce90">TOKYO · CONCIERGE ATELIER</span><h2 id="detailName"></h2><p id="detailJapanese"></p></div><div class="detail-body"><p id="detailSummary"></p><div class="detail-grid"><div class="detail-cell"><small>AREA</small><strong id="detailArea"></strong></div><div class="detail-cell"><small>CATEGORY</small><strong id="detailType"></strong></div></div><div class="detail-notice" id="detailNotice"></div><div class="detail-source" id="detailSource"></div><div class="actions" id="detailActions"></div></div></dialog><div class="footer">Tokyo Concierge Atelier · The Westin Tokyo concierge research · Cinematic Atelier 11.5 RC · Updated 2026-10-18<div class="site-footer-links"><a href="#catalogPanel">Explore</a><a href="#guide">Guest shortlist</a><a href="https://www.marriott.com/en-us/hotels/tyowi-the-westin-tokyo/overview/" target="_blank" rel="noopener noreferrer">The Westin Tokyo</a></div></div>
 <script>
@@ -918,7 +958,15 @@ const VALID_VENUE_IDS=new Set(DATA.map(r=>r.id));
 function parseSavedShortlist(raw){try{const ids=JSON.parse(raw||"[]");return new Set(Array.isArray(ids)?ids.filter(id=>typeof id==="string"&&VALID_VENUE_IDS.has(id)):[])}catch(e){return new Set()}}
 let storageWriteFailed=false;
 try{selected=parseSavedShortlist(localStorage.getItem("atelier-shortlist-v2"))}catch(e){storageWriteFailed=true}
+let csvExportUrl=null;
+function invalidateCsvDownload(){
+ if(csvExportUrl){URL.revokeObjectURL(csvExportUrl);csvExportUrl=null}
+ const fallback=$("csvDownloadFallback"),link=$("csvDirectDownload");
+ if(fallback)fallback.classList.add("hidden");
+ if(link)link.removeAttribute("href");
+}
 function save(){
+ invalidateCsvDownload();
  try{localStorage.setItem("atelier-shortlist-v2",JSON.stringify([...selected]));storageWriteFailed=false}
  catch(e){storageWriteFailed=true}
  $("share").textContent={en:"Copy guide link",ja:"ガイドリンクをコピー",ko:"가이드 링크 복사"}[lang];
@@ -1161,6 +1209,7 @@ document.addEventListener("click",e=>{const photoButton=e.target.closest("[data-
 $("photoClose").onclick=()=>$("photoDialog").close();
 window.addEventListener("storage",event=>{
  if(event.key==="atelier-shortlist-v2"){
+  invalidateCsvDownload();
   selected=parseSavedShortlist(event.newValue);
   render();
   const dialog=$("detailDialog");
@@ -1169,10 +1218,45 @@ window.addEventListener("storage",event=>{
  }
 });
 window.addEventListener("hashchange",()=>{if(importShortlistHash())render()});
-$("share").onclick=async()=>{const url=shortlistUrl();try{await navigator.clipboard.writeText(url);$("share").textContent={en:"Link copied",ja:"コピーしました",ko:"링크 복사 완료"}[lang]}catch(e){window.prompt("Copy guest guide URL",url)}};$("shortlistJump").onclick=()=>document.getElementById("guide").scrollIntoView({behavior:"smooth",block:"start"});$("detailClose").onclick=()=>{const d=$("detailDialog");if(typeof d.close==="function")d.close();else d.removeAttribute("open")};$("language").addEventListener("change",e=>{lang=e.target.value;try{localStorage.setItem("tokyo_atelier_lang",lang)}catch(err){}translate(true);if($("detailDialog").open){const current=$("detailActions").querySelector("[data-id]");if(current)openDetail(current.dataset.id)}});let searchRenderTimer; $("query").addEventListener("input",()=>{clearTimeout(searchRenderTimer);searchRenderTimer=setTimeout(render,120)});["area","type","sort","photoFilter"].forEach(id=>$(id).addEventListener("input",render));$("photoQuickbar").addEventListener("click",e=>{const button=e.target.closest("button[data-photo-quick]");if(!button)return;$("photoFilter").value=button.dataset.photoQuick;render()});$("resetFilters").onclick=()=>{$("query").value="";$("area").value="";$("type").value="";$("sort").value="default";$("photoFilter").value="all";render();feedback("reset")};$("print").onclick=()=>window.print();$("clear").onclick=()=>{selected.clear();save();render();feedback("cleared")};$("download").onclick=()=>{const rows=DATA.filter(r=>selected.has(r.id));if(!rows.length){feedback("empty");return}const quote=s=>{const value=String(s??"");return '"'+(/^[\s]*[=+@-]/.test(value)?"\u0027":"")+value.replace(/"/g,'""')+'"'};const csv=[["Name","Japanese","Category","Area","Type","Review status","Source reviewed on","Reference URL","Concierge note","Map search","Hotel route"].map(quote).join(","),...rows.map(r=>[r.name,r.ja,r.category,r.area,r.type,VERIFIED_SOURCES[r.id]?"SOURCE_REVIEWED_CONDITIONS_UNCONFIRMED":"NEEDS_OFFICIAL_REVIEW",VERIFIED_SOURCES[r.id]?.checked||"",VERIFIED_SOURCES[r.id]?.url||r.url,conciergeNote(r),venueMap(r),hotelDirections(r,"transit")].map(quote).join(","))].join("\r\n");const b=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="tokyo-concierge-shortlist.csv";a.click();feedback("exported");setTimeout(()=>URL.revokeObjectURL(a.href),30000)};try{const preferred=localStorage.getItem("tokyo_atelier_lang");if(["en","ja","ko"].includes(preferred))lang=preferred}catch(err){}importShortlistHash();
+$("share").onclick=async()=>{const url=shortlistUrl();try{await navigator.clipboard.writeText(url);$("share").textContent={en:"Link copied",ja:"コピーしました",ko:"링크 복사 완료"}[lang]}catch(e){window.prompt("Copy guest guide URL",url)}};$("shortlistJump").onclick=()=>document.getElementById("guide").scrollIntoView({behavior:"smooth",block:"start"});$("detailClose").onclick=()=>{const d=$("detailDialog");if(typeof d.close==="function")d.close();else d.removeAttribute("open")};$("language").addEventListener("change",e=>{lang=e.target.value;try{localStorage.setItem("tokyo_atelier_lang",lang)}catch(err){}translate(true);if($("detailDialog").open){const current=$("detailActions").querySelector("[data-id]");if(current)openDetail(current.dataset.id)}});let searchRenderTimer; $("query").addEventListener("input",()=>{clearTimeout(searchRenderTimer);searchRenderTimer=setTimeout(render,120)});["area","type","sort","photoFilter"].forEach(id=>$(id).addEventListener("input",render));$("photoQuickbar").addEventListener("click",e=>{const button=e.target.closest("button[data-photo-quick]");if(!button)return;$("photoFilter").value=button.dataset.photoQuick;render()});$("resetFilters").onclick=()=>{$("query").value="";$("area").value="";$("type").value="";$("sort").value="default";$("photoFilter").value="all";render();feedback("reset")};$("print").onclick=()=>window.print();$("clear").onclick=()=>{selected.clear();save();render();feedback("cleared")};window.addEventListener("pagehide",()=>{if(csvExportUrl)URL.revokeObjectURL(csvExportUrl)});$("download").onclick=()=>{const rows=DATA.filter(r=>selected.has(r.id));if(!rows.length){feedback("empty");return}const quote=s=>{const value=String(s??"");return '"'+(/^[\s]*[=+@-]/.test(value)?"\u0027":"")+value.replace(/"/g,'""')+'"'};const csv=[["Name","Japanese","Category","Area","Type","Review status","Source reviewed on","Reference URL","Concierge note","Map search","Hotel route"].map(quote).join(","),...rows.map(r=>[r.name,r.ja,r.category,r.area,r.type,VERIFIED_SOURCES[r.id]?"SOURCE_REVIEWED_CONDITIONS_UNCONFIRMED":"NEEDS_OFFICIAL_REVIEW",VERIFIED_SOURCES[r.id]?.checked||"",VERIFIED_SOURCES[r.id]?.url||r.url,conciergeNote(r),venueMap(r),hotelDirections(r,"transit")].map(quote).join(","))].join("\r\n");const b=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"});if(csvExportUrl)URL.revokeObjectURL(csvExportUrl);csvExportUrl=URL.createObjectURL(b);const direct=$("csvDirectDownload");direct.href=csvExportUrl;$("csvDownloadFallback").classList.remove("hidden");const a=document.createElement("a");a.href=csvExportUrl;a.download="tokyo-concierge-shortlist.csv";document.body.appendChild(a);a.click();a.remove();feedback("exported")};try{const preferred=localStorage.getItem("tokyo_atelier_lang");if(["en","ja","ko"].includes(preferred))lang=preferred}catch(err){}importShortlistHash();
 
 
 /* Localize the main editorial copy as well as catalogue controls. */
+const LANDING_COPY={
+ en:{language:"Language",kicker:"TOKYO CITY GUIDE · CONCIERGE DESK",cta:"FIND PLACES ↓",leadEyebrow:"DISCOVER TOKYO",leadTitle:"Tokyo, at your fingertips.",leadNote:"Choose a category or search 131 places to build a guest guide.",tiles:[["Dining","Restaurants & more"],["Sights","Culture & views"],["Shopping","Style & gifts"]],sourceTitle:"Research guide · Check before recommending",sourceFlag:"NEEDS CONFIRMATION",sourceBody:"Hours, availability and prices must be verified with official sources.",fallbackText:"If the file does not download automatically:",fallbackAction:"Open CSV file ↓",footer:"Tokyo Concierge Atelier · The Westin Tokyo concierge research · Site updated 2026-10-20"},
+ ja:{language:"言語",kicker:"東京シティガイド · コンシェルジュ",cta:"施設を探す ↓",leadEyebrow:"東京を探す",leadTitle:"東京を、もっと身近に。",leadNote:"カテゴリーまたは131件の施設検索から、お客様向けのガイドを作成できます。",tiles:[["グルメ","レストラン・美食"],["観光","文化・眺望"],["買い物","ファッション・お土産"]],sourceTitle:"調査用ガイド · ご案内前に要確認",sourceFlag:"公式確認が必要",sourceBody:"営業時間・空席・料金は必ず公式情報でご確認ください。",fallbackText:"自動で保存されない場合：",fallbackAction:"CSVファイルを開く ↓",footer:"Tokyo Concierge Atelier · ウェスティンホテル東京 コンシェルジュ調査 · 更新 2026-10-20"},
+ ko:{language:"언어",kicker:"도쿄 시티 가이드 · 컨시어지",cta:"장소 검색 ↓",leadEyebrow:"도쿄 둘러보기",leadTitle:"도쿄를 더 가깝게.",leadNote:"카테고리나 131개 장소 검색으로 고객 추천 안내를 만들어 보세요.",tiles:[["미식","레스토랑·맛집"],["명소","문화·전망"],["쇼핑","패션·기념품"]],sourceTitle:"조사용 가이드 · 추천 전 확인",sourceFlag:"공식 확인 필요",sourceBody:"영업시간·예약 가능 여부·요금은 공식 출처에서 확인하세요.",fallbackText:"자동 다운로드가 시작되지 않으면:",fallbackAction:"CSV 파일 열기 ↓",footer:"Tokyo Concierge Atelier · 웨스틴 도쿄 컨시어지 조사 · 사이트 갱신 2026-10-20"}
+};
+function translateLanding(){
+ const x=LANDING_COPY[lang]||LANDING_COPY.en;
+ const put=(selector,value)=>{const el=document.querySelector(selector);if(el)el.textContent=value;};
+ put('header .toolbar label[for="language"]',x.language);
+ put('header .hero-kicker',x.kicker);
+ put('header .hero-cta',x.cta);
+ put('.magazine-lead .section-eyebrow',x.leadEyebrow);
+ put('.magazine-lead strong',x.leadTitle);
+ put('.magazine-lead p',x.leadNote);
+ document.querySelectorAll('.magazine-tile').forEach((el,i)=>{const tile=x.tiles[i];if(!tile)return;const heading=el.querySelector('b'),note=el.querySelector('small');if(heading)heading.textContent=tile[0];if(note)note.textContent=tile[1];el.setAttribute('aria-label',tile.join(' · '));});
+ put('.source-explainer>strong',x.sourceTitle);
+ put('.source-explainer .status-key .pill',x.sourceFlag);
+ put('.source-explainer .status-key span:last-child',x.sourceBody);
+ put('#csvFallbackText',x.fallbackText);
+ put('#csvDirectDownload',x.fallbackAction);
+ const footer=document.querySelector('.footer');if(footer&&footer.firstChild&&footer.firstChild.nodeType===Node.TEXT_NODE)footer.firstChild.textContent=x.footer;
+}
+// Put the working catalogue ahead of inspirational stories on narrow screens;
+// preserve desktop editorial order and accessible DOM/keyboard reading order.
+const mobileConciergeMedia=window.matchMedia('(max-width:720px)');
+function prioritizeConciergeOnMobile(){
+ const main=document.querySelector('main'),intro=document.querySelector('.magazine-intro'),end=document.querySelector('.atelier-note');
+ if(!main||!intro||!end)return;
+ if(mobileConciergeMedia.matches&&main.previousElementSibling!==intro)intro.insertAdjacentElement('afterend',main);
+ else if(!mobileConciergeMedia.matches&&main.previousElementSibling!==end)end.insertAdjacentElement('afterend',main);
+}
+if(mobileConciergeMedia.addEventListener)mobileConciergeMedia.addEventListener('change',prioritizeConciergeOnMobile);
+else if(mobileConciergeMedia.addListener)mobileConciergeMedia.addListener(prioritizeConciergeOnMobile);
+window.addEventListener('resize',prioritizeConciergeOnMobile,{passive:true});
+prioritizeConciergeOnMobile();
 const VISUAL_COPY={
  en:{gallery:"Tokyo, vividly.",galleryNote:"From glowing skylines to quiet shrines — discover a city of contrasts.",areas:"Tokyo, one district at a time.",story:"Curated inspiration for exploring Tokyo — from intimate dining to memorable city views.",storyLink:"DISCOVER PLACES"},
  ja:{gallery:"色彩豊かな東京へ。",galleryNote:"きらめく街並みから静かな神社まで。東京の多彩な魅力を見つけましょう。",areas:"街ごとに出会う、東京。",story:"心に残るお食事から東京の眺望まで、旅のヒントを厳選してご紹介します。",storyLink:"スポットを探す"},
@@ -1197,6 +1281,7 @@ const note=document.querySelector(".atelier-note-inner");if(note){const title=no
 const CHROME_COPY={"en":["Share a selection of public places by link. No guest name, reservation details or payment information is included.","Research catalogue, not a booking system. Hours, availability, pricing, age policies, cancellations, accessibility and seasonal dates must be checked with official sources. Map links are searches, not verified directions. Do not enter guest personal or payment data.","Guest shortlist","Explore","Print guide","Export CSV","Clear"],"ja":["公開施設の候補をリンクで共有できます。お客様のお名前、予約情報、決済情報は含まれません。","本サイトは調査用カタログであり、予約システムではありません。営業時間、空席、料金、年齢制限、キャンセル規定、バリアフリー情報、季節イベントの日程は公式情報をご確認ください。地図リンクは検索結果であり、経路を保証するものではありません。個人情報や決済情報は入力しないでください。","候補リスト","スポットを探す","ガイドを印刷","CSV出力","クリア"],"ko":["공개된 장소 목록을 링크로 공유합니다. 고객 성함, 예약 내역 또는 결제 정보는 포함되지 않습니다.","본 사이트는 예약 시스템이 아닌 조사용 목록입니다. 영업시간, 예약 가능 여부, 요금, 연령 제한, 취소 규정, 접근성 및 계절 행사 일정은 공식 출처로 확인해야 합니다. 지도 링크는 검색 결과이며 검증된 경로가 아닙니다. 고객 개인정보나 결제 정보를 입력하지 마세요.","추천 목록","장소 둘러보기","가이드 인쇄","CSV 내보내기","비우기"]};
 function translateChrome(){const c=CHROME_COPY[lang]||CHROME_COPY.en;const set=(selector,v)=>{const el=document.querySelector(selector);if(el)el.textContent=v};set(".shortlist-help",c[0]);set("#disclaimer",c[1]);set(".site-footer-links a:first-child",c[3]);set(".site-footer-links a:nth-child(2)",c[2]);set("#print",c[4]);set("#download",c[5]);set("#clear",c[6]);const jump=document.getElementById("shortlistJump"),badge=document.getElementById("shortlistBadge");if(jump&&badge){jump.textContent="✦ "+c[2]+" ";jump.appendChild(badge)}}
 function translateEditorial(){
+ translateLanding();
  translateImageLabels();
  translateChrome();
  const c=VISUAL_COPY[lang]||VISUAL_COPY.en;

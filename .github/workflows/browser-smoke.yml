@@ -54,6 +54,8 @@ jobs:
         run: node tests/state-regression.cjs
       - name: Test iPhone Safari-style WebKit mobile UX and CSV
         run: node tests/webkit-mobile.cjs
+      - name: Verify mobile-first designer UX in Chromium and WebKit
+        run: node tests/design-ux-regression.cjs
       - name: Audit all image-generation and research safety gates
         run: |
           node --check scripts/find-photo-candidates.mjs
@@ -94,6 +96,7 @@ jobs:
           node tests/smoke.cjs
           node tests/state-regression.cjs
           node tests/webkit-mobile.cjs
+          node tests/design-ux-regression.cjs
       - name: Maintain one actionable automatic health issue
         if: ${{ always() && github.event_name != 'pull_request' }}
         continue-on-error: true
