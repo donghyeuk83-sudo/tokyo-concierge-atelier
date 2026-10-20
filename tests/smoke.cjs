@@ -295,7 +295,7 @@ const assert=require('assert');
  const batch11=[
    ['restaurant','r44','shiorian-yamashiro.com','/ebisu/space/','operator'],
    ['attraction','a26','shizukokoro.com','/chado-workshop','operator'],
-   ['attraction','a30','bub-activitycenter.com','/','operator']
+   ['attraction','a30','bub-activitycenter.com','/samurai-experience/','operator']
  ];
  for(const [category,id,host,path,kind] of batch11){
    const row=publicPhotoSourceBlock.split(String.fromCharCode(10)).find(line=>line.trim().startsWith(id+':'));
@@ -318,6 +318,30 @@ const assert=require('assert');
    assert.equal(await page.locator('#detailActions .detail-photo-source').getAttribute('href'),parsed[1],'Detail photo source matches catalog card '+id);
    await page.locator('#detailClose').click();
  }
+
+
+ // Pending-only canonical original-photo sources. 1F + 2F belong to the same Oshiage
+ // store, so the official two-floor photo page is safer than a single-floor listing.
+ const officialOshiage=publicPhotoSourceBlock.split(String.fromCharCode(10)).find(line=>line.trim().startsWith('r37:'));
+ assert(officialOshiage,'r37 original photo source mapped');
+ const oshiageUrl=officialOshiage.match(/url:"([^"]+)",kind:"([^"]+)"/);
+ assert(oshiageUrl,'Oshiage source parsed');
+ assert.equal(new URL(oshiageUrl[1]).hostname,'www.kurasushi.co.jp','Oshiage exact chain operator');
+ assert.equal(new URL(oshiageUrl[1]).pathname,'/oshiage/','Official shared 1F and 2F image tour');
+ assert.equal(oshiageUrl[2],'operator','Rights attributed to restaurant operator');
+ assert(!expectedPhotos.includes('r37'),'Oshiage remains in the pending-photo queue');
+ await page.locator('#tabs [data-cat="restaurant"]').click();
+ const oshiageCard=page.locator('article.card').filter({has:page.locator('.detail-trigger[data-detail="r37"]')});
+ assert.equal(await oshiageCard.locator('a.venue-photo-source').getAttribute('href'),oshiageUrl[1],'Official two-floor photo source visible');
+ assert.equal(await oshiageCard.locator('img[data-venue-photo]').count(),0,'No uncleared Kura photo duplicated');
+ await oshiageCard.locator('.detail-trigger').click();
+ assert.equal(await page.locator('#detailActions .detail-photo-source').getAttribute('href'),oshiageUrl[1],'Oshiage detail uses same official source');
+ await page.locator('#detailClose').click();
+ // Commons matches remain license *candidates*, never venue-approved images.
+ const discoverySource=require('fs').readFileSync('tests/find-commons-photos.cjs','utf8');
+ assert(discoverySource.includes('eligibleLicense(p.license)'),'Commercial-only CC filter remains enabled');
+ assert(discoverySource.includes("venue_match:'UNVERIFIED',reuse_approved:false"),'Original-file candidates remain unapproved');
+ assert(discoverySource.includes("if(!registered.has(v[0]))await sleep(2500)"),'Skip research throttle for all 89 registered venues');
 
  const checkedPhotoRefs=[
    ['restaurant','r06','tabelog.com'],
