@@ -11,6 +11,16 @@ const assert=require('assert');
  assert((await page.locator('.card').count())>0,'catalogue cards render');
  assert.equal(await page.evaluate(()=>typeof illustration),'function','Separate illustrative renderer is initialized before catalogue cards');
  assert((await page.locator('#cards .card-art').count())>0,'Unlicensed venue slots still render the existing illustrative artwork');
+ // Every venue's new cached search string must be exactly identical to the
+ // original uncached EN/JA/KO indexing formula (all 131 entries, original case
+ // folding and aliases). This guards search behavior during modularization.
+ const indexProof=await page.evaluate(()=>{
+  const same=DATA.every(r=>searchText(r)===[r.name,r.ja,r.area,r.type,SEARCH_ALIASES[r.area]||"",PLACE_ALIASES[r.id]||"",I18N.en.cats[CATS.indexOf(r.category)],I18N.ja.cats[CATS.indexOf(r.category)],I18N.ko.cats[CATS.indexOf(r.category)]].join(" ").toLocaleLowerCase());
+  const cache=typeof SEARCH_TEXT_CACHE!=="undefined"&&DATA.every(r=>SEARCH_TEXT_CACHE.get(r)===searchText(r));
+  const tokyo=searchText(DATA.find(r=>r.id==='a01'));
+  return {same,cache,count:DATA.length,japanese:tokyo.includes("東京タワー"),korean:tokyo.includes("도쿄타워")};
+ });
+ assert.deepEqual(indexProof,{same:true,cache:true,count:131,japanese:true,korean:true},'Multilingual search index stays exactly compatible across every venue');
  // Exact labels distinguish third-party references from official operator links.
  const seirinkan=page.locator('article.card').filter({has:page.locator('[data-detail="r06"]')});
  const sourceLink=seirinkan.locator('.actions a').filter({hasText:/^Reference website$/});
