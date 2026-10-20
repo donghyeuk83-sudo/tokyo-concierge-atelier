@@ -85,6 +85,20 @@ function startLocalServer(){
     button.addEventListener('touchstart',()=>{window.__csvTouchStart++},{capture:true});
     button.addEventListener('touchend',()=>{window.__csvTouchEnd++},{capture:true});
   });
+  // GitHub Pages loads remote photo assets and uses CSS smooth scrolling.
+  // Emulate a guest who has finished scrolling before tapping the control.
+  // A tap during an active WebKit scroll can fire touchstart/touchend but no click.
+  await page.locator('#download').evaluate(async button=>{
+    const root=document.documentElement,original=root.style.scrollBehavior;
+    root.style.scrollBehavior='auto';
+    button.scrollIntoView({behavior:'auto',block:'center',inline:'nearest'});
+    await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+    root.style.scrollBehavior=original;
+  });
+  await page.waitForFunction(()=>{
+    const r=document.querySelector('#download').getBoundingClientRect();
+    return r.top>40&&r.bottom<innerHeight-80;
+  });
   await page.locator('#download').tap();
   const fallback=page.locator('#csvDirectDownload');
   // A scripted Blob click must NOT navigate iOS Safari away from the guest guide.
@@ -102,7 +116,14 @@ function startLocalServer(){
       activeElement:document.activeElement?.id,
       clickEvents:window.__csvClickSeen,
       touchStarts:window.__csvTouchStart,
-      touchEnds:window.__csvTouchEnd
+      touchEnds:window.__csvTouchEnd,
+      scrollY:window.scrollY,
+      buttonRect:document.querySelector('#download')?.getBoundingClientRect().toJSON(),
+      hitTarget:(()=>{
+        const r=document.querySelector('#download').getBoundingClientRect();
+        const node=document.elementFromPoint((r.left+r.right)/2,(r.top+r.bottom)/2);
+        return {id:node?.id,tag:node?.tagName};
+      })()
     }));
     console.error('WEBKIT_CSV_DIAGNOSTIC',JSON.stringify({...state,newPageErrors:jsErrors.slice(errorsBefore)}));
   }
