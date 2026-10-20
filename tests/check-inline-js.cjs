@@ -2,6 +2,12 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),vm=require('node:vm');
 const html=fs.readFileSync('index.html','utf8');
+const {paths,verifyExtractedSnapshot}=require('./atelier-source-registry.cjs');
+const baseline=verifyExtractedSnapshot();
+assert.deepEqual(baseline,{places:131,licensed:89,ai:50,pending:42},'Original data and rights baseline');
+for(const path of [paths.catalogue,paths.sources,paths.media]){
+ new vm.Script(fs.readFileSync(path,'utf8'),{filename:path});
+}
 const blocks=[...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)];
 assert(blocks.length>0,'Atelier must contain at least one runnable inline script');
 for(const [i,match] of blocks.entries()){
@@ -33,4 +39,4 @@ for(let i=0;i<originalLocale.length;i++){h^=originalLocale.charCodeAt(i);h=Math.
 assert.equal((h>>>0).toString(16),'a7fb4a39','Original three-language copy changed unexpectedly');
 assert(!html.includes('const I18N='),'Locale definitions must have exactly one source of truth');
 assert(searchSource.includes('function searchText(r)'),'Dedicated search index must define searchText');
-console.log('PASS',blocks.length,'inline and three extracted JS assets with original translations');
+console.log('PASS',blocks.length,'inline JS, 6 ordered classic source modules, exact 131/89/50/42 data snapshot, original translations');
