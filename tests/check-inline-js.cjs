@@ -61,5 +61,36 @@ for(const name of ['CONCIERGE_GUIDANCE','VENUE_ALERTS','DESCRIPTIONS','INTERNAL_
  assert(!html.includes('const '+name+'='),'Duplicated extracted declaration '+name);
 }
 assert(!html.includes('function shortlistUrl()')&&!html.includes('function save()'),'Shortlist state must have one source of truth');
-console.log('PASS',blocks.length,'inline JS, 9 ordered classic scripts, unchanged stage 1 data + stage 2 state/guidance snapshot, locale fingerprint');
+// Stage 3: prove editorial and renderer extraction kept byte-identical code.
+const stage3=JSON.parse(fs.readFileSync('audits/stage03-original-code-snapshot.json','utf8'));
+let previous=-1;
+for(const path of [...stage3.load_after,...stage3.load_order]){
+ const token='<script src="'+path+'?v=';
+ const at=html.indexOf(token);
+ assert(at>previous&&at<html.indexOf('<script>'),'Stage 3 classic JS dependency order: '+path);
+ assert(html.indexOf(token,at+token.length)===-1,'Duplicate classic script: '+path);
+ previous=at;
+}
+for(const [path,expected] of Object.entries(stage3.git_blob_sha1)){
+ const contents=fs.readFileSync(path,'utf8');
+ new vm.Script(contents,{filename:path});
+ assert.equal(blob(contents),expected,'Stage 3 byte-exact source fingerprint changed: '+path);
+}
+const renderSource=fs.readFileSync('assets/atelier-render.js','utf8');
+const editorialSource=fs.readFileSync('assets/atelier-editorial.js','utf8');
+for(const name of ['options','card','openVenuePhoto','openDetail','syncPhotoQuickbar','render']){
+ assert(renderSource.includes('function '+name+'(')&&!html.includes('function '+name+'('),'Renderer duplication or disappearance: '+name);
+}
+for(const name of ['translateLanding','prioritizeConciergeOnMobile','translateImageLabels','translateChrome','translateEditorial','verifyEditorialPhotos']){
+ assert(editorialSource.includes('function '+name+'(')&&!html.includes('function '+name+'('),'Editorial duplication or disappearance: '+name);
+}
+for(const name of ['LANDING_COPY','VISUAL_COPY','IMAGE_LABELS','CHROME_COPY']){
+ assert(editorialSource.includes('const '+name+'=')&&!html.includes('const '+name+'='),'Editorial language content source duplicate: '+name);
+}
+for(const statement of stage3.unchanged_bootstrap_in_index){
+ assert(html.includes(statement),'Original UI startup behavior missing: '+statement);
+}
+assert(html.includes('$("download").onclick=')&&html.includes('document.addEventListener("click"'),'CSV and event binding must remain unchanged in stage 3');
+console.log('PASS',blocks.length,'inline JS, 11 ordered classic scripts, exact stage 1/2/3 source fingerprints, full render/editorial safety checks');
+
 

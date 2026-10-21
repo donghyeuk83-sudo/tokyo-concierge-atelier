@@ -2,6 +2,7 @@
 const fs=require('node:fs');
 const assert=require('node:assert/strict');
 const {html,catalogueSection:dataSection,licensedSection,verifyExtractedSnapshot}=require('./atelier-source-registry.cjs');
+const renderSource=fs.readFileSync('assets/atelier-render.js','utf8');
 verifyExtractedSnapshot();
 const localPhotos=JSON.parse(fs.readFileSync('assets/photos/sources.json','utf8'));
 assert.equal(new Set(localPhotos.map(p=>p.id)).size,localPhotos.length,'Duplicate local source review');
@@ -22,8 +23,8 @@ assert.equal(new Set(licensed.map(x=>x.id)).size,licensed.length,'Duplicate lice
 assert.equal(licensed.length,licensedSection.split('\n').filter(line=>/^[a-z][0-9]+:\{/.test(line)).length,'Photo registry contains unparsed entries');
 for(const p of licensed){assert(ids.includes(p.id),'Unknown image ID: '+p.id);assert(p.url.startsWith('https://')||/^assets\/photos\/[a-z0-9-]+\.(jpg|webp)$/.test(p.url),'Image URL not HTTPS or a local photo');assert(p.source.startsWith('https://'),'Source URL not HTTPS');assert(p.credit.trim(),'Missing photographer');assert(p.licenseUrl.startsWith('https://creativecommons.org/'),'Missing CC license');assert(!/\bNC\b|\/by-nc(?:-|\/)/i.test(p.license+' '+p.licenseUrl),'Non-commercial-only photo cannot be added to the public hotel concierge catalogue without separate permission: '+p.id);}
 // Regression checks: every venue remains visually represented, including image-load failures.
-assert(html.includes('licensedPhoto||')&&html.includes('illustration(r)'),'Missing photo / AI visual / illustration fallback chain');
-assert(html.includes("img.addEventListener('error'"),'Missing broken-photo fallback handler');
+assert(renderSource.includes('licensedPhoto||')&&renderSource.includes('illustration(r)'),'Missing photo / AI visual / illustration fallback chain');
+assert(renderSource.includes("img.addEventListener('error'"),'Missing broken-photo fallback handler');
 for(const p of licensed){
  if(p.url.startsWith('assets/photos/')){
   const review=localPhotos.find(photo=>photo.id===p.id);assert(review,'Local photo requires a reviewed source record: '+p.id);
@@ -40,8 +41,8 @@ for(const p of licensed){
  assert(imageName&&sourceName&&imageName===sourceName,'Photo filename differs from credited Commons file: '+p.id);
 }
 // Ensure failures hide the broken photo and insert a visible venue illustration.
-assert(html.includes("photo.style.display='none'"),'Broken photos must be hidden');
-assert(html.includes("photo.insertAdjacentElement('afterend',fallback.firstElementChild)"),'Fallback illustration must be inserted');
+assert(renderSource.includes("photo.style.display='none'"),'Broken photos must be hidden');
+assert(renderSource.includes("photo.insertAdjacentElement('afterend',fallback.firstElementChild)"),'Fallback illustration must be inserted');
 // Evidence-backed manual checks; all other images remain unverified.
 // This records source-page metadata, not blanket permission for every downstream use.
 const manuallyChecked=new Map([
