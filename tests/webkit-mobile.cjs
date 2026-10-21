@@ -41,6 +41,7 @@ function startLocalServer(){
    await artwork.waitFor({timeout:10000});
    await page.waitForFunction(()=>{const el=document.querySelector('#cards .card:has([data-detail="r06"]) .card-art');if(!el)return false;el.scrollIntoView({block:'center'});return true;}); // Avoid detached Playwright locators during language rerender.
    await artwork.locator('img').evaluate(el=>new Promise(resolve=>{
+    el.loading='eager'; // Explicitly request the image in headless WebKit.
     if(el.complete)return resolve();
     el.addEventListener('load',resolve,{once:true});
     el.addEventListener('error',resolve,{once:true});
