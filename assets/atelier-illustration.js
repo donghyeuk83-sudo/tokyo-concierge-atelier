@@ -5,7 +5,7 @@
 function illustration(r){
 const c=r.category,t=r.type.toLowerCase(),n=r.name.toLowerCase();
 // Show pre-existing venue-specific AI artwork, preserving SVG as the loading/error fallback.
-const aiVisual=typeof AI_VENUE_VISUALS!=="undefined"&&AI_VENUE_VISUALS[r.id];
+const aiVisual=r.id==="r11"?null:(typeof AI_VENUE_VISUALS!=="undefined"&&AI_VENUE_VISUALS[r.id]); // r11 artwork depicts Chuo, not Yoroniku
 const art={
 sushi:'<ellipse cx="100" cy="102" rx="78" ry="13" fill="#785c6670"/><ellipse cx="100" cy="84" rx="77" ry="24" fill="#fffaf2"/><path d="M46 79q15-21 31 0t31 0t31 0t31 0" fill="none" stroke="#fff0d3" stroke-width="17"/><path d="M45 70q16-17 31 0t31 0t31 0t31 0" fill="none" stroke="#ed806d" stroke-width="13"/><path d="M148 16l30 59M161 13l30 59" stroke="#624c46" stroke-width="5"/>',
 tempura:'<ellipse cx="100" cy="99" rx="78" ry="16" fill="#fff8e7"/><path d="M43 81q8-49 26-17t28 0t29 0t29 17" fill="none" stroke="#f3ae53" stroke-width="17" stroke-linecap="round"/><path d="M55 65l-13-22M92 63l-4-30M128 65l17-30" stroke="#d87b52" stroke-width="9" stroke-linecap="round"/><path d="M25 96q75 35 150 0" fill="none" stroke="#fbdfac" stroke-width="6"/>',
