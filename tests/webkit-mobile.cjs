@@ -39,6 +39,7 @@ function startLocalServer(){
    await page.locator('#query').fill('Seirinkan');
    const artwork=page.locator('#cards .card:has([data-detail="r06"]) .card-art');
    await artwork.waitFor({timeout:10000});
+   await artwork.scrollIntoViewIfNeeded(); // Trigger native lazy-loading on mobile WebKit.
    await artwork.locator('img').evaluate(el=>new Promise(resolve=>{
     if(el.complete)return resolve();
     el.addEventListener('load',resolve,{once:true});
