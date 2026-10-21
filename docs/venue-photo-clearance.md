@@ -2,7 +2,7 @@
 
 Only place-specific photography with a **confirmed file-level license** may enter `LICENSED_VENUE_PHOTOS` in `index.html`. An accessible image or official venue URL is not permission to embed it. Record the author, file-specific source link, CC/Public Domain license and target venue ID before publishing. A building in the same neighborhood, another branch of a chain, or a food illustration is **not** a verified image of that venue.
 
-Current source registry: 131 cards, 83 uniquely mapped photographic entries, 48 without photos. The registry checks do **not** prove all 83 source pages are alive, correctly licensed or visually matched to the venue. GitHub Actions reports IDs of cards still needing photos.
+Current source registry (2026-10-21): **131 venue cards, 89 registered photographic entries, and 42 without verified reusable photographs**. The older 83/48 figures below are historical, not current. See [photo research batch 14](../audits/photo-research-batch14-2026-10-21.md) for current rights-pending exact-site gallery leads. The registry checks do **not** prove all 83 source pages are alive, correctly licensed or visually matched to the venue. GitHub Actions reports IDs of cards still needing photos.
 
 | Venue ID | Target | Candidate evidence | Reuse clearance | Next action |
 | --- | --- | --- | --- | --- |
