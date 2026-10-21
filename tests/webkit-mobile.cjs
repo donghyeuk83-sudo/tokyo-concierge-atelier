@@ -43,6 +43,7 @@ function startLocalServer(){
     if(el.complete)return resolve();
     el.addEventListener('load',resolve,{once:true});
     el.addEventListener('error',resolve,{once:true});
+    setTimeout(resolve,8000); // Bound the wait when WebKit never emits image events.
    }));
    const layout=await artwork.evaluate(el=>{
     const img=el.querySelector('img'),svg=el.querySelector('svg'),badge=el.querySelector('.card-photo-label');
