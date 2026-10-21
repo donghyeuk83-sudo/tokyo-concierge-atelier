@@ -11,6 +11,14 @@ const assert=require('assert');
  assert((await page.locator('.card').count())>0,'catalogue cards render');
  assert.equal(await page.evaluate(()=>typeof illustration),'function','Separate illustrative renderer is initialized before catalogue cards');
  assert((await page.locator('#cards .card-art').count())>0,'Unlicensed venue slots still render the existing illustrative artwork');
+ // Stage 3: functions and 3-language editorial content must resolve as
+ // ordinary globals on file:// AND on live Pages before any user events.
+ const stage3Browser=await page.evaluate(()=>{
+  const funcs=[options,openVenuePhoto,card,openDetail,syncPhotoQuickbar,render,translateLanding,prioritizeConciergeOnMobile,translateImageLabels,translateChrome,translateEditorial,verifyEditorialPhotos];
+  return {callable:funcs.every(f=>typeof f==='function'),languages:Object.keys(LANDING_COPY).sort(),visibleVenues:DATA.length,images:Object.keys(LICENSED_VENUE_PHOTOS).length,artwork:Object.keys(AI_VENUE_VISUALS).length,mobileQuery:typeof mobileConciergeMedia.matches==='boolean'};
+ });
+ assert.deepEqual(stage3Browser,{callable:true,languages:['en','ja','ko'],visibleVenues:131,images:89,artwork:50,mobileQuery:true},'Unchanged editorial and render functions work together on file and Pages');
+
  // Prove that cached category partitions are identical, in the same order,
  // to the old full-catalogue filter for each of the five tabs.
  const categoriesMatch=await page.evaluate(()=>{
