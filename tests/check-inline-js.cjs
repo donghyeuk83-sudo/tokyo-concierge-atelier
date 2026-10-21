@@ -18,12 +18,12 @@ assert.equal(scriptTags.length,13,'Expected exactly thirteen source-controlled e
 assert(scriptTags.every(m=>/\bsrc="assets\/[\w-]+\.js\?v=[^"]+"/.test(m[1])&&!m[2].trim()),'No inline executable scripts or unknown script URL forms are permitted');
 
 const illustrationPath='assets/atelier-illustration.js';
-assert(html.includes('<script src="'+illustrationPath+'?v=20261021-a"></script>'),'Venue illustration renderer must load before catalogue inline script');
+assert(html.includes('<script src="'+illustrationPath+'?v=20261022-svg-hidden"></script>'),'Venue illustration renderer must load before catalogue inline script');
 const externalJS=fs.readFileSync(illustrationPath,'utf8');
 assert(externalJS.includes('function illustration(r){'),'Venue artwork function missing from extracted asset');
 new vm.Script(externalJS,{filename:illustrationPath});
 const searchPath='assets/atelier-search.js';
-const illustrationTag='<script src="'+illustrationPath+'?v=20261021-a"></script>';
+const illustrationTag='<script src="'+illustrationPath+'?v=20261022-svg-hidden"></script>';
 const searchTag='<script src="'+searchPath+'?v=20261021-a"></script>';
 assert(html.includes(searchTag),'Versioned external multilingual search index missing');
 assert(html.indexOf(illustrationTag)<html.indexOf(searchTag)&&html.indexOf(searchTag)<entryPos,'Illustration and search assets must load before inline catalogue initialization');
