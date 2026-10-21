@@ -32,6 +32,44 @@ function startLocalServer(){
   assert((await page.locator('html').getAttribute('lang'))==='en','Language defaults to English');
   const viewport=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth}));
   assert(viewport.scroll<=viewport.width+2,'No sideways iPhone viewport overflow: '+JSON.stringify(viewport));
+
+  // iPhone screenshot regression: prevent duplicate labels over Seirinkan artwork.
+  for(const locale of ['ko','ja','en']){
+   await page.locator('#language').selectOption(locale);
+   await page.locator('#query').fill('Seirinkan');
+   const artwork=page.locator('#cards .card:has([data-detail="r06"]) .card-art');
+   await artwork.waitFor({timeout:10000});
+   await page.waitForFunction(()=>{const el=document.querySelector('#cards .card:has([data-detail="r06"]) .card-art');if(!el)return false;el.scrollIntoView({block:'center'});return true;}); // Avoid detached Playwright locators during language rerender.
+   await artwork.locator('img').evaluate(el=>new Promise(resolve=>{
+    el.loading='eager'; // Explicitly request the image in headless WebKit.
+    if(el.complete)return resolve();
+    el.addEventListener('load',resolve,{once:true});
+    el.addEventListener('error',resolve,{once:true});
+    setTimeout(resolve,8000); // Bound the wait when WebKit never emits image events.
+   }));
+   const layout=await artwork.evaluate(el=>{
+    const img=el.querySelector('img'),svg=el.querySelector('svg'),badge=el.querySelector('.card-photo-label');
+    const caption=el.querySelector('.art-caption');
+    const outer=el.getBoundingClientRect(),box=badge.getBoundingClientRect();
+    return {loaded:img.naturalWidth>0,svgHidden:getComputedStyle(svg).display==='none',
+     captionCount:el.querySelectorAll('.art-caption').length,
+     badgeCount:el.querySelectorAll('.card-photo-label').length,
+     badgeFits:box.left>=outer.left&&box.right<=outer.right+1&&box.top>=outer.top&&box.bottom<=outer.bottom+1,
+     captionOverlaps:!!caption&&!(box.bottom<=caption.getBoundingClientRect().top||caption.getBoundingClientRect().bottom<=box.top)};
+   });
+   // A failed/missing image must show its SVG fallback; a loaded image must hide it.
+   assert(layout.loaded ? layout.svgHidden : !layout.svgHidden,
+    'AI image and SVG fallback are mutually exclusive in '+locale+': '+JSON.stringify(layout));
+   assert.equal(layout.captionCount,0,'No duplicate venue caption over image in '+locale);
+   assert.equal(layout.badgeCount,1,'Exactly one image-type label in '+locale);
+   assert(layout.badgeFits&&!layout.captionOverlaps,'Art labels fit and do not collide in '+locale+': '+JSON.stringify(layout));
+  }
+  const seirinkanArt=page.locator('#cards .card:has([data-detail="r06"]) .card-art');
+  await seirinkanArt.locator('img').evaluate(el=>el.dispatchEvent(new Event('error')));
+  assert(await seirinkanArt.locator('img').evaluate(el=>el.hidden),'Failed illustration image becomes hidden');
+  assert.notEqual(await seirinkanArt.locator('svg').evaluate(el=>getComputedStyle(el).display),'none','SVG fallback appears on image failure');
+  await page.locator('#query').fill('');
+
   // Multilingual aliases are loaded before the catalogue and remain searchable
   // on iPhone WebKit; return to Restaurants to preserve every existing test.
   await page.locator('#tabs [data-cat="attraction"]').click();

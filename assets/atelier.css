@@ -464,3 +464,8 @@ html:has(#photoDialog[open]){overflow:hidden}
 
 /* Explicitly enforce fallback SVG visibility: author CSS can override SVG's hidden attribute on iOS Safari. */
 .card-art svg[hidden]{display:none!important}
+
+/* Venue art overlays: keep the optional SVG caption and media-type badge in separate corners.
+   This also protects long Japanese/Korean labels at narrow Safari widths. */
+.card-art .art-caption{top:12px;bottom:auto;max-width:calc(100% - 24px);box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card-art .card-photo-label{bottom:10px;left:12px;max-width:calc(100% - 24px);box-sizing:border-box;overflow-wrap:anywhere;line-height:1.35}
