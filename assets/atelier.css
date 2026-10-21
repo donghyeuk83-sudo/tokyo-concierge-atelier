@@ -461,3 +461,6 @@ html:has(#photoDialog[open]){overflow:hidden}
 .csv-download-fallback a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:9px 15px;border:1px solid #1f675b;border-radius:5px;background:#1c675b;color:#fff;text-decoration:none;font-weight:750}
 .csv-download-fallback a:hover{background:#124f46}
 @media(max-width:550px){.csv-download-fallback{align-items:stretch;flex-direction:column}.csv-download-fallback a{width:100%}}
+
+/* Explicitly enforce fallback SVG visibility: author CSS can override SVG's hidden attribute on iOS Safari. */
+.card-art svg[hidden]{display:none!important}
