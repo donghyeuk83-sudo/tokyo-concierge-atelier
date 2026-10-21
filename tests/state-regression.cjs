@@ -14,8 +14,8 @@ const assert=require('node:assert/strict');
  await page.goto(testUrl.toString(),{waitUntil:'domcontentloaded',timeout:45000});
  await page.locator('.card').first().waitFor();
  const stage2=await page.evaluate(()=>{
-  const required=['parseSavedShortlist','invalidateCsvDownload','save','shortlistUrl','importShortlistHash','conciergeNote','hotelDirections','currentVenueLocation','esc','tr'];
-  const callable=required.every(name=>typeof eval(name)==='function');
+  const required=[parseSavedShortlist,invalidateCsvDownload,save,shortlistUrl,importShortlistHash,conciergeNote,hotelDirections,currentVenueLocation,esc,tr];
+  const callable=required.every(fn=>typeof fn==='function');
   const untouched=DATA.length===131&&Object.keys(LICENSED_VENUE_PHOTOS).length===89&&Object.keys(AI_VENUE_VISUALS).length===50;
   const privacy=!shortlistUrl().includes('PRIVATE_TEST_GUEST')&&!shortlistUrl().includes('cache-test');
   const outside=CONCIERGE_GUIDANCE.w05.ko.includes('웨스틴')&&PLACE_ALIASES.r29.includes('쿠라스시');
