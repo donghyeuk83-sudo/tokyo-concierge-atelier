@@ -4,7 +4,11 @@ Updated 2026-10-21. Site: `https://donghyeuk83-sudo.github.io/tokyo-concierge-at
 
 ## Architecture
 
-- `index.html`: the original static HTML layout and remaining inline **state, UI rendering, CSV and event** script. Stage 0–1 extracted canonical data without changing its values; stages 2–4 are NOT performed yet.
+- `index.html`: original HTML layout and remaining inline **UI rendering, editorial, filter controls, CSV output and event wiring**. Stage 0–1 data plus stage 2 guidance/common/state have been extracted; stages **3 and 4 are NOT yet done**.
+- `assets/atelier-common.js`: original DOM lookup, HTML escaping, locale accessor, venue map and Westin route helpers. Defines the shared `lang`/`category` state, loaded before the shortlist module.
+- `assets/atelier-guidance.js`: original source-sensitive venue alerts, EN/JA/KO concierge notes, curated internal recommendation labels and exact additional multilingual aliases. Loaded after the search module, prior to any search indexing or rendering.
+- `assets/atelier-state.js`: original `atelier-shortlist-v2` hydration/validation, blocked-storage fallback, copied guide link generation/import and CSV URL invalidation. UI event registration and actual CSV formatting still reside in `index.html`; stage 4 will extract them.
+- `audits/stage02-original-code-snapshot.json`: checksums for the three preserved code extractions and strict load dependencies. `tests/check-inline-js.cjs` checks syntactic validity, exact blob hashes and unique source definitions.
 - `assets/atelier-catalog.js`: byte-preserved 131-record `DATA` registry and the original five-category order/cache.
 - `assets/atelier-sources.js`: byte-preserved `VERIFIED_SOURCES`, pending source reviews and exact official-vs-reference provenance.
 - `assets/atelier-media.js`: byte-preserved 89 CC photo mappings, 50 AI concept mappings, host-building photo disclosures and external photo-source metadata.
@@ -29,6 +33,6 @@ Updated 2026-10-21. Site: `https://donghyeuk83-sudo.github.io/tokyo-concierge-at
 - Share links contain only public shortlist venue IDs. Never leak arbitrary URL query parameters or persist guest PII. When shortlist selection **or locale** changes, invalidate previously prepared CSV export blobs.
 - Protect production with branch/PR checks before merging. Review test results for real Chromium and iPhone WebKit, not only syntax checks. Distinguish emulator/Playwright behavior from a physical iPhone Safari hardware test.
 
-## Next modularization step — Stage 2–4 (not performed in this PR)
+## Next modularization step — Stage 3–4 (not performed in this PR)
 
-The 131-place catalogue, source notes and 89-photo licensed registry are now canonical external JS. Next isolate guest-facing guidance/common helpers/state, then editorial/rendering and CSV/boot code in separate reviewed PRs. Retain file:// functionality, exact legacy translation copy and all existing safety and photo-approval gates. Do not mutate the stage 0–1 snapshot to conceal unreviewed data changes.
+The 131-place catalogue, source notes and 89-photo licensed registry are now canonical external JS. The guest-facing guidance, common helpers and shortlist state now live in three versioned classic-script assets. Next isolate editorial UI and card rendering in stage 3, then CSV generation and application bootstrap/events in stage 4; use separate reviewed PRs. Retain file:// functionality, exact legacy translation copy and all existing safety and photo-approval gates. Do not mutate the stage 0–1 snapshot to conceal unreviewed data changes.

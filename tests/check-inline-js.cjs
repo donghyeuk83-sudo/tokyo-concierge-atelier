@@ -39,4 +39,27 @@ for(let i=0;i<originalLocale.length;i++){h^=originalLocale.charCodeAt(i);h=Math.
 assert.equal((h>>>0).toString(16),'a7fb4a39','Original three-language copy changed unexpectedly');
 assert(!html.includes('const I18N='),'Locale definitions must have exactly one source of truth');
 assert(searchSource.includes('function searchText(r)'),'Dedicated search index must define searchText');
-console.log('PASS',blocks.length,'inline JS, 6 ordered classic source modules, exact 131/89/50/42 data snapshot, original translations');
+// Stage 2: immutable original code extraction + ordered classic-script initialization.
+const {createHash}=require('node:crypto');
+const stage2=JSON.parse(fs.readFileSync('audits/stage02-original-code-snapshot.json','utf8'));
+const blob=(source)=>{const bytes=Buffer.from(source,'utf8');return createHash('sha1').update(Buffer.from('blob '+bytes.length,'utf8')).update(Buffer.from([0])).update(bytes).digest('hex');};
+const scripts=[...stage2.load_after,...stage2.load_order];
+let prev=-1;
+for(const path of scripts){
+ const token='<script src="'+path+'?v=';
+ const pos=html.indexOf(token);
+ assert(pos>prev&&pos<html.indexOf('<script>'),'Classic script missing or out of order: '+path);
+ assert(!html.includes(token,pos+token.length),'Classic script duplicated: '+path);
+ prev=pos;
+}
+for(const [path,sha] of Object.entries(stage2.git_blob_sha1)){
+ const source=fs.readFileSync(path,'utf8');
+ new vm.Script(source,{filename:path});
+ assert.equal(blob(source),sha,'Stage 2 extracted code changed without review: '+path);
+}
+for(const name of ['CONCIERGE_GUIDANCE','VENUE_ALERTS','DESCRIPTIONS','INTERNAL_RECOMMENDATIONS','VALID_VENUE_IDS']){
+ assert(!html.includes('const '+name+'='),'Duplicated extracted declaration '+name);
+}
+assert(!html.includes('function shortlistUrl()')&&!html.includes('function save()'),'Shortlist state must have one source of truth');
+console.log('PASS',blocks.length,'inline JS, 9 ordered classic scripts, unchanged stage 1 data + stage 2 state/guidance snapshot, locale fingerprint');
+

@@ -13,6 +13,15 @@ const assert=require('node:assert/strict');
  page.on('pageerror',e=>errors.push(e.message));
  await page.goto(testUrl.toString(),{waitUntil:'domcontentloaded',timeout:45000});
  await page.locator('.card').first().waitFor();
+ const stage2=await page.evaluate(()=>{
+  const required=[parseSavedShortlist,invalidateCsvDownload,save,shortlistUrl,importShortlistHash,conciergeNote,hotelDirections,currentVenueLocation,esc,tr];
+  const callable=required.every(fn=>typeof fn==='function');
+  const untouched=DATA.length===131&&Object.keys(LICENSED_VENUE_PHOTOS).length===89&&Object.keys(AI_VENUE_VISUALS).length===50;
+  const privacy=!shortlistUrl().includes('PRIVATE_TEST_GUEST')&&!shortlistUrl().includes('cache-test');
+  const outside=CONCIERGE_GUIDANCE.w05.ko.includes('웨스틴')&&PLACE_ALIASES.r29.includes('쿠라스시');
+  return {callable,untouched,privacy,outside};
+ });
+ assert.deepEqual(stage2,{callable:true,untouched:true,privacy:true,outside:true},'Extracted stage 2 functions, data, guide privacy, and search guidance parity');
  await page.locator('#tabs [data-cat="attraction"]').click();
  const area=page.locator('#area');
  assert(await area.locator('option').allTextContents().then(a=>a.includes('Meguro')),'Meguro selectable in attraction area filters');
