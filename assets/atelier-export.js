@@ -1,0 +1,9 @@
+"use strict";
+// Avoid revoking in pagehide: on iOS Safari the download navigation may still be reading the blob.
+$("download").onclick=()=>{const rows=DATA.filter(r=>selected.has(r.id));if(!rows.length){feedback("empty");return}const quote=s=>{const value=String(s??"");return '"'+(/^[\s]*[=+@-]/.test(value)?"\u0027":"")+value.replace(/"/g,'""')+'"'};const csv=[["Name","Japanese","Category","Area","Type","Review status","Source reviewed on","Reference URL","Concierge note","Map search","Hotel route"].map(quote).join(","),...rows.map(r=>[r.name,r.ja,r.category,r.area,r.type,VERIFIED_SOURCES[r.id]?"SOURCE_REVIEWED_CONDITIONS_UNCONFIRMED":"NEEDS_OFFICIAL_REVIEW",VERIFIED_SOURCES[r.id]?.checked||"",VERIFIED_SOURCES[r.id]?.url||r.url,[conciergeNote(r),VENUE_ALERTS[r.id]?.[lang]||VENUE_ALERTS[r.id]?.en].filter(Boolean).join(" | "),venueMap(r),hotelDirections(r,"transit")].map(quote).join(","))].join("\r\n");const b=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"});if(csvExportUrl)URL.revokeObjectURL(csvExportUrl);csvExportUrl=URL.createObjectURL(b);const direct=$("csvDirectDownload");direct.href=csvExportUrl;$("csvDownloadFallback").classList.remove("hidden");const a=document.createElement("a");a.href=csvExportUrl;a.download="tokyo-concierge-shortlist.csv";document.body.appendChild(a);
+// On real iPhone/iPad WebKit, scripted blob navigation may replace the page before
+// the human-tappable link is shown. Keep the verified CSV blob and visible fallback.
+// Desktop browsers retain the existing one-click automatic download.
+const isIOSWebKit=/iPhone|iPad|iPod/.test(navigator.userAgent)&&/AppleWebKit/.test(navigator.userAgent);
+if(!isIOSWebKit)a.click();
+a.remove();feedback("exported")};

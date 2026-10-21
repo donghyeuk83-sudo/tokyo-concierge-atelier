@@ -1,0 +1,56 @@
+{
+  "baseline_commit": "26ba3e75cd1c65e2785a661e5cfcd5f71466971e",
+  "description": "Stage 4 byte-preserves original inline CSV handler and application event/bootstrap bodies. CSV handler's original registration now executes immediately before app event listeners instead of among them; no user input can interleave synchronous classic scripts. All runtime business/state semantics are unchanged.",
+  "git_blob_sha1": {
+    "assets/atelier-export.js": "0d882ea66dccce8c3d85dd3ddf874985dc93e026",
+    "assets/atelier-app.js": "e7185412c8dc4db04c7b4ecdff553a80f2678054"
+  },
+  "load_order": [
+    "assets/atelier-catalog.js",
+    "assets/atelier-sources.js",
+    "assets/atelier-media.js",
+    "assets/atelier-illustration.js",
+    "assets/atelier-search.js",
+    "assets/atelier-i18n.js",
+    "assets/atelier-common.js",
+    "assets/atelier-guidance.js",
+    "assets/atelier-state.js",
+    "assets/atelier-editorial.js",
+    "assets/atelier-render.js",
+    "assets/atelier-export.js",
+    "assets/atelier-app.js"
+  ],
+  "retained_in_export": [
+    "$(\"download\").onclick=",
+    "const isIOSWebKit=",
+    "a.remove();feedback(\"exported\")"
+  ],
+  "retained_in_app": [
+    "function translate(",
+    "function feedback(",
+    "document.addEventListener(\"click\"",
+    "window.addEventListener(\"storage\"",
+    "window.addEventListener(\"hashchange\"",
+    "importShortlistHash();",
+    "prioritizeConciergeOnMobile();",
+    "const imageObserver=new MutationObserver(",
+    "verifyEditorialPhotos();",
+    "translate();",
+    "navigator.serviceWorker.getRegistrations()"
+  ],
+  "csv_columns": [
+    "Name",
+    "Japanese",
+    "Category",
+    "Area",
+    "Type",
+    "Review status",
+    "Source reviewed on",
+    "Reference URL",
+    "Concierge note",
+    "Map search",
+    "Hotel route"
+  ],
+  "privacy_key": "atelier-shortlist-v2",
+  "file_protocol": "All 13 external classic scripts load synchronously and can execute directly from file:// without native ESM CORS restrictions"
+}

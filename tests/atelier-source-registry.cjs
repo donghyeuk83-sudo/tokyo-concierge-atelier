@@ -52,7 +52,8 @@ function verifyExtractedSnapshot(){
   assert(html.indexOf(match,pos+1)===-1,'Source asset loaded more than once: '+path);
   prior=pos;
  }
- assert(prior<html.indexOf('<script>'),'All source data must load before main entrypoint');
+ const appPos=html.indexOf('<script src="assets/atelier-app.js?v=');
+ assert(appPos>prior,'All audited canonical data scripts must load before the external app entrypoint');
  for(const name of ['DATA','VERIFIED_SOURCES','LICENSED_VENUE_PHOTOS','AI_VENUE_VISUALS','VENUE_PHOTO_SOURCE_LINKS','VENUE_PHOTO_CONTEXT']){
   assert(!html.includes('const '+name+'='),'Duplicate inline canonical declaration: '+name);
  }

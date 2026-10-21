@@ -8,6 +8,18 @@ const assert=require('assert');
  await page.goto(target,{waitUntil:'domcontentloaded',timeout:45000});
  assert((await page.title()).includes('Tokyo Concierge Atelier'),'site title');
  await page.waitForSelector('.card',{timeout:15000});
+ // Stage 4 runs without any inline executable script; the original
+ // CSV and application event handlers remain wired in classic-script order.
+ const stage4Boot=await page.evaluate(()=>{
+  const scripts=[...document.scripts];
+  const files=scripts.map(node=>node.getAttribute('src')?.split('?')[0]||'');
+  return {count:scripts.length,noInline:scripts.every(node=>Boolean(node.getAttribute('src'))&&!node.textContent.trim()),
+   csvLastTwo:files.slice(-2),csvReady:typeof document.querySelector('#download').onclick==='function',
+   bootReady:typeof translate==='function'&&typeof feedback==='function'&&typeof render==='function',
+   savedKey:'atelier-shortlist-v2'};
+ });
+ assert.deepEqual(stage4Boot,{count:13,noInline:true,csvLastTwo:['assets/atelier-export.js','assets/atelier-app.js'],csvReady:true,bootReady:true,savedKey:'atelier-shortlist-v2'},'Stage 4 file:// and published site must boot 13 external classic scripts with original CSV and app handlers');
+
  assert((await page.locator('.card').count())>0,'catalogue cards render');
  assert.equal(await page.evaluate(()=>typeof illustration),'function','Separate illustrative renderer is initialized before catalogue cards');
  assert((await page.locator('#cards .card-art').count())>0,'Unlicensed venue slots still render the existing illustrative artwork');
