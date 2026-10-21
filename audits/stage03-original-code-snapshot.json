@@ -1,0 +1,29 @@
+{
+  "baseline_commit": "7099dd26b1cf86b6339b5fb20209af7adfc4b3ef",
+  "description": "Original stage 3 editorial translations, mobile layout function, venue card/detail/filter renderer and photo-load error fallback were extracted without modifying source text; bootstrap side effects remain at the original execution point in index.html. Exact Git blob SHA-1 values are pinned.",
+  "git_blob_sha1": {
+    "assets/atelier-editorial.js": "885a2bb809787e355c3f445a123244ec93157bc2",
+    "assets/atelier-render.js": "468014f4d4966a5487a55f3b3a1b52833d8dc06a"
+  },
+  "load_after": [
+    "assets/atelier-catalog.js",
+    "assets/atelier-sources.js",
+    "assets/atelier-media.js",
+    "assets/atelier-illustration.js",
+    "assets/atelier-search.js",
+    "assets/atelier-i18n.js",
+    "assets/atelier-common.js",
+    "assets/atelier-guidance.js",
+    "assets/atelier-state.js"
+  ],
+  "load_order": [
+    "assets/atelier-editorial.js",
+    "assets/atelier-render.js"
+  ],
+  "unchanged_bootstrap_in_index": [
+    "if(mobileConciergeMedia.addEventListener)",
+    "const imageObserver=new MutationObserver(",
+    "translate();"
+  ],
+  "deferred": "Stage 4 will extract existing CSV and event/bootstrap functions; this PR does not change them."
+}
