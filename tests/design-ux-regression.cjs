@@ -62,6 +62,14 @@ async function verify(browserType,label,dimensions,url){
   const yoroniku=page.locator('#cards .card:has([data-detail="r11"])');
   await yoroniku.waitFor({timeout:10000});
   const yoronikuArt=yoroniku.locator('.card-art');
+  // Content-visibility:auto deliberately skips layout of cards below the fold.
+  // Scroll into the viewport before measuring the real artwork/badge geometry.
+  await yoroniku.scrollIntoViewIfNeeded();
+  await yoronikuArt.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+  await page.waitForFunction(()=>{
+   const el=document.querySelector('#cards .card:has([data-detail="r11"]) .card-art');
+   return !!el&&el.getBoundingClientRect().height>50;
+  },null,{timeout:10000});
   const artworkState=await yoronikuArt.evaluate(el=>{
    const badge=el.querySelector('.card-photo-label');
    const svg=el.querySelector('svg');
