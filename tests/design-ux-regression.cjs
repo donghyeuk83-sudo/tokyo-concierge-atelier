@@ -74,6 +74,7 @@ async function verify(browserType,label,dimensions,url){
     captions:el.querySelectorAll('.art-caption').length,
     badges:el.querySelectorAll('.card-photo-label').length,
     badgeContained:!!rect&&rect.left>=container.left-1&&rect.right<=container.right+1&&rect.top>=container.top-1&&rect.bottom<=container.bottom+1,
+    badgeRect:rect?.toJSON(),containerRect:container.toJSON(),badgeStyle:badge?{position:getComputedStyle(badge).position,bottom:getComputedStyle(badge).bottom,left:getComputedStyle(badge).left,fontSize:getComputedStyle(badge).fontSize}:null,
     containsWrongChuo:el.textContent.includes('Chuo')
    };
   });
