@@ -59,12 +59,21 @@ async function verify(browserType,label,dimensions,url){
   // The source registry and original 50 AI assets remain untouched.
   await page.locator('#tabs [data-cat="restaurant"]').click();
   await page.locator('#query').fill('Yoroniku');
+  // Wait for the debounced catalogue rerender, not just an r11 card from an older frame.
+  await page.waitForFunction(()=>{
+   const cards=[...document.querySelectorAll('#cards .card')];
+   return cards.length===1&&!!cards[0].querySelector('[data-detail="r11"]');
+  },null,{timeout:10000});
   const yoroniku=page.locator('#cards .card:has([data-detail="r11"])');
-  await yoroniku.waitFor({timeout:10000});
   const yoronikuArt=yoroniku.locator('.card-art');
-  // Content-visibility:auto deliberately skips layout of cards below the fold.
-  // Scroll into the viewport before measuring the real artwork/badge geometry.
-  await yoroniku.scrollIntoViewIfNeeded();
+  // content-visibility:auto skips layout below the fold. Avoid Playwright's
+  // actionability/stability retry while a re-render or CSS transition is settling.
+  await page.evaluate(()=>{
+   const root=document.documentElement,old=root.style.scrollBehavior;
+   root.style.scrollBehavior='auto';
+   document.querySelector('#cards .card:has([data-detail="r11"])').scrollIntoView({block:'center',behavior:'auto'});
+   root.style.scrollBehavior=old;
+  });
   await yoronikuArt.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
   await page.waitForFunction(()=>{
    const el=document.querySelector('#cards .card:has([data-detail="r11"]) .card-art');
