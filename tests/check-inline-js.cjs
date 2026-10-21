@@ -42,7 +42,7 @@ assert(searchSource.includes('function searchText(r)'),'Dedicated search index m
 // Stage 2: immutable original code extraction + ordered classic-script initialization.
 const {createHash}=require('node:crypto');
 const stage2=JSON.parse(fs.readFileSync('audits/stage02-original-code-snapshot.json','utf8'));
-const blob=(source)=>{const bytes=Buffer.from(source,'utf8');return createHash('sha1').update(Buffer.from('blob '+bytes.length+'\\0','utf8')).update(bytes).digest('hex');};
+const blob=(source)=>{const bytes=Buffer.from(source,'utf8');return createHash('sha1').update(Buffer.from('blob '+bytes.length,'utf8')).update(Buffer.from([0])).update(bytes).digest('hex');};
 const scripts=[...stage2.load_after,...stage2.load_order];
 let prev=-1;
 for(const path of scripts){
