@@ -1,0 +1,26 @@
+{
+  "baseline_commit": "c778f69e29e6900d0ce05ebced388d9b61b8aea6",
+  "baseline_index_blob_sha": "7e45b4f0cde5828512a20e219e3e92080cad842b",
+  "description": "Stage 2 conservatively extracts unchanged guidance, DOM helpers and saved shortlist behavior into classic JS files. Each Git blob hash pins exact audited extraction; edits require deliberate update and full regression testing.",
+  "git_blob_sha1": {
+    "assets/atelier-common.js": "03e5a4d5aedfe01d8aff2c26d1479d0a38317678",
+    "assets/atelier-guidance.js": "d1ce51401f35165e79dd7921555670af3da6348e",
+    "assets/atelier-state.js": "f0098560a59650c050b726032b927807e5bcd7e0"
+  },
+  "load_after": [
+    "assets/atelier-catalog.js",
+    "assets/atelier-sources.js",
+    "assets/atelier-media.js",
+    "assets/atelier-illustration.js",
+    "assets/atelier-search.js",
+    "assets/atelier-i18n.js"
+  ],
+  "load_order": [
+    "assets/atelier-common.js",
+    "assets/atelier-guidance.js",
+    "assets/atelier-state.js"
+  ],
+  "storage_key": "atelier-shortlist-v2",
+  "selected_venue_order": "DATA original sequence",
+  "privacy": "Only public venue IDs, never guest query data, in guide links"
+}
