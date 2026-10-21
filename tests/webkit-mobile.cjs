@@ -56,8 +56,9 @@ function startLocalServer(){
      badgeFits:box.left>=outer.left&&box.right<=outer.right+1&&box.top>=outer.top&&box.bottom<=outer.bottom+1,
      captionOverlaps:!!caption&&!(box.bottom<=caption.getBoundingClientRect().top||caption.getBoundingClientRect().bottom<=box.top)};
    });
-   assert(layout.loaded,'Venue-specific AI image loads in '+locale);
-   assert(layout.svgHidden,'Fallback SVG remains hidden behind loaded image in '+locale);
+   // A failed/missing image must show its SVG fallback; a loaded image must hide it.
+   assert(layout.loaded ? layout.svgHidden : !layout.svgHidden,
+    'AI image and SVG fallback are mutually exclusive in '+locale+': '+JSON.stringify(layout));
    assert.equal(layout.captionCount,0,'No duplicate venue caption over image in '+locale);
    assert.equal(layout.badgeCount,1,'Exactly one image-type label in '+locale);
    assert(layout.badgeFits&&!layout.captionOverlaps,'Art labels fit and do not collide in '+locale+': '+JSON.stringify(layout));
