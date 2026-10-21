@@ -5,7 +5,7 @@
   "git_blob_sha1": {
     "assets/atelier-common.js": "03e5a4d5aedfe01d8aff2c26d1479d0a38317678",
     "assets/atelier-guidance.js": "d1ce51401f35165e79dd7921555670af3da6348e",
-    "assets/atelier-state.js": "f0098560a59650c050b726032b927807e5bcd7e0"
+    "assets/atelier-state.js": "a34995ba5fd34163f32a21de6eb39f1766b11f13"
   },
   "load_after": [
     "assets/atelier-catalog.js",

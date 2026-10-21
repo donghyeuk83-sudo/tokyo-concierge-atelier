@@ -74,6 +74,10 @@ const assert=require('node:assert/strict');
   if(importShortlistHash())render();
  });
  const shared=new URL(await page.evaluate(()=>shortlistUrl()));
+ if(testUrl.protocol==='file:'||['localhost','127.0.0.1','[::1]'].includes(testUrl.hostname)){
+  assert.equal(shared.origin,'https://donghyeuk83-sudo.github.io','Local file or localhost share points to a reachable public host');
+  assert.equal(shared.pathname,'/tokyo-concierge-atelier/','Local share uses the published catalogue path');
+ }
  assert.equal(shared.search,'','Public shortlist URL must remove all arbitrary query parameters, not only cache-busting v');
  assert.equal(shared.hash,'#guide=a32','Public shortlist still contains the selected venue ID');
  assert(!shared.href.includes('PRIVATE_TEST_GUEST'),'Guest-like query data must never leak into a copied guide');
