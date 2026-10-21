@@ -23,7 +23,7 @@ assert.equal(new Set(licensed.map(x=>x.id)).size,licensed.length,'Duplicate lice
 assert.equal(licensed.length,licensedSection.split('\n').filter(line=>/^[a-z][0-9]+:\{/.test(line)).length,'Photo registry contains unparsed entries');
 for(const p of licensed){assert(ids.includes(p.id),'Unknown image ID: '+p.id);assert(p.url.startsWith('https://')||/^assets\/photos\/[a-z0-9-]+\.(jpg|webp)$/.test(p.url),'Image URL not HTTPS or a local photo');assert(p.source.startsWith('https://'),'Source URL not HTTPS');assert(p.credit.trim(),'Missing photographer');assert(p.licenseUrl.startsWith('https://creativecommons.org/'),'Missing CC license');assert(!/\bNC\b|\/by-nc(?:-|\/)/i.test(p.license+' '+p.licenseUrl),'Non-commercial-only photo cannot be added to the public hotel concierge catalogue without separate permission: '+p.id);}
 // Regression checks: every venue remains visually represented, including image-load failures.
-assert(renderSource.includes('licensedPhoto||')&&html.includes('illustration(r)'),'Missing photo / AI visual / illustration fallback chain');
+assert(renderSource.includes('licensedPhoto||')&&renderSource.includes('illustration(r)'),'Missing photo / AI visual / illustration fallback chain');
 assert(renderSource.includes("img.addEventListener('error'"),'Missing broken-photo fallback handler');
 for(const p of licensed){
  if(p.url.startsWith('assets/photos/')){
