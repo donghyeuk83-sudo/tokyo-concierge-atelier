@@ -283,4 +283,11 @@ function startLocalServer(){
   if(browser)await browser.close().catch(()=>{});
   if(server)await new Promise(resolve=>server.close(resolve));
  }
-})().catch(e=>{console.error(e);process.exitCode=1});
+})().catch(e=>{
+ console.error(e);process.exitCode=1;
+ // Surface the failing assertion as a GitHub annotation (job logs are not always retrievable).
+ if(process.env.GITHUB_ACTIONS){
+  const line=(e.stack||'').split('\n').find(l=>l.includes('webkit-mobile.cjs:'))||'';
+  console.log('::error title=WebKit mobile regression::'+String(e.message||e).replace(/\r?\n/g,' ').slice(0,900)+' @ '+line.trim().slice(-80));
+ }
+});
