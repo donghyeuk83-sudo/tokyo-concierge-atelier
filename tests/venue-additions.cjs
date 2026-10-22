@@ -64,7 +64,7 @@ ctx.esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','
 for(const f of ['atelier-image-policy.js','atelier-manual-photos.js','atelier-illustration.js'])load(f);
 for(const lang of ['en','ja','ko']){
  vm.runInContext('lang='+JSON.stringify(lang),ctx); // atelier-common.js declares lang with let
- for(const id of ['a48','a49'])assert(vm.runInContext('illustration(DATA.find(r=>r.id==="'+id+'"))',ctx).includes(ctx.IMAGE_SOURCE_LABELS.stockActual[lang]),'Place-specific stock label: '+id+' '+lang);
+ for(const id of ['a48','a49']){const html=vm.runInContext('illustration(DATA.find(r=>r.id==="'+id+'"))',ctx);assert(html.includes(ctx.IMAGE_SOURCE_LABELS.stockUnverified[lang]),'Neutral unverified-location label: '+id+' '+lang);assert(!html.includes(ctx.IMAGE_SOURCE_LABELS.stockActual[lang])&&!html.includes(ctx.IMAGE_SOURCE_LABELS.stock[lang]),'Neither place-specific nor NOT-THIS-VENUE claim: '+id+' '+lang)}
  for(const id of ['r53','r54','r55'])assert(vm.runInContext('illustration(DATA.find(r=>r.id==="'+id+'"))',ctx).includes(ctx.IMAGE_SOURCE_LABELS.stock[lang]),'Generic reference label: '+id+' '+lang);
 }
 // Photo queue for additions is generated and current.

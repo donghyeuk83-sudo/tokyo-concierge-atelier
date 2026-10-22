@@ -113,8 +113,8 @@ const STOCK_IMAGE_LIBRARY={
 "unsplash-r53-yakitori":{sourceType:"stock",provider:"Unsplash",imageUrl:"https://images.unsplash.com/photo-1767974968707-db3d448d4ef3?w=640&q=70&fm=jpg&fit=crop",sourcePageUrl:"https://unsplash.com/photos/grilled-meat-skewers-on-a-serving-platter-z4MYbjYb5p0",photographer:"tommao wang",photographerUrl:"https://unsplash.com/@tommaomaoer",license:"Unsplash License",licenseUrl:"https://unsplash.com/license",subject:"yakitori",alt:"Grilled meat skewers on a platter (generic reference photo)",approvedForReuse:true,fileVerified:false,contentVerified:false,ownerApproved:"2026-10-22",isActualVenue:false,lastVerified:"2026-10-22"},
 "unsplash-r54-tonkatsu":{sourceType:"stock",provider:"Unsplash",imageUrl:"https://images.unsplash.com/photo-1770966666361-b448e634e163?w=640&q=70&fm=jpg&fit=crop",sourcePageUrl:"https://unsplash.com/photos/three-breaded-cutlets-with-shredded-cabbage-and-lemon-fvGOeiYaza4",photographer:"Zhang Ziyu",photographerUrl:"https://unsplash.com/@rs1497",license:"Unsplash License",licenseUrl:"https://unsplash.com/license",subject:"tonkatsu",alt:"Breaded pork cutlets with shredded cabbage (generic reference photo)",approvedForReuse:true,fileVerified:false,contentVerified:false,ownerApproved:"2026-10-22",isActualVenue:false,lastVerified:"2026-10-22"},
 "unsplash-r55-ramen":{sourceType:"stock",provider:"Unsplash",imageUrl:"https://images.unsplash.com/photo-1509680859026-7d8cfc6894f4?w=640&q=70&fm=jpg&fit=crop",sourcePageUrl:"https://unsplash.com/photos/focus-photography-of-ramen-in-bowl-with-condiment-shakers-lbxLlgi_8_w",photographer:"j",photographerUrl:"https://unsplash.com/@janicetea",license:"Unsplash License",licenseUrl:"https://unsplash.com/license",subject:"ramen",alt:"Bowl of ramen (generic reference photo)",approvedForReuse:true,fileVerified:false,contentVerified:false,ownerApproved:"2026-10-22",isActualVenue:false,lastVerified:"2026-10-22"},
-"unsplash-a48-garden":{sourceType:"stock",provider:"Unsplash",imageUrl:"https://images.unsplash.com/photo-1532188978303-4bfaccc429d2?w=640&q=70&fm=jpg&fit=crop",sourcePageUrl:"https://unsplash.com/photos/A57akxc-4BQ",photographer:"Thor Alvis",photographerUrl:"https://unsplash.com/@terminath0r",license:"Unsplash License",licenseUrl:"https://unsplash.com/license",subject:"garden",alt:"Pond and pavilion in Shinjuku Gyoen",approvedForReuse:true,fileVerified:false,contentVerified:false,ownerApproved:"2026-10-22",isActualVenue:true,locationEvidence:"Unsplash location tag: Shinjuku Gyoen National Garden, Shinjuku-ku",lastVerified:"2026-10-22"},
-"unsplash-a49-market":{sourceType:"stock",provider:"Unsplash",imageUrl:"https://images.unsplash.com/photo-1705056132737-6d2df2218726?w=640&q=70&fm=jpg&fit=crop",sourcePageUrl:"https://unsplash.com/photos/a-bunch-of-fish-that-are-in-some-boxes-C9j8IFVV2uQ",photographer:"Deepavali Gaind",photographerUrl:"https://unsplash.com/@deepavalig",license:"Unsplash License",licenseUrl:"https://unsplash.com/license",subject:"market",alt:"Fish in boxes at Tsukiji",approvedForReuse:true,fileVerified:false,contentVerified:false,ownerApproved:"2026-10-22",isActualVenue:true,locationEvidence:"Unsplash location tag: Tsukiji 4-13-13, Chuo City (outer market area)",lastVerified:"2026-10-22"}
+"unsplash-a48-garden":{sourceType:"stock",provider:"Unsplash",imageUrl:"https://images.unsplash.com/photo-1532188978303-4bfaccc429d2?w=640&q=70&fm=jpg&fit=crop",sourcePageUrl:"https://unsplash.com/photos/A57akxc-4BQ",photographer:"Thor Alvis",photographerUrl:"https://unsplash.com/@terminath0r",license:"Unsplash License",licenseUrl:"https://unsplash.com/license",subject:"garden",alt:"Body of water near a gazebo",approvedForReuse:true,fileVerified:false,contentVerified:false,ownerApproved:"2026-10-22",isActualVenue:false,locationStatus:"unverified",locationEvidence:"Unsplash location tag only (uploader-set): Shinjuku Gyoen National Garden, Shinjuku-ku. Image content and shooting place not independently verified.",lastVerified:"2026-10-22"},
+"unsplash-a49-market":{sourceType:"stock",provider:"Unsplash",imageUrl:"https://images.unsplash.com/photo-1705056132737-6d2df2218726?w=640&q=70&fm=jpg&fit=crop",sourcePageUrl:"https://unsplash.com/photos/a-bunch-of-fish-that-are-in-some-boxes-C9j8IFVV2uQ",photographer:"Deepavali Gaind",photographerUrl:"https://unsplash.com/@deepavalig",license:"Unsplash License",licenseUrl:"https://unsplash.com/license",subject:"market",alt:"Fish in boxes at a market",approvedForReuse:true,fileVerified:false,contentVerified:false,ownerApproved:"2026-10-22",isActualVenue:false,locationStatus:"unverified",locationEvidence:"Unsplash location tag only (uploader-set): Tsukiji 4-13-13, Chuo City. Image content and shooting place not independently verified.",lastVerified:"2026-10-22"}
 };
 
 // Venue → its own stock photo. Never used for a venue with an approved registry photo.
@@ -197,6 +197,7 @@ const IMAGE_SOURCE_LABELS={
  stock:{en:"REFERENCE PHOTO · NOT THIS VENUE",ja:"参考写真 · 当店の写真ではありません",ko:"참고 사진 · 이 장소 사진 아님"},
  stockCredit:{en:"Generic reference photo",ja:"一般的な参考写真",ko:"일반 참고 사진"},
  stockActual:{en:"STOCK PHOTO OF THIS PLACE",ja:"この場所のストック写真",ko:"이 장소의 스톡 사진"},
+ stockUnverified:{en:"REFERENCE PHOTO · SHOOTING LOCATION NOT VERIFIED",ja:"参考写真 · 実際の撮影場所は未確認",ko:"참고 사진 · 실제 촬영 장소 미확인"},
  stockActualCredit:{en:"Stock photo of this place",ja:"この場所のストック写真",ko:"이 장소의 스톡 사진"},
  manualActual:{en:"VENUE PHOTO · ADDED BY STAFF",ja:"施設写真 · スタッフ追加",ko:"장소 사진 · 직접 추가"},
  manualOfficial:{en:"OFFICIAL VENUE PHOTO",ja:"施設提供の公式写真",ko:"공식 제공 사진"},
@@ -205,5 +206,25 @@ const IMAGE_SOURCE_LABELS={
 };
 function imageSourceLabel(kind,item){
  if(kind==="manual")return item.isActualVenue?(item.sourceType==="official"?IMAGE_SOURCE_LABELS.manualOfficial:IMAGE_SOURCE_LABELS.manualActual):IMAGE_SOURCE_LABELS.manualReference;
- return item.isActualVenue?IMAGE_SOURCE_LABELS.stockActual:IMAGE_SOURCE_LABELS.stock;
+ if(item.isActualVenue)return IMAGE_SOURCE_LABELS.stockActual;
+ return item.locationStatus==="unverified"?IMAGE_SOURCE_LABELS.stockUnverified:IMAGE_SOURCE_LABELS.stock;
 }
+
+// Provenance corrections overlay (2026-10-23, owner-approved wording). The protected originals in
+// atelier-media.js and atelier-sources.js stay byte-identical and hash-pinned
+// (audits/stage01-original-data-snapshot.json); the superseded wording is replaced here at load time.
+(function applyProvenanceCorrections(){
+ if(typeof VENUE_PHOTO_CONTEXT!=="undefined"){
+  const unverified={en:"processing history not verified against the Flickr original",ja:"加工履歴は原本との照合未了",ko:"가공 이력 원본 대조 미완료"};
+  const superseded={en:/published photo reproduced without further editing$/,ja:/(追加編集なし|公開写真を追加編集せず掲載)$/,ko:/(추가 편집 없음|공개 사진을 추가 편집 없이 표시)$/};
+  for(const id of ["r16","r20"]){
+   const ctx=VENUE_PHOTO_CONTEXT[id];
+   if(ctx)for(const l of ["en","ja","ko"])if(superseded[l].test(ctx[l]))ctx[l]=ctx[l].replace(superseded[l],unverified[l]);
+  }
+ }
+ if(typeof VERIFIED_SOURCES!=="undefined"&&VERIFIED_SOURCES.r37)Object.assign(VERIFIED_SOURCES.r37,{
+  en:"The official Kura Sushi Oshiage page lists one Oshiage (Skytree-front) station-side store at 1-8-23 Oshiage, with separate 1F and 2F entries (own detail pages). Whether 1F and 2F are separate branches is not stated; confirm the floor on the store detail page before booking.",
+  ja:"公式サイトは押上（スカイツリー前）駅前店（押上1-8-23）として1階・2階を別々に掲載しています。別店舗かは明記されていません。予約前に店舗詳細ページで階をご確認ください。",
+  ko:"공식 사이트는 오시아게(스카이트리 앞) 역앞점(오시아게 1-8-23)을 1층·2층으로 나누어 게재합니다. 두 층이 별도 지점인지는 명시되어 있지 않습니다. 예약 전 매장 상세 페이지에서 층을 확인하세요."
+ });
+})();
