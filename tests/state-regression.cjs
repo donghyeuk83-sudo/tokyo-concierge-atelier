@@ -120,4 +120,12 @@ const assert=require('node:assert/strict');
  assert.deepEqual(deniedErrors,[],'Blocked storage does not crash runtime');
  await deniedContext.close();await context.close();await browser.close();
  console.log('PASS '+target+': verified Meguro venue indexing, cross-tab shortlist, malformed storage recovery, share-state reset and blocked-storage warnings');
-})().catch(e=>{console.error(e);process.exit(1)});
+})().catch(e=>{
+ console.error(e);
+ // Surface the failing assertion as a GitHub annotation (job logs are not always retrievable).
+ if(process.env.GITHUB_ACTIONS){
+  const line=(e.stack||'').split('\n').find(l=>l.includes('state-regression.cjs:'))||'';
+  console.log('::error title=Shortlist/state regression::'+String(e.message||e).replace(/\r?\n/g,' ').slice(0,900)+' @ '+line.trim().slice(-80)+(process.env.TEST_URL?' [deployed]':' [repo]'));
+ }
+ process.exit(1);
+});

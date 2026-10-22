@@ -656,4 +656,12 @@ const assert=require('assert');
  assert.equal(errors.length,0,'JS errors: '+errors.join('; '));
  console.log('PASS '+target+': render, search, no results, EN/JA/KO, shortlist, CSV, print invocation, detail, Korean search, mobile width, JS console');
  await browser.close();
-})().catch(e=>{console.error(e);process.exit(1)});
+})().catch(e=>{
+ console.error(e);
+ // Surface the failing assertion as a GitHub annotation (job logs are not always retrievable).
+ if(process.env.GITHUB_ACTIONS){
+  const line=(e.stack||'').split('\n').find(l=>l.includes('smoke.cjs:'))||'';
+  console.log('::error title=Chromium smoke regression::'+String(e.message||e).replace(/\r?\n/g,' ').slice(0,900)+' @ '+line.trim().slice(-80)+(process.env.TEST_URL?' [deployed]':' [repo]'));
+ }
+ process.exit(1);
+});
