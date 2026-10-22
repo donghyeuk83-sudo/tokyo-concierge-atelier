@@ -26,7 +26,7 @@ const assert=require('assert');
    bootReady:typeof translate==='function'&&typeof feedback==='function'&&typeof render==='function',
    savedKey:'atelier-shortlist-v2'};
  });
- assert.deepEqual(stage4Boot,{count:16,noInline:true,csvLastTwo:['assets/atelier-export.js','assets/atelier-app.js'],csvReady:true,bootReady:true,savedKey:'atelier-shortlist-v2'},'Stage 4 file:// and published site must boot 16 external classic scripts (13 original + image policy + manual photos + venue additions) with original CSV and app handlers');
+ assert.deepEqual(stage4Boot,{count:17,noInline:true,csvLastTwo:['assets/atelier-export.js','assets/atelier-app.js'],csvReady:true,bootReady:true,savedKey:'atelier-shortlist-v2'},'Stage 4 file:// and published site must boot 17 external classic scripts (13 original + image policy + manual photos + venue additions + landing count sync) with original CSV and app handlers');
 
  assert((await page.locator('.card').count())>0,'catalogue cards render');
  assert.equal(await page.evaluate(()=>typeof illustration),'function','Separate illustrative renderer is initialized before catalogue cards');
