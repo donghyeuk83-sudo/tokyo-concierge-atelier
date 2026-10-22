@@ -518,13 +518,19 @@ const assert=require('assert');
  // Minimum tap target and readable attribution on narrow iPhone screens.
  await page.locator('#tabs [data-cat="restaurant"]').click();
  const mobilePhotoCard=page.locator('article.card').filter({has:page.locator('.detail-trigger[data-detail="r21"]')});
+ // 2026-10-22 owner request: the "Photos & venue details" box is not shown on cards; the same
+ // external photo page remains one tap away in the Details dialog.
  const mobileSource=mobilePhotoCard.locator('.venue-photo-source');
- const linkHeight=await mobileSource.evaluate(el=>el.getBoundingClientRect().height);
- assert(linkHeight>=44,'Mobile external venue photo link meets 44px touch target');
+ assert.equal(await mobileSource.evaluate(el=>getComputedStyle(el).display),'none','Card photo-source box hidden on iPhone');
  const creditSize=await mobilePhotoCard.locator('.photo-credit').evaluate(el=>parseFloat(getComputedStyle(el).fontSize));
  assert(creditSize>=11,'Mobile photo licensing source and credit are legible');
  const photoButtonHeight=await mobilePhotoCard.locator('.photo-view-trigger').evaluate(el=>el.getBoundingClientRect().height);
  assert(photoButtonHeight>=44,'Mobile photo enlargement touch target');
+ const cardSourceHref=await mobileSource.getAttribute('href');
+ await mobilePhotoCard.locator('.detail-trigger').click();
+ assert.equal(await page.locator('#detailActions .detail-photo-source').getAttribute('href'),cardSourceHref,'Details dialog keeps the same external photo page');
+ assert(await page.locator('#detailActions .detail-photo-source').isVisible(),'Photo page link visible in Details dialog');
+ await page.locator('#detailClose').click();
 
  assert(expectedPhotos.length>=24,'Photo registry unexpectedly shrank');
  assert.equal(expectedPhotos.length,89,'Expected 89 original images including six licensed host-building exteriors');
