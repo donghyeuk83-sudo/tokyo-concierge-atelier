@@ -59,4 +59,14 @@ function verifyExtractedSnapshot(){
  }
  return {places:venueRows.length,licensed:licensedEntries.length,ai:aiEntries.length,pending:venueRows.length-licensedEntries.length};
 }
-module.exports={paths,catalogue,sources,media,html,snapshot,catalogueSection,licensedSection,aiSection,publicPhotoSourceBlock,photoContextBlock,sourceReviewSection,venueRows,licensedEntries,aiEntries,verifyExtractedSnapshot};
+// 2026-10-22: venues added after the protected 131-record baseline live in their own file,
+// in the identical 7-field row format. The original catalogue above stays byte-pinned.
+paths.additions='assets/atelier-catalog-additions.js';
+const additions=fs.readFileSync(paths.additions,'utf8');
+const additionsSection=section(additions,'const VENUE_ADDITIONS=[','].map(');
+const additionRows=[...additionsSection.matchAll(/^\[("(?:[^"\\]|\\.)*"(?:,\s*"(?:[^"\\]|\\.)*"){6})\],?$/gm)].map(m=>JSON.parse('['+m[1]+']'));
+assert.equal(additionsSection.split('\n').filter(x=>/^\[/.test(x)).length,additionRows.length,'Unparsed venue addition rows');
+const additionSourceUrls=new Map([...additions.slice(additions.indexOf('const VENUE_ADDITION_SOURCES=')).matchAll(/(?:^|\n)([a-z]\d+):\{url:"(https:[^"]+)",checked:"(\d{4}-\d{2}-\d{2})"/g)].map(m=>[m[1],m[2]]));
+const allVenueRows=[...venueRows,...additionRows];
+assert.equal(new Set(allVenueRows.map(r=>r[0])).size,allVenueRows.length,'Added venue ID collides with an existing venue');
+module.exports={paths,catalogue,sources,media,html,snapshot,catalogueSection,licensedSection,aiSection,publicPhotoSourceBlock,photoContextBlock,sourceReviewSection,venueRows,licensedEntries,aiEntries,verifyExtractedSnapshot,additions,additionRows,additionSourceUrls,allVenueRows};

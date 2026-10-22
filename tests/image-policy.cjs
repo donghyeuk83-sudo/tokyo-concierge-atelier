@@ -130,6 +130,6 @@ for(const [id,item] of Object.entries(VO)){
 // 9. Totals: every venue resolves to exactly one source type.
 const counts={official:0,licensed:0,stock:0,ai:0,svg:0};
 for(const r of DATA)counts[ctx.venueImageRecord(r).sourceType]++;
-assert.equal(Object.values(counts).reduce((a,b)=>a+b,0),131,'All 131 venues resolved');
+assert.equal(Object.values(counts).reduce((a,b)=>a+b,0),131,'All 131 original venues resolved (additions load later and are covered by venue-additions.cjs)');
 assert.equal(counts.licensed,89,'89 approved photos untouched');
 console.log('PASS image policy: '+JSON.stringify(counts)+', quarantined AI '+Object.keys(Q).length+', stock candidates '+Object.keys(S).length+' (displayable '+Object.values(S).filter(ctx.isDisplayableStock).length+')');
