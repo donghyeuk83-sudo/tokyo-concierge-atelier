@@ -21,8 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: '22'
       - run: npm install --no-save playwright
@@ -48,7 +48,7 @@ jobs:
           node tests/link-exception-regression.cjs
           node tests/check-venue-links.cjs
       - name: Upload venue photo audit
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: venue-photo-audit-131
           path: audits/
