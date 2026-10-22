@@ -7,7 +7,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Extract embedded photographic raster (no vector conversion)
         run: |
           python3 - <<'PY'
@@ -33,7 +33,7 @@ jobs:
           p.write_text(s.replace(old,new))
           PY
       - name: Upload raster conversion for review without modifying main
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ai-raster-review-only
           path: |

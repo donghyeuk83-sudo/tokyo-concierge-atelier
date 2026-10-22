@@ -11,8 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 65
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
       - run: pip install Pillow
@@ -23,7 +23,7 @@ jobs:
       - name: Validate images, file identity and design
         run: python scripts/validate-venue-photos.py
       - name: Upload draft image concepts without editing main or publishing
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: venue-ai-concepts-review-only
           path: |

@@ -7,14 +7,14 @@ jobs:
   review:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: '22'
       - name: Preview AI concept mapping (no commit)
         run: node scripts/map-uploaded-ai-concepts.cjs
       - name: Export proposed changes for manual PR review
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: atelier-concept-mapping-review
           path: assets/atelier-media.js
