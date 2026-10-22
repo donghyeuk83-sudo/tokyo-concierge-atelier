@@ -1,0 +1,15 @@
+{
+  "schema_version": 3,
+  "mode": "offline-adapters-only",
+  "repository": "donghyeuk83-sudo/tokyo-concierge-atelier",
+  "providers": ["chatgpt", "claude", "gemini"],
+  "accepted_data_class": "public-metadata",
+  "network_enabled": false,
+  "allow_real_ai": false,
+  "allow_secret_loading": false,
+  "allow_data_export": false,
+  "allow_repository_writes": false,
+  "allow_deployments": false,
+  "max_cost_usd": 0,
+  "max_retries": 0
+}
