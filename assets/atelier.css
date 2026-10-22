@@ -476,3 +476,6 @@ html:has(#photoDialog[open]){overflow:hidden}
 .stock-credit a{color:inherit;text-decoration:underline}
 @media(max-width:600px){.stock-credit{font-size:11px;padding:6px 12px}}
 @media print{.stock-credit{display:none!important}}
+/* 2026-10-22: rendered cards measure ~740-800px (390px and 1280px, with photo credits). A closer
+   placeholder keeps the page from jumping while off-screen cards render during scroll. */
+@supports (content-visibility:auto){#cards .card{contain-intrinsic-size:auto 760px}}
