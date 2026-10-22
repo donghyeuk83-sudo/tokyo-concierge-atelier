@@ -16,6 +16,90 @@ async function baseUrl(){
   }).listen(0,'127.0.0.1',()=>resolve('http://127.0.0.1:'+server.address().port+'/'));
  });
 }
+// Every card shows exactly one image source; quarantined AI tiles never render; AI/local images
+// really decode (naturalWidth>0); image and SVG fallback are never visible together; the label
+// stays inside the card and never collides with a caption. Also exercises the stock tier.
+async function auditCardImages(page,label){
+ const quarantine=await page.evaluate(()=>Object.keys(AI_VISUAL_QUARANTINE));
+ const badFiles=await page.evaluate(()=>Object.keys(AI_VISUAL_QUARANTINE).map(id=>AI_VENUE_VISUALS[id].url));
+ const totals={cards:0,ai:0,svg:0,stock:0,licensed:0};
+ await page.locator('#query').fill('');
+ for(const cat of ['restaurant','attraction','shopping','wellness','transport']){
+  const tab=page.locator('#tabs [data-cat="'+cat+'"]');
+  if(!(await tab.count()))continue;
+  await tab.click();
+  await page.waitForFunction(c=>document.querySelector('#tabs .tab.active')?.dataset.cat===c,cat);
+  const rows=await page.evaluate(async({quarantine,badFiles})=>{
+   const out=[];
+   for(const card of document.querySelectorAll('#cards .card')){
+    card.scrollIntoView({block:'center',behavior:'auto'});
+    const id=card.querySelector('[data-detail]')?.dataset.detail;
+    const art=card.querySelector('.card-art,.card-photo');
+    const imgs=art?[...art.querySelectorAll('img')]:[];
+    for(const img of imgs){
+     if(img.complete)continue;
+     img.loading='eager';
+     await new Promise(r=>{img.addEventListener('load',r,{once:true});img.addEventListener('error',r,{once:true});setTimeout(r,6000)});
+    }
+    await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+    const svg=art?.querySelector('svg'),img=imgs[0],badge=art?.querySelector('.card-photo-label'),cap=art?.querySelector('.art-caption');
+    const a=art?.getBoundingClientRect(),b=badge?.getBoundingClientRect(),c=cap?.getBoundingClientRect();
+    out.push({id,source:art?.dataset.imageSource||(art?.classList.contains('licensed-photo')?'licensed':'unknown'),
+     imgCount:imgs.length,src:img?.getAttribute('src')||'',natural:img?img.naturalWidth:0,imgVisible:!!img&&!img.hidden&&getComputedStyle(img).display!=='none',
+     svgVisible:!!svg&&!svg.hasAttribute('hidden')&&getComputedStyle(svg).display!=='none',
+     badges:art?art.querySelectorAll('.card-photo-label').length:0,
+     badgeInside:!!b&&b.left>=a.left-1&&b.right<=a.right+1&&b.top>=a.top-1&&b.bottom<=a.bottom+1,
+     overlap:!!(b&&c)&&!(b.bottom<=c.top||c.bottom<=b.top||b.right<=c.left||c.right<=b.left),
+     quarantined:quarantine.includes(id),usesBadFile:badFiles.some(f=>card.innerHTML.includes(f))});
+   }
+   return out;
+  },{quarantine,badFiles});
+  for(const r of rows){
+   totals.cards++;totals[r.source]=(totals[r.source]||0)+1;
+   assert(!r.usesBadFile,label+': quarantined AI file referenced on '+r.id);
+   assert.equal(r.badges,1,label+': exactly one image-type label '+r.id);
+   assert(r.badgeInside,label+': label inside card '+r.id);
+   assert(!r.overlap,label+': caption and label do not overlap '+r.id);
+   assert(r.imgCount<=1,label+': at most one image '+r.id);
+   // r18/r21/r28 are quarantined but keep their approved registry photo, which always wins.
+   if(r.quarantined&&r.source!=='licensed')assert(r.imgCount===0&&r.svgVisible&&r.source==='svg',label+': quarantined venue shows SVG only '+r.id+' '+JSON.stringify(r));
+   if(r.source==='ai'){
+    assert(r.natural>0,label+': AI venue image decodes (naturalWidth>0) '+r.id+' '+r.src);
+    assert(r.imgVisible&&!r.svgVisible,label+': loaded AI image hides SVG fallback '+r.id);
+   }
+   if(r.source==='svg')assert(r.imgCount===0&&r.svgVisible,label+': SVG card has no image '+r.id);
+   if(r.source==='licensed'&&!/^https?:/.test(r.src))assert(r.natural>0,label+': local approved photo decodes '+r.id);
+  }
+ }
+ assert.equal(totals.cards,131,label+': all 131 venues rendered');
+ assert.equal(totals.licensed,89,label+': 89 approved photos still rendered');
+ // Stock tier: simulate a fully verified stock record for r02 and confirm the labelled,
+ // mutually exclusive rendering in all three languages, then restore the real (gated) state.
+ await page.locator('#tabs [data-cat="restaurant"]').click();
+ for(const lang of ['ko','ja','en']){
+  await page.locator('#language').selectOption(lang);
+  await page.evaluate(()=>{const s=STOCK_IMAGE_LIBRARY[VENUE_STOCK_IMAGES.r02];s.__f=s.fileVerified;s.__c=s.contentVerified;s.fileVerified=true;s.contentVerified=true;document.querySelector('#query').value='Sushi Takeuchi';render()});
+  await page.waitForFunction(()=>!!document.querySelector('#cards .card:has([data-detail="r02"]) .stock-art'));
+  const stock=await page.locator('#cards .card:has([data-detail="r02"])').evaluate(async card=>{
+   const art=card.querySelector('.stock-art'),img=art.querySelector('img');
+   img.loading='eager';
+   if(!img.complete)await new Promise(r=>{img.addEventListener('load',r,{once:true});img.addEventListener('error',r,{once:true});setTimeout(r,8000)});
+   await new Promise(r=>setTimeout(r,50));
+   const svgVisible=getComputedStyle(art.querySelector('svg')).display!=='none'&&!art.querySelector('svg').hasAttribute('hidden');
+   return {label:art.querySelector('.card-photo-label').textContent,loaded:img.naturalWidth>0&&!img.hidden,svgVisible,
+    credit:card.querySelector('.stock-credit')?.textContent||'',links:card.querySelectorAll('.stock-credit a').length,claimsReal:/REAL VENUE PHOTO|実際の施設写真|실제 장소 사진/.test(card.textContent)};
+  });
+  const expected={en:'REFERENCE PHOTO · NOT THIS VENUE',ja:'参考写真 · 当店の写真ではありません',ko:'참고 사진 · 이 장소 사진 아님'}[lang];
+  assert.equal(stock.label,expected,label+': stock reference label '+lang);
+  assert(stock.loaded!==stock.svgVisible,label+': stock image and SVG fallback mutually exclusive '+lang+' '+JSON.stringify(stock));
+  assert.equal(stock.links,2,label+': stock credit links to photo page and license '+lang);
+  assert(!stock.claimsReal,label+': stock card never claims to be the venue '+lang);
+  await page.evaluate(()=>{const s=STOCK_IMAGE_LIBRARY[VENUE_STOCK_IMAGES.r02];s.fileVerified=s.__f;s.contentVerified=s.__c;delete s.__f;delete s.__c;document.querySelector('#query').value='';render()});
+ }
+ await page.locator('#language').selectOption('en');
+ assert.equal(await page.evaluate(()=>venueImageRecord(DATA.find(r=>r.id==='r02')).sourceType),'svg',label+': unverified stock stays hidden after restore');
+ console.log('PASS '+label+' image sweep '+JSON.stringify(totals));
+}
 async function verify(browserType,label,dimensions,url){
  const browser=await browserType.launch({headless:true});
  try{
@@ -103,6 +187,8 @@ async function verify(browserType,label,dimensions,url){
   assert.equal(artworkState.badges,1,'Yoroniku has exactly one illustration label');
   assert(artworkState.badgeContained,'Yoroniku label stays inside its card: '+JSON.stringify(artworkState));
   assert(!artworkState.containsWrongChuo,'Yoroniku image has no Chuo text');
+  // 2026-10-22 image policy: sweep every card in every category at this browser/viewport.
+  await auditCardImages(page,label);
   await page.locator('#query').fill('');
   await page.locator('.magazine-tile[data-cat="attraction"]').click();
   assert.equal(await page.locator('#tabs .tab.active').getAttribute('data-cat'),'attraction','Localized featured shortcut opens real category');

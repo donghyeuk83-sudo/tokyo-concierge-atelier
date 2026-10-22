@@ -43,7 +43,7 @@ function verifyExtractedSnapshot(){
  assert.equal(licensedSection.split('\n').filter(x=>/^[a-z]\d+:\{/.test(x)).length,licensedEntries.length,'Unparsed licensed photo records');
  assert.equal(catalogueSection.split('\n').filter(x=>/^\[/.test(x)).length,venueRows.length,'Unparsed catalogue rows');
  // Ensure the public HTML actually loads the audited files, in strict dependency order.
- const expectedScripts=[paths.catalogue,paths.sources,paths.media,'assets/atelier-illustration.js','assets/atelier-search.js','assets/atelier-i18n.js'];
+ const expectedScripts=[paths.catalogue,paths.sources,paths.media,'assets/atelier-image-policy.js','assets/atelier-illustration.js','assets/atelier-search.js','assets/atelier-i18n.js'];
  let prior=-1;
  for(const path of expectedScripts){
   const match='<script src="'+path+'?v=';
