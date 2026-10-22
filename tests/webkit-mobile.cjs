@@ -34,14 +34,17 @@ function startLocalServer(){
   assert(viewport.scroll<=viewport.width+2,'No sideways iPhone viewport overflow: '+JSON.stringify(viewport));
 
   // iPhone screenshot regression: prevent duplicate labels over AI venue artwork.
-  // Fixture moved from Seirinkan (r06) to Ten-Masa (r04) on 2026-10-22: r06's AI tile showed an
-  // invented storefront sign and is now quarantined (checked separately below).
+  // Fixture moved from Seirinkan (r06) to Zauo Shibuya (r45) on 2026-10-22: r06's AI tile showed an
+  // invented storefront sign and duplicated tiles were withdrawn; r45 keeps a unique AI image.
   for(const locale of ['ko','ja','en']){
    await page.locator('#language').selectOption(locale);
-   await page.locator('#query').fill('Ten-Masa');
-   const artwork=page.locator('#cards .card:has([data-detail="r04"]) .card-art');
+   await page.locator('#query').fill('Zauo Shibuya');
+   // Wait for the debounced catalogue rerender (same guard as the PR #69 Yoroniku check).
+   await page.waitForFunction(()=>{const cards=document.querySelectorAll('#cards .card');return cards.length===1&&!!cards[0].querySelector('[data-detail="r45"]')},null,{timeout:10000});
+   await page.waitForTimeout(400);
+   const artwork=page.locator('#cards .card:has([data-detail="r45"]) .card-art');
    await artwork.waitFor({timeout:10000});
-   await page.waitForFunction(()=>{const el=document.querySelector('#cards .card:has([data-detail="r04"]) .card-art');if(!el)return false;el.scrollIntoView({block:'center'});return true;}); // Avoid detached Playwright locators during language rerender.
+   await page.waitForFunction(()=>{const el=document.querySelector('#cards .card:has([data-detail="r45"]) .card-art');if(!el)return false;el.scrollIntoView({block:'center'});return true;}); // Avoid detached Playwright locators during language rerender.
    await artwork.locator('img').evaluate(el=>new Promise(resolve=>{
     el.loading='eager'; // Explicitly request the image in headless WebKit.
     if(el.complete)return resolve();
@@ -66,23 +69,33 @@ function startLocalServer(){
    assert.equal(layout.badgeCount,1,'Exactly one image-type label in '+locale);
    assert(layout.badgeFits&&!layout.captionOverlaps,'Art labels fit and do not collide in '+locale+': '+JSON.stringify(layout));
   }
-  const aiFixtureArt=page.locator('#cards .card:has([data-detail="r04"]) .card-art');
+  const aiFixtureArt=page.locator('#cards .card:has([data-detail="r45"]) .card-art');
   await aiFixtureArt.locator('img').evaluate(el=>el.dispatchEvent(new Event('error')));
   assert(await aiFixtureArt.locator('img').evaluate(el=>el.hidden),'Failed illustration image becomes hidden');
   assert.notEqual(await aiFixtureArt.locator('svg').evaluate(el=>getComputedStyle(el).display),'none','SVG fallback appears on image failure');
-  // Quarantined AI tiles (wrong baked-in area text, watermarks, fictional signage) render only the SVG.
-  for(const [query,id] of [['Seirinkan','r06'],['Sushi Takeuchi','r02'],['Yoroniku','r11']]){
+  // Withdrawn AI tiles (wrong baked-in area text, watermarks, fictional signage, duplicates) never render;
+  // those venues show their own labelled stock reference photo or the SVG.
+  for(const [cat,query,id,expect] of [['restaurant','Seirinkan','r06','stock'],['restaurant','Sushi Takeuchi','r02','stock'],['restaurant','Yoroniku','r11','stock'],['wellness','Shimizuyu','w05','svg']]){
+   await page.locator('#tabs [data-cat="'+cat+'"]').click();
    await page.locator('#query').fill(query);
    await page.waitForFunction(id=>{const cards=document.querySelectorAll('#cards .card');return cards.length===1&&!!cards[0].querySelector('[data-detail="'+id+'"]')},id,{timeout:10000});
-   const state=await page.locator('#cards .card:has([data-detail="'+id+'"]) .card-art').evaluate(el=>{el.scrollIntoView({block:'center'});const outer=el.getBoundingClientRect(),badge=el.querySelector('.card-photo-label').getBoundingClientRect();return {imgs:el.querySelectorAll('img').length,svgVisible:getComputedStyle(el.querySelector('svg')).display!=='none',captions:el.querySelectorAll('.art-caption').length,badges:el.querySelectorAll('.card-photo-label').length,source:el.dataset.imageSource,badgeFits:badge.left>=outer.left-1&&badge.right<=outer.right+1,text:el.textContent}});
-   assert.equal(state.imgs,0,'Quarantined AI image never rendered on iPhone: '+id);
-   assert(state.svgVisible,'SVG fallback visible for quarantined '+id);
-   assert.equal(state.captions,0,'No caption over quarantined fallback '+id);
+   const state=await page.locator('#cards .card:has([data-detail="'+id+'"]) .card-art').evaluate(async(el,id)=>{
+    el.scrollIntoView({block:'center'});const img=el.querySelector('img');
+    if(img){img.loading='eager';if(!img.complete)await new Promise(r=>{img.addEventListener('load',r,{once:true});img.addEventListener('error',r,{once:true});setTimeout(r,8000)})}
+    const outer=el.getBoundingClientRect(),badge=el.querySelector('.card-photo-label').getBoundingClientRect(),svg=el.querySelector('svg');
+    return {imgs:el.querySelectorAll('img').length,imgVisible:!!img&&!img.hidden&&img.naturalWidth>0,svgVisible:getComputedStyle(svg).display!=='none'&&!svg.hasAttribute('hidden'),
+     captions:el.querySelectorAll('.art-caption').length,badges:el.querySelectorAll('.card-photo-label').length,source:el.dataset.imageSource,
+     badgeFits:badge.left>=outer.left-1&&badge.right<=outer.right+1,text:el.textContent,usesWithdrawn:!!AI_VENUE_VISUALS[id]&&el.innerHTML.includes(AI_VENUE_VISUALS[id].url)}},id);
+   assert.equal(state.source,expect,'Expected image source on iPhone: '+id);
+   assert(!state.usesWithdrawn,'Withdrawn AI image never rendered on iPhone: '+id);
+   assert(state.imgVisible!==state.svgVisible,'Exactly one of image / SVG visible: '+id+' '+JSON.stringify(state));
+   if(expect==='svg')assert.equal(state.imgs,0,'SVG-only venue has no image '+id);
+   assert.equal(state.captions,0,'No caption over fallback '+id);
    assert.equal(state.badges,1,'Exactly one image-type label '+id);
-   assert.equal(state.source,'svg','Quarantined venue reports SVG source '+id);
    assert(state.badgeFits,'Label fits card on iPhone '+id);
    assert(!/Chuo|Tsukiji|pollinations/i.test(state.text),'No wrong area/venue/watermark text '+id);
   }
+  await page.locator('#tabs [data-cat="restaurant"]').click();
   await page.locator('#query').fill('');
 
   // Multilingual aliases are loaded before the catalogue and remain searchable

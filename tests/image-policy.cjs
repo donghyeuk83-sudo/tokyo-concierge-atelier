@@ -67,6 +67,7 @@ for(const [key,item] of Object.entries(S)){
  assert(/^https:\/\//.test(item.licenseUrl)&&item.license&&item.photographer,'License + credit metadata: '+key);
  assert(/^\d{4}-\d{2}-\d{2}$/.test(item.lastVerified),'Verification date: '+key);
  for(const flag of ['approvedForReuse','fileVerified','contentVerified'])assert.equal(typeof item[flag],'boolean',flag+' '+key);
+ assert(item.fileVerified&&item.contentVerified||/^\d{4}-\d{2}-\d{2}$/.test(item.ownerApproved||''),'Shown stock needs verification or dated owner approval: '+key);
 }
 for(const [id,key] of Object.entries(VS)){
  assert(ids.includes(id),'Stock mapping for unknown venue '+id);
@@ -77,27 +78,36 @@ for(const bad of ['https://unsplash.com/s/photos/sushi','https://www.pexels.com/
  assert(!ctx.isSafeStockUrl(bad),'Rejects non-image or unknown URL '+bad);
 }
 
-// 6. Display gate: a stock image appears only when license, file and content were each verified.
-const probe=Object.assign({},S['unsplash-sushi-Jm5uc0Z-5MQ']);
-assert.equal(ctx.isDisplayableStock(Object.assign({},probe,{fileVerified:true,contentVerified:false})),false,'Unseen content is never displayed');
-assert.equal(ctx.isDisplayableStock(Object.assign({},probe,{fileVerified:false,contentVerified:true})),false,'Unverified file is never displayed');
-assert.equal(ctx.isDisplayableStock(Object.assign({},probe,{approvedForReuse:false,fileVerified:true,contentVerified:true})),false,'Unlicensed is never displayed');
-assert.equal(ctx.isDisplayableStock(Object.assign({},probe,{isActualVenue:true,fileVerified:true,contentVerified:true})),false,'Stock posing as venue is never displayed');
-assert.equal(ctx.isDisplayableStock(Object.assign({},probe,{fileVerified:true,contentVerified:true})),true,'Fully verified stock is displayable');
-// Rendering a verified stock image: one labelled reference photo, hidden SVG fallback, credit + license.
+// 6. Display gate: license confirmed AND (file+content verified OR dated owner approval).
+const probe=Object.assign({},S[VS.r02]);
+const off={fileVerified:false,contentVerified:false,ownerApproved:undefined};
+assert.equal(ctx.isDisplayableStock(Object.assign({},probe,off)),false,'Unchecked and unapproved stock is never displayed');
+assert.equal(ctx.isDisplayableStock(Object.assign({},probe,off,{fileVerified:true})),false,'File check alone is not enough');
+assert.equal(ctx.isDisplayableStock(Object.assign({},probe,off,{fileVerified:true,contentVerified:true})),true,'Fully verified stock is displayable');
+assert.equal(ctx.isDisplayableStock(Object.assign({},probe,off,{ownerApproved:'yes'})),false,'Owner approval must be a dated record');
+assert.equal(ctx.isDisplayableStock(Object.assign({},probe,{approvedForReuse:false})),false,'Unlicensed is never displayed, even owner-approved');
+assert.equal(ctx.isDisplayableStock(Object.assign({},probe,{isActualVenue:true})),false,'Stock posing as venue is never displayed');
+// No photo is reused across venues (the reason the AI duplicates were withdrawn).
+const shownUrls=new Map();
+for(const r of DATA){const rec=ctx.venueImageRecord(r);if(rec.sourceType==='svg')continue;
+ assert(!shownUrls.has(rec.imageUrl),'Same image shown for '+shownUrls.get(rec.imageUrl)+' and '+r.id);shownUrls.set(rec.imageUrl,r.id)}
+assert.equal(new Set(Object.values(VS)).size,Object.keys(VS).length,'Each venue maps to its own stock record');
+// Rendering: one labelled reference photo, hidden SVG fallback, credit + license, every language.
 const r02=DATA.find(r=>r.id==='r02');
-S['unsplash-sushi-Jm5uc0Z-5MQ'].fileVerified=true;S['unsplash-sushi-Jm5uc0Z-5MQ'].contentVerified=true;
 for(const lang of ['en','ja','ko']){
- ctx.lang=lang;const html=vm.runInContext('illustration(DATA.find(r=>r.id==="r02"))',ctx);
- assert(html.includes('data-image-source="stock"')&&html.includes(probe.imageUrl.replace(/&/g,'&amp;')),'Stock image rendered: '+lang);
- assert(html.includes(ctx.IMAGE_SOURCE_LABELS.stock[lang]),'Reference-photo label in '+lang);
- assert(html.includes('<svg hidden'),'SVG fallback hidden while image loads: '+lang);
- assert(html.includes('onerror='),'Load failure reveals SVG fallback: '+lang);
- assert(html.includes(probe.sourcePageUrl)&&html.includes(probe.licenseUrl),'Credit and license links: '+lang);
- assert(!/REAL VENUE PHOTO|実際の施設写真|실제 장소 사진/.test(html),'Never claims to be the real venue: '+lang);
+ ctx.lang=lang;
+ for(const id of Object.keys(VS)){
+  const html=vm.runInContext('illustration(DATA.find(r=>r.id==="'+id+'"))',ctx),item=S[VS[id]];
+  assert(html.includes('data-image-source="stock"')&&html.includes(item.imageUrl.replace(/&/g,'&amp;')),'Stock image rendered: '+id+' '+lang);
+  assert(html.includes(ctx.IMAGE_SOURCE_LABELS.stock[lang]),'Reference-photo label: '+id+' '+lang);
+  assert(html.includes('<svg hidden')&&html.includes('onerror='),'SVG fallback only on load failure: '+id);
+  assert(html.includes(item.sourcePageUrl)&&html.includes(item.licenseUrl)&&html.includes(ctx.esc(item.photographer)),'Credit and license links: '+id);
+  assert(!/REAL VENUE PHOTO|実際の施設写真|실제 장소 사진/.test(html),'Never claims to be the real venue: '+id);
+  if(A[id])assert(!html.includes(A[id].url),'Withdrawn AI file not referenced: '+id);
+ }
 }
-S['unsplash-sushi-Jm5uc0Z-5MQ'].fileVerified=probe.fileVerified;S['unsplash-sushi-Jm5uc0Z-5MQ'].contentVerified=probe.contentVerified;ctx.lang='en';
-assert.equal(ctx.venueImageRecord(r02).sourceType,Object.values(probe).length&&ctx.isDisplayableStock(probe)?'stock':'svg','r02 falls back safely');
+ctx.lang='en';
+assert.equal(ctx.venueImageRecord(r02).sourceType,'stock','Sushi Takeuchi shows its stock reference photo');
 
 // 7. Registration guard never overwrites a working image and refuses unsafe records.
 const licensedId=Object.keys(L)[0];
