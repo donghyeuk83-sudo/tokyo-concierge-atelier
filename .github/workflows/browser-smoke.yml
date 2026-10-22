@@ -35,6 +35,8 @@ jobs:
           git diff --exit-code -- audits/missing-photo-queue.csv audits/missing-photo-queue-additions.csv
       - name: Validate the 10 venues added after the 131 baseline
         run: node tests/venue-additions.cjs
+      - name: Validate manually added photos and their registry
+        run: node tests/manual-photos.cjs
       - name: Audit permission inquiry routes for missing photos
         run: node tests/audit-photo-permission-queue.cjs
       - name: Audit 32 photo leads and 48 original image rightsholders
@@ -67,7 +69,7 @@ jobs:
           node --check scripts/find-photo-candidates.mjs
           node --check tests/find-commons-photos.cjs
           node tests/audit-pipeline-safety.cjs
-          python -m py_compile scripts/generate-venue-ai-images.py scripts/validate-venue-photos.py
+          python -m py_compile scripts/generate-venue-ai-images.py scripts/validate-venue-photos.py scripts/manual-photo-intake.py
       - name: Validate automatic production health notifier
         run: node tests/health-issue.cjs --self-test
       - name: Wait for current revision on GitHub Pages

@@ -1,0 +1,58 @@
+name: Manual photo intake
+# Owner uploads a photo to assets/manual-photos/inbox/ in a pull request (GitHub web or mobile).
+# This job validates it, converts it to a metadata-free WebP, registers it, commits the result
+# back to the same pull-request branch and then runs the full browser QA on that branch.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+    paths:
+      - 'assets/manual-photos/inbox/**'
+permissions:
+  contents: write
+  actions: write
+  pull-requests: read
+concurrency:
+  group: manual-photo-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  intake:
+    # Only branches in this repository (never forks) may receive automatic commits.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - run: pip install pillow pillow-heif
+      - name: Validate, convert and register uploaded photos
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: python scripts/manual-photo-intake.py
+      - name: Check registry, priority and page wiring
+        run: |
+          node tests/check-inline-js.cjs
+          node tests/manual-photos.cjs
+          node tests/image-policy.cjs
+      - name: Commit processed photos to this pull request
+        id: commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A assets/manual-photos assets/atelier-manual-photos.js
+          if git diff --cached --quiet; then echo "changed=false" >> "$GITHUB_OUTPUT"; exit 0; fi
+          git commit -m "Register manually added venue photo(s) from PR #${{ github.event.pull_request.number }}"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+      - name: Run full browser QA on the updated branch
+        # Commits pushed with GITHUB_TOKEN do not start new workflows; dispatch QA explicitly.
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run browser-smoke.yml --ref "${{ github.event.pull_request.head.ref }}"

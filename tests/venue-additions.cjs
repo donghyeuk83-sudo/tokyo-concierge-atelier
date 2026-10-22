@@ -59,6 +59,14 @@ for(const [id,,,ja] of additionRows){
  assert(text.includes(ja.toLocaleLowerCase()),'Japanese name searchable: '+id);
  assert(text.includes(PLACE_ALIASES[id].split(' ')[0].toLocaleLowerCase()),'Korean alias searchable: '+id);
 }
+// Stock photos of the place itself (location-tagged) vs generic references, in all languages.
+ctx.esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+for(const f of ['atelier-image-policy.js','atelier-manual-photos.js','atelier-illustration.js'])load(f);
+for(const lang of ['en','ja','ko']){
+ vm.runInContext('lang='+JSON.stringify(lang),ctx); // atelier-common.js declares lang with let
+ for(const id of ['a48','a49'])assert(vm.runInContext('illustration(DATA.find(r=>r.id==="'+id+'"))',ctx).includes(ctx.IMAGE_SOURCE_LABELS.stockActual[lang]),'Place-specific stock label: '+id+' '+lang);
+ for(const id of ['r53','r54','r55'])assert(vm.runInContext('illustration(DATA.find(r=>r.id==="'+id+'"))',ctx).includes(ctx.IMAGE_SOURCE_LABELS.stock[lang]),'Generic reference label: '+id+' '+lang);
+}
 // Photo queue for additions is generated and current.
 const queue=fs.readFileSync('audits/missing-photo-queue-additions.csv','utf8').trim().split('\n').slice(1).map(l=>l.match(/^"([^"]+)"/)[1]);
 assert.deepEqual(queue,additionRows.map(r=>r[0]),'Additions photo queue lists every added venue (run tests/photo-queue.cjs)');
