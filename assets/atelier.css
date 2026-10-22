@@ -469,3 +469,13 @@ html:has(#photoDialog[open]){overflow:hidden}
    This also protects long Japanese/Korean labels at narrow Safari widths. */
 .card-art .art-caption{top:12px;bottom:auto;max-width:calc(100% - 24px);box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .card-art .card-photo-label{bottom:10px;left:12px;max-width:calc(100% - 24px);box-sizing:border-box;overflow-wrap:anywhere;line-height:1.35}
+/* 2026-10-22 image policy: generic stock reference photos (never labelled as the venue). */
+.card-art.stock-art img{display:block;z-index:1}
+.card-art.stock-art .card-photo-label{z-index:3;background:#5a3d1fd9}
+.stock-credit{font-size:10px;line-height:1.45;padding:4px 12px;color:#6b5a48;overflow-wrap:anywhere}
+.stock-credit a{color:inherit;text-decoration:underline}
+@media(max-width:600px){.stock-credit{font-size:11px;padding:6px 12px}}
+@media print{.stock-credit{display:none!important}}
+/* 2026-10-22: rendered cards measure ~740-800px (390px and 1280px, with photo credits). A closer
+   placeholder keeps the page from jumping while off-screen cards render during scroll. */
+@supports (content-visibility:auto){#cards .card{contain-intrinsic-size:auto 760px}}
