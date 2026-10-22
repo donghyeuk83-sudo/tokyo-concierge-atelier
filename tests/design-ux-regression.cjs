@@ -232,4 +232,12 @@ async function verify(browserType,label,dimensions,url){
   await verify(webkit,'WebKit desktop','desktop',url);
   await verify(webkit,'WebKit iPhone','mobile',url);
  }finally{if(server)await new Promise(resolve=>server.close(resolve))}
-})().catch(e=>{console.error(e);process.exitCode=1});
+})().catch(e=>{
+ console.error(e);
+ // Surface the failing assertion as a GitHub annotation (job logs are not always retrievable).
+ if(process.env.GITHUB_ACTIONS){
+  const line=(e.stack||'').split('\n').find(l=>l.includes('design-ux-regression.cjs:'))||'';
+  console.log('::error title=Design/image regression (4 browser combos)::'+String(e.message||e).replace(/\r?\n/g,' ').slice(0,900)+' @ '+line.trim().slice(-80)+(process.env.TEST_URL?' [deployed]':' [repo]'));
+ }
+ process.exitCode=1;
+});
