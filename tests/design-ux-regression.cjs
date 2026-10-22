@@ -107,6 +107,28 @@ async function auditCardImages(page,label){
  assert.deepEqual(withdrawn,{source:'svg',imgs:0},label+': unapproved stock is withdrawn to SVG');
  await page.locator('#language').selectOption('en');
  assert.equal(await page.evaluate(()=>venueImageRecord(DATA.find(r=>r.id==='r02')).sourceType),'stock',label+': approval restored');
+ // Manual photo tier: a staff-added photo for LOG ROAD DAIKANYAMA (s20, SVG today) is served from
+ // this repository, outranks stock/AI/SVG, decodes, and carries its label and credit in EN/JA/KO.
+ await page.route('**/assets/manual-photos/s20.webp',route=>route.fulfill({body:fs.readFileSync('assets/photos/kagurazaka.webp'),contentType:'image/webp'}));
+ await page.locator('#tabs [data-cat="shopping"]').click();
+ for(const [lang,expected] of [['ko','장소 사진 · 직접 추가'],['ja','施設写真 · スタッフ追加'],['en','VENUE PHOTO · ADDED BY STAFF']]){
+  await page.locator('#language').selectOption(lang);
+  await page.evaluate(()=>{MANUAL_VENUE_PHOTOS.s20={venueId:'s20',file:'assets/manual-photos/s20.webp',sourceType:'owner',credit:'QA staff photo',rightsBasis:'Regression fixture, not published',isActualVenue:true,alt:'LOG ROAD DAIKANYAMA',addedOn:'2026-10-22'};document.querySelector('#query').value='LOG ROAD';render()});
+  await page.waitForFunction(()=>!!document.querySelector('#cards .card:has([data-detail="s20"]) .manual-art'));
+  const manual=await page.locator('#cards .card:has([data-detail="s20"])').evaluate(async card=>{
+   const art=card.querySelector('.manual-art'),img=art.querySelector('img');art.scrollIntoView({block:'center'});img.loading='eager';
+   if(!img.complete)await new Promise(r=>{img.addEventListener('load',r,{once:true});img.addEventListener('error',r,{once:true});setTimeout(r,8000)});
+   const svg=art.querySelector('svg');
+   return {source:art.dataset.imageSource,label:art.querySelector('.card-photo-label').textContent,natural:img.naturalWidth,svgVisible:getComputedStyle(svg).display!=='none'&&!svg.hasAttribute('hidden'),credit:card.querySelector('.stock-credit').textContent};
+  });
+  assert.equal(manual.source,'manual',label+': manual photo outranks other tiers '+lang);
+  assert.equal(manual.label,expected,label+': manual photo label '+lang);
+  assert(manual.natural>0&&!manual.svgVisible,label+': manual photo decodes and hides the SVG '+lang+' '+JSON.stringify(manual));
+  assert(manual.credit.includes('QA staff photo'),label+': manual photo credit '+lang);
+ }
+ await page.evaluate(()=>{delete MANUAL_VENUE_PHOTOS.s20;document.querySelector('#query').value='';render()});
+ await page.unroute('**/assets/manual-photos/s20.webp');
+ await page.locator('#language').selectOption('en');
  console.log('PASS '+label+' image sweep '+JSON.stringify(totals));
 }
 async function verify(browserType,label,dimensions,url){

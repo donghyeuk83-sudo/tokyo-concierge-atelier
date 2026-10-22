@@ -14,7 +14,7 @@
 // A stock image is displayed only when its license, its file and its visual content were each
 // checked. Nothing here may present a stock or AI image as a photograph of the actual venue.
 
-const VENUE_IMAGE_POLICY_VERSION="20261022-stock-dedupe";
+const VENUE_IMAGE_POLICY_VERSION="20261022-manual-photos";
 
 // Pre-existing AI tiles that must never be shown again. Files stay on disk (protected originals);
 // only the card mapping is suppressed. Audited visually on 2026-10-22 — see
@@ -108,12 +108,19 @@ const STOCK_IMAGE_LIBRARY={
 "unsplash-a37-matcha":{sourceType:"stock",provider:"Unsplash",imageUrl:"https://images.unsplash.com/photo-1746932451426-209444cd613a?w=640&q=70&fm=jpg&fit=crop",sourcePageUrl:"https://unsplash.com/photos/someone-is-whisking-matcha-tea-in-a-bowl-GThopTGQEGc",photographer:"Qdal Studio",photographerUrl:"https://unsplash.com/@qdalstudio",license:"Unsplash License",licenseUrl:"https://unsplash.com/license",subject:"matcha",alt:"Whisking matcha in a bowl (generic reference photo)",approvedForReuse:true,fileVerified:false,contentVerified:false,ownerApproved:"2026-10-22",isActualVenue:false,lastVerified:"2026-10-22"},
 "unsplash-a31-sake":{sourceType:"stock",provider:"Unsplash",imageUrl:"https://images.unsplash.com/photo-1664477407933-dd42ed0c6c62?w=640&q=70&fm=jpg&fit=crop",sourcePageUrl:"https://unsplash.com/photos/a-group-of-people-pouring-liquid-into-small-cups-kmvUaRxhjb4",photographer:"Frederick Shaw",photographerUrl:"https://unsplash.com/@dropfastcollective",license:"Unsplash License",licenseUrl:"https://unsplash.com/license",subject:"sake",alt:"Sake poured into small cups (generic reference photo)",approvedForReuse:true,fileVerified:false,contentVerified:false,ownerApproved:"2026-10-22",isActualVenue:false,lastVerified:"2026-10-22"},
 "unsplash-a28-indigo":{sourceType:"stock",provider:"Unsplash",imageUrl:"https://images.unsplash.com/photo-1778084356053-40103587d24f?w=640&q=70&fm=jpg&fit=crop",sourcePageUrl:"https://unsplash.com/photos/wall-display-of-indigo-dyed-fabric-squares-nQX99aOzyXE",photographer:"Jimmy Liu",photographerUrl:"https://unsplash.com/@jimmy__liu",license:"Unsplash License",licenseUrl:"https://unsplash.com/license",subject:"indigo",alt:"Indigo-dyed fabric squares (generic reference photo)",approvedForReuse:true,fileVerified:false,contentVerified:false,ownerApproved:"2026-10-22",isActualVenue:false,lastVerified:"2026-10-22"},
-"unsplash-a29-ninja":{sourceType:"stock",provider:"Unsplash",imageUrl:"https://images.unsplash.com/photo-1567299720257-2619000f105e?w=640&q=70&fm=jpg&fit=crop",sourcePageUrl:"https://unsplash.com/photos/xm49F658RyM",photographer:"Daniel Lincoln",photographerUrl:"https://unsplash.com/@danny_lincoln",license:"Unsplash License",licenseUrl:"https://unsplash.com/license",subject:"ninja",alt:"Shuriken throwing star (generic reference photo)",approvedForReuse:true,fileVerified:false,contentVerified:false,ownerApproved:"2026-10-22",isActualVenue:false,lastVerified:"2026-10-22"}
+"unsplash-a29-ninja":{sourceType:"stock",provider:"Unsplash",imageUrl:"https://images.unsplash.com/photo-1567299720257-2619000f105e?w=640&q=70&fm=jpg&fit=crop",sourcePageUrl:"https://unsplash.com/photos/xm49F658RyM",photographer:"Daniel Lincoln",photographerUrl:"https://unsplash.com/@danny_lincoln",license:"Unsplash License",licenseUrl:"https://unsplash.com/license",subject:"ninja",alt:"Shuriken throwing star (generic reference photo)",approvedForReuse:true,fileVerified:false,contentVerified:false,ownerApproved:"2026-10-22",isActualVenue:false,lastVerified:"2026-10-22"},
+// 2026-10-22 venue additions. a48/a49 are photos OF that place (location-tagged), not generic.
+"unsplash-r53-yakitori":{sourceType:"stock",provider:"Unsplash",imageUrl:"https://images.unsplash.com/photo-1767974968707-db3d448d4ef3?w=640&q=70&fm=jpg&fit=crop",sourcePageUrl:"https://unsplash.com/photos/grilled-meat-skewers-on-a-serving-platter-z4MYbjYb5p0",photographer:"tommao wang",photographerUrl:"https://unsplash.com/@tommaomaoer",license:"Unsplash License",licenseUrl:"https://unsplash.com/license",subject:"yakitori",alt:"Grilled meat skewers on a platter (generic reference photo)",approvedForReuse:true,fileVerified:false,contentVerified:false,ownerApproved:"2026-10-22",isActualVenue:false,lastVerified:"2026-10-22"},
+"unsplash-r54-tonkatsu":{sourceType:"stock",provider:"Unsplash",imageUrl:"https://images.unsplash.com/photo-1770966666361-b448e634e163?w=640&q=70&fm=jpg&fit=crop",sourcePageUrl:"https://unsplash.com/photos/three-breaded-cutlets-with-shredded-cabbage-and-lemon-fvGOeiYaza4",photographer:"Zhang Ziyu",photographerUrl:"https://unsplash.com/@rs1497",license:"Unsplash License",licenseUrl:"https://unsplash.com/license",subject:"tonkatsu",alt:"Breaded pork cutlets with shredded cabbage (generic reference photo)",approvedForReuse:true,fileVerified:false,contentVerified:false,ownerApproved:"2026-10-22",isActualVenue:false,lastVerified:"2026-10-22"},
+"unsplash-r55-ramen":{sourceType:"stock",provider:"Unsplash",imageUrl:"https://images.unsplash.com/photo-1509680859026-7d8cfc6894f4?w=640&q=70&fm=jpg&fit=crop",sourcePageUrl:"https://unsplash.com/photos/focus-photography-of-ramen-in-bowl-with-condiment-shakers-lbxLlgi_8_w",photographer:"j",photographerUrl:"https://unsplash.com/@janicetea",license:"Unsplash License",licenseUrl:"https://unsplash.com/license",subject:"ramen",alt:"Bowl of ramen (generic reference photo)",approvedForReuse:true,fileVerified:false,contentVerified:false,ownerApproved:"2026-10-22",isActualVenue:false,lastVerified:"2026-10-22"},
+"unsplash-a48-garden":{sourceType:"stock",provider:"Unsplash",imageUrl:"https://images.unsplash.com/photo-1532188978303-4bfaccc429d2?w=640&q=70&fm=jpg&fit=crop",sourcePageUrl:"https://unsplash.com/photos/A57akxc-4BQ",photographer:"Thor Alvis",photographerUrl:"https://unsplash.com/@terminath0r",license:"Unsplash License",licenseUrl:"https://unsplash.com/license",subject:"garden",alt:"Pond and pavilion in Shinjuku Gyoen",approvedForReuse:true,fileVerified:false,contentVerified:false,ownerApproved:"2026-10-22",isActualVenue:true,locationEvidence:"Unsplash location tag: Shinjuku Gyoen National Garden, Shinjuku-ku",lastVerified:"2026-10-22"},
+"unsplash-a49-market":{sourceType:"stock",provider:"Unsplash",imageUrl:"https://images.unsplash.com/photo-1705056132737-6d2df2218726?w=640&q=70&fm=jpg&fit=crop",sourcePageUrl:"https://unsplash.com/photos/a-bunch-of-fish-that-are-in-some-boxes-C9j8IFVV2uQ",photographer:"Deepavali Gaind",photographerUrl:"https://unsplash.com/@deepavalig",license:"Unsplash License",licenseUrl:"https://unsplash.com/license",subject:"market",alt:"Fish in boxes at Tsukiji",approvedForReuse:true,fileVerified:false,contentVerified:false,ownerApproved:"2026-10-22",isActualVenue:true,locationEvidence:"Unsplash location tag: Tsukiji 4-13-13, Chuo City (outer market area)",lastVerified:"2026-10-22"}
 };
 
 // Venue → its own stock photo. Never used for a venue with an approved registry photo.
 const VENUE_STOCK_IMAGES={
-r01:"unsplash-r01-sushi",r02:"unsplash-r02-sushi",r39:"unsplash-r39-sushi",r40:"unsplash-r40-sushi",r43:"unsplash-r43-sushi",r38:"unsplash-r38-sushi",r41:"unsplash-r41-sushi",r42:"unsplash-r42-sushi",r44:"unsplash-r44-sushi",r29:"unsplash-r29-sushi",r31:"unsplash-r31-sushi",r33:"unsplash-r33-sushi",r36:"unsplash-r36-sushi",r37:"unsplash-r37-sushi",r03:"unsplash-r03-tempura",r04:"unsplash-r04-tempura",r05:"unsplash-r05-tempura",r06:"unsplash-r06-pizza",r08:"unsplash-r08-pizza",r09:"unsplash-r09-italian",r11:"unsplash-r11-yakiniku",r52:"unsplash-r52-kaiseki",a26:"unsplash-a26-tea",a27:"unsplash-a27-tea",a39:"unsplash-a39-matcha",a37:"unsplash-a37-matcha",a31:"unsplash-a31-sake",a28:"unsplash-a28-indigo",a29:"unsplash-a29-ninja"
+r01:"unsplash-r01-sushi",r02:"unsplash-r02-sushi",r39:"unsplash-r39-sushi",r40:"unsplash-r40-sushi",r43:"unsplash-r43-sushi",r38:"unsplash-r38-sushi",r41:"unsplash-r41-sushi",r42:"unsplash-r42-sushi",r44:"unsplash-r44-sushi",r29:"unsplash-r29-sushi",r31:"unsplash-r31-sushi",r33:"unsplash-r33-sushi",r36:"unsplash-r36-sushi",r37:"unsplash-r37-sushi",r03:"unsplash-r03-tempura",r04:"unsplash-r04-tempura",r05:"unsplash-r05-tempura",r06:"unsplash-r06-pizza",r08:"unsplash-r08-pizza",r09:"unsplash-r09-italian",r11:"unsplash-r11-yakiniku",r52:"unsplash-r52-kaiseki",a26:"unsplash-a26-tea",a27:"unsplash-a27-tea",a39:"unsplash-a39-matcha",a37:"unsplash-a37-matcha",a31:"unsplash-a31-sake",a28:"unsplash-a28-indigo",a29:"unsplash-a29-ninja",
+r53:"unsplash-r53-yakitori",r54:"unsplash-r54-tonkatsu",r55:"unsplash-r55-ramen",a48:"unsplash-a48-garden",a49:"unsplash-a49-market"
 };
 
 const STOCK_IMAGE_HOSTS=["images.unsplash.com","images.pexels.com","cdn.pixabay.com","upload.wikimedia.org"];
@@ -126,7 +133,7 @@ function isSafeStockUrl(url){
  try{const u=new URL(url);return u.protocol==="https:"&&STOCK_IMAGE_HOSTS.includes(u.hostname)}catch(_){return false}
 }
 function isDisplayableStock(item){
- return !!item&&item.sourceType==="stock"&&item.isActualVenue===false&&item.approvedForReuse===true&&((item.fileVerified===true&&item.contentVerified===true)||/^\d{4}-\d{2}-\d{2}$/.test(item.ownerApproved||""))&&isSafeStockUrl(item.imageUrl)&&/^https:\/\//.test(item.sourcePageUrl||"")&&/^https:\/\//.test(item.licenseUrl||"")&&!!item.license;
+ return !!item&&item.sourceType==="stock"&&(item.isActualVenue===false||(item.isActualVenue===true&&typeof item.locationEvidence==="string"&&item.locationEvidence.length>=20))&&item.approvedForReuse===true&&((item.fileVerified===true&&item.contentVerified===true)||/^\d{4}-\d{2}-\d{2}$/.test(item.ownerApproved||""))&&isSafeStockUrl(item.imageUrl)&&/^https:\/\//.test(item.sourcePageUrl||"")&&/^https:\/\//.test(item.licenseUrl||"")&&!!item.license;
 }
 function isAiVisualQuarantined(id){return Object.prototype.hasOwnProperty.call(AI_VISUAL_QUARANTINE,id)}
 function aiVisualFor(r){
@@ -137,6 +144,16 @@ function stockImageFor(r){
  if(typeof LICENSED_VENUE_PHOTOS!=="undefined"&&LICENSED_VENUE_PHOTOS[r.id])return null; // an approved photo always wins
  const item=STOCK_IMAGE_LIBRARY[VENUE_STOCK_IMAGES[r.id]];
  return isDisplayableStock(item)?item:null;
+}
+// Manually added photos (assets/atelier-manual-photos.js): shown after an approved registry photo
+// and before stock. Each record carries who supplied it and why it may be published.
+function isPublishableManualPhoto(item,id){
+ return !!item&&item.venueId===id&&["official","owner"].includes(item.sourceType)&&/^assets\/manual-photos\/[a-z]\d+\.webp$/.test(item.file||"")&&typeof item.credit==="string"&&item.credit.trim().length>=2&&typeof item.rightsBasis==="string"&&item.rightsBasis.trim().length>=10&&typeof item.isActualVenue==="boolean"&&/^\d{4}-\d{2}-\d{2}$/.test(item.addedOn||"");
+}
+function manualPhotoFor(r){
+ if(typeof LICENSED_VENUE_PHOTOS!=="undefined"&&LICENSED_VENUE_PHOTOS[r.id])return null; // approved photo wins
+ const item=typeof MANUAL_VENUE_PHOTOS!=="undefined"?MANUAL_VENUE_PHOTOS[r.id]:null;
+ return isPublishableManualPhoto(item,r.id)?item:null;
 }
 function officialImageFor(r){
  const item=VENUE_OFFICIAL_IMAGES[r.id];
@@ -152,8 +169,10 @@ function venueImageRecord(r){
   const exterior=typeof isBuildingExteriorPhoto==="function"?isBuildingExteriorPhoto(r.id):false;
   return Object.assign(base,{sourceType:"licensed",imageUrl:licensed.url,sourcePageUrl:licensed.source,photographer:licensed.credit,license:licensed.license,licenseUrl:licensed.licenseUrl,approvedForReuse:true,isActualVenue:!exterior});
  }
+ const manual=manualPhotoFor(r);
+ if(manual)return Object.assign(base,{sourceType:"manual",manualSource:manual.sourceType,imageUrl:manual.file,photographer:manual.credit,license:manual.rightsBasis,licenseUrl:manual.permissionUrl||"",approvedForReuse:true,isActualVenue:manual.isActualVenue,alt:manual.alt||r.name,lastVerified:manual.addedOn});
  const stock=stockImageFor(r);
- if(stock)return Object.assign(base,stock,{venueId:r.id,sourceType:"stock",isActualVenue:false});
+ if(stock)return Object.assign(base,stock,{venueId:r.id,sourceType:"stock",isActualVenue:stock.isActualVenue===true});
  const ai=aiVisualFor(r);
  if(ai)return Object.assign(base,{sourceType:"ai",imageUrl:ai.url});
  return Object.assign(base,{sourceType:"svg"});
@@ -165,7 +184,7 @@ function registerVenueImage(store,entry,venueIds){
  else if(venueIds&&!venueIds.includes(entry.venueId))errors.push("unknown venue "+entry.venueId);
  if(!["official","stock"].includes(entry?.sourceType))errors.push("sourceType must be official or stock");
  if(entry?.approvedForReuse!==true)errors.push("rights not confirmed (approvedForReuse)");
- if(entry?.sourceType==="stock"&&entry.isActualVenue!==false)errors.push("stock images can never be labelled as the actual venue");
+ if(entry?.sourceType==="stock"&&entry.isActualVenue!==false&&!(entry.isActualVenue===true&&(entry.locationEvidence||"").length>=20))errors.push("stock images are generic unless location evidence shows they depict this place");
  if(entry?.sourceType==="stock"&&!isSafeStockUrl(entry.imageUrl))errors.push("stock imageUrl must be a direct file on an allowed host, not a search page");
  if(entry?.sourceType==="official"&&entry.isActualVenue!==true)errors.push("official image must depict the actual venue");
  if(!/^https:\/\//.test(entry?.licenseUrl||""))errors.push("licenseUrl required");
@@ -176,5 +195,15 @@ function registerVenueImage(store,entry,venueIds){
 }
 const IMAGE_SOURCE_LABELS={
  stock:{en:"REFERENCE PHOTO · NOT THIS VENUE",ja:"参考写真 · 当店の写真ではありません",ko:"참고 사진 · 이 장소 사진 아님"},
- stockCredit:{en:"Generic reference photo",ja:"一般的な参考写真",ko:"일반 참고 사진"}
+ stockCredit:{en:"Generic reference photo",ja:"一般的な参考写真",ko:"일반 참고 사진"},
+ stockActual:{en:"STOCK PHOTO OF THIS PLACE",ja:"この場所のストック写真",ko:"이 장소의 스톡 사진"},
+ stockActualCredit:{en:"Stock photo of this place",ja:"この場所のストック写真",ko:"이 장소의 스톡 사진"},
+ manualActual:{en:"VENUE PHOTO · ADDED BY STAFF",ja:"施設写真 · スタッフ追加",ko:"장소 사진 · 직접 추가"},
+ manualOfficial:{en:"OFFICIAL VENUE PHOTO",ja:"施設提供の公式写真",ko:"공식 제공 사진"},
+ manualReference:{en:"REFERENCE PHOTO · ADDED BY STAFF",ja:"参考写真 · スタッフ追加",ko:"참고 사진 · 직접 추가"},
+ manualCredit:{en:"Photo",ja:"写真",ko:"사진"}
 };
+function imageSourceLabel(kind,item){
+ if(kind==="manual")return item.isActualVenue?(item.sourceType==="official"?IMAGE_SOURCE_LABELS.manualOfficial:IMAGE_SOURCE_LABELS.manualActual):IMAGE_SOURCE_LABELS.manualReference;
+ return item.isActualVenue?IMAGE_SOURCE_LABELS.stockActual:IMAGE_SOURCE_LABELS.stock;
+}

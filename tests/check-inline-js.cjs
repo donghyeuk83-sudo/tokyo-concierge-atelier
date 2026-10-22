@@ -14,7 +14,12 @@ for(const path of [paths.catalogue,paths.sources,paths.media]){
  new vm.Script(fs.readFileSync(path,'utf8'),{filename:path});
 }
 const scriptTags=[...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)];
-assert.equal(scriptTags.length,15,'Expected exactly fifteen source-controlled external classic JavaScript tags (13 original + image policy + venue additions)');
+assert.equal(scriptTags.length,16,'Expected exactly sixteen source-controlled external classic JavaScript tags (13 original + image policy + manual photos + venue additions)');
+// Manual photo registry: after the image policy, before the renderer that reads it.
+const manualTag='<script src="assets/atelier-manual-photos.js?v=20261022-manual-photos"></script>';
+assert(html.includes(manualTag),'Versioned manual photo registry present');
+assert(html.indexOf('<script src="assets/atelier-image-policy.js?v=')<html.indexOf(manualTag)&&html.indexOf(manualTag)<html.indexOf('<script src="assets/atelier-illustration.js?v='),'Manual photos load after the policy and before the renderer');
+new vm.Script(fs.readFileSync('assets/atelier-manual-photos.js','utf8'),{filename:'assets/atelier-manual-photos.js'});
 // 2026-10-22 venue additions: after guidance (aliases/notes exist) and before state (shortlist hydration).
 const additionsTag='<script src="assets/atelier-catalog-additions.js?v=20261022-additions-10"></script>';
 assert(html.includes(additionsTag),'Versioned venue additions script present');
@@ -23,10 +28,10 @@ new vm.Script(fs.readFileSync('assets/atelier-catalog-additions.js','utf8'),{fil
 assert(scriptTags.every(m=>/\bsrc="assets\/[\w-]+\.js\?v=[^"]+"/.test(m[1])&&!m[2].trim()),'No inline executable scripts or unknown script URL forms are permitted');
 
 const illustrationPath='assets/atelier-illustration.js';
-assert(html.includes('<script src="'+illustrationPath+'?v=20261022-image-policy"></script>'),'Venue illustration renderer must load before catalogue inline script');
+assert(html.includes('<script src="'+illustrationPath+'?v=20261022-manual-photos"></script>'),'Venue illustration renderer must load before catalogue inline script');
 // 2026-10-22 image policy: loads after the protected media registry and before the renderer.
 const policyPath='assets/atelier-image-policy.js';
-const policyTag='<script src="'+policyPath+'?v=20261022-stock-dedupe"></script>';
+const policyTag='<script src="'+policyPath+'?v=20261022-manual-photos"></script>';
 const mediaTagPos=html.indexOf('<script src="assets/atelier-media.js?v=');
 assert(mediaTagPos>=0&&html.indexOf(policyTag)>mediaTagPos,'Image policy must load after the media registry');
 assert(html.indexOf(policyTag)<html.indexOf('<script src="'+illustrationPath+'?v='),'Image policy must load before the illustration renderer');
@@ -35,7 +40,7 @@ const externalJS=fs.readFileSync(illustrationPath,'utf8');
 assert(externalJS.includes('function illustration(r){'),'Venue artwork function missing from extracted asset');
 new vm.Script(externalJS,{filename:illustrationPath});
 const searchPath='assets/atelier-search.js';
-const illustrationTag='<script src="'+illustrationPath+'?v=20261022-image-policy"></script>';
+const illustrationTag='<script src="'+illustrationPath+'?v=20261022-manual-photos"></script>';
 assert(html.includes(illustrationTag),'Versioned illustration renderer tag present (order check below must not be vacuous)');
 const searchTag='<script src="'+searchPath+'?v=20261021-a"></script>';
 assert(html.includes(searchTag),'Versioned external multilingual search index missing');

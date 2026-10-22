@@ -11,11 +11,12 @@ assert.deepEqual(verifyExtractedSnapshot(),{places:131,licensed:89,ai:50,pending
 
 const ctx={lang:'en',esc:s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),URL};
 vm.createContext(ctx);
-for(const f of ['catalog','sources','media','image-policy','illustration']){
+for(const f of ['catalog','sources','media','image-policy','manual-photos','illustration']){
  vm.runInContext(fs.readFileSync('assets/atelier-'+f+'.js','utf8').replace(/^(const|let) /gm,'var '),ctx,{filename:f});
 }
 const {DATA,LICENSED_VENUE_PHOTOS:L,AI_VENUE_VISUALS:A,AI_VISUAL_QUARANTINE:Q,STOCK_IMAGE_LIBRARY:S,VENUE_STOCK_IMAGES:VS,VENUE_OFFICIAL_IMAGES:VO}=ctx;
 const ids=DATA.map(r=>r.id);
+const allIds=require('./atelier-source-registry.cjs').allVenueRows.map(r=>r[0]); // original + 2026-10-22 additions
 
 // 1. Every mapped local file exists and is non-empty (AI + local licensed photos).
 for(const [id,v] of Object.entries(A)){
@@ -61,7 +62,8 @@ for(const r of DATA){
 // 5. Stock library: direct files on allowed hosts, individual license pages, never the venue.
 for(const [key,item] of Object.entries(S)){
  assert.equal(item.sourceType,'stock',key);
- assert.equal(item.isActualVenue,false,'Stock image cannot be labelled as the venue: '+key);
+ // Stock is generic unless its own location tag shows this exact place (e.g. a public garden).
+ assert(item.isActualVenue===false||(item.isActualVenue===true&&(item.locationEvidence||'').length>=20),'Stock image labelled as the venue needs location evidence: '+key);
  assert(ctx.isSafeStockUrl(item.imageUrl),'Stock imageUrl must be a direct image file, not a search page: '+key);
  assert(/^https:\/\/(unsplash\.com\/photos\/|www\.pexels\.com\/photo\/|pixabay\.com\/(photos|illustrations)\/|commons\.wikimedia\.org\/wiki\/File:)/.test(item.sourcePageUrl),'Individual image page required: '+key);
  assert(/^https:\/\//.test(item.licenseUrl)&&item.license&&item.photographer,'License + credit metadata: '+key);
@@ -70,7 +72,7 @@ for(const [key,item] of Object.entries(S)){
  assert(item.fileVerified&&item.contentVerified||/^\d{4}-\d{2}-\d{2}$/.test(item.ownerApproved||''),'Shown stock needs verification or dated owner approval: '+key);
 }
 for(const [id,key] of Object.entries(VS)){
- assert(ids.includes(id),'Stock mapping for unknown venue '+id);
+ assert(allIds.includes(id),'Stock mapping for unknown venue '+id);
  assert(S[key],'Stock mapping points to library item: '+id);
  assert(!L[id],'Stock must never replace an approved registry photo: '+id);
 }
@@ -96,13 +98,13 @@ assert.equal(new Set(Object.values(VS)).size,Object.keys(VS).length,'Each venue 
 const r02=DATA.find(r=>r.id==='r02');
 for(const lang of ['en','ja','ko']){
  ctx.lang=lang;
- for(const id of Object.keys(VS)){
+ for(const id of Object.keys(VS).filter(id=>ids.includes(id))){ // additions are rendered in venue-additions.cjs
   const html=vm.runInContext('illustration(DATA.find(r=>r.id==="'+id+'"))',ctx),item=S[VS[id]];
   assert(html.includes('data-image-source="stock"')&&html.includes(item.imageUrl.replace(/&/g,'&amp;')),'Stock image rendered: '+id+' '+lang);
   assert(html.includes(ctx.IMAGE_SOURCE_LABELS.stock[lang]),'Reference-photo label: '+id+' '+lang);
   assert(html.includes('<svg hidden')&&html.includes('onerror='),'SVG fallback only on load failure: '+id);
   assert(html.includes(item.sourcePageUrl)&&html.includes(item.licenseUrl)&&html.includes(ctx.esc(item.photographer)),'Credit and license links: '+id);
-  assert(!/REAL VENUE PHOTO|実際の施設写真|실제 장소 사진/.test(html),'Never claims to be the real venue: '+id);
+  assert(item.isActualVenue||!/REAL VENUE PHOTO|実際の施設写真|실제 장소 사진|THIS PLACE|この場所|이 장소의/.test(html),'Generic stock never claims to be the real venue: '+id);
   if(A[id])assert(!html.includes(A[id].url),'Withdrawn AI file not referenced: '+id);
  }
 }
