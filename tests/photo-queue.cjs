@@ -2,7 +2,7 @@
 // Usage: node tests/photo-queue.cjs
 const fs = require('node:fs');
 const assert = require('node:assert/strict');
-const {catalogueSection:data,licensedSection:photoSection,verifyExtractedSnapshot}=require('./atelier-source-registry.cjs');
+const {catalogueSection:data,licensedSection:photoSection,verifyExtractedSnapshot,additionRows}=require('./atelier-source-registry.cjs');
 verifyExtractedSnapshot();
 assert(data && photoSection, 'Missing catalogue or photo registry');
 const venues = [...data.matchAll(/^\[("(?:[^"\\]|\\.)*"(?:,\s*"(?:[^"\\]|\\.)*"){6})\],?$/gm)].map(m=>JSON.parse('['+m[1]+']'));
@@ -13,4 +13,8 @@ const csv=s=>'"'+String(s??'').replace(/"/g,'""')+'"';
 const columns=['id','category','name_en','name_ja','area','type','venue_url','status'];
 fs.mkdirSync('audits',{recursive:true});
 fs.writeFileSync('audits/missing-photo-queue.csv',[columns.map(csv).join(','),...missing.map(v=>columns.map(k=>csv(v[k])).join(','))].join('\n')+'\n');
-console.log(JSON.stringify({venues:venues.length,registered:registered.size,pending:missing.length,output:'audits/missing-photo-queue.csv'}));
+// Venues added after the 131 baseline get their own queue, so the historic 48-ID outreach
+// reconciliation in audit-photo-permission-queue.cjs stays exact.
+const added=additionRows.filter(v=>!registered.has(v[0])).map(v=>({id:v[0],category:v[1],name_en:v[2],name_ja:v[3],area:v[4],type:v[5],venue_url:v[6],status:'NEEDS_RIGHTS_AND_VENUE_MATCH_REVIEW'}));
+fs.writeFileSync('audits/missing-photo-queue-additions.csv',[columns.map(csv).join(','),...added.map(v=>columns.map(k=>csv(v[k])).join(','))].join('\n')+'\n');
+console.log(JSON.stringify({venues:venues.length,registered:registered.size,pending:missing.length,output:'audits/missing-photo-queue.csv',additions:additionRows.length,additionsPending:added.length,additionsOutput:'audits/missing-photo-queue-additions.csv'}));

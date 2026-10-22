@@ -18,7 +18,7 @@ const assert=require('assert');
    bootReady:typeof translate==='function'&&typeof feedback==='function'&&typeof render==='function',
    savedKey:'atelier-shortlist-v2'};
  });
- assert.deepEqual(stage4Boot,{count:14,noInline:true,csvLastTwo:['assets/atelier-export.js','assets/atelier-app.js'],csvReady:true,bootReady:true,savedKey:'atelier-shortlist-v2'},'Stage 4 file:// and published site must boot 14 external classic scripts (13 original + image policy) with original CSV and app handlers');
+ assert.deepEqual(stage4Boot,{count:15,noInline:true,csvLastTwo:['assets/atelier-export.js','assets/atelier-app.js'],csvReady:true,bootReady:true,savedKey:'atelier-shortlist-v2'},'Stage 4 file:// and published site must boot 15 external classic scripts (13 original + image policy + venue additions) with original CSV and app handlers');
 
  assert((await page.locator('.card').count())>0,'catalogue cards render');
  assert.equal(await page.evaluate(()=>typeof illustration),'function','Separate illustrative renderer is initialized before catalogue cards');
@@ -29,7 +29,7 @@ const assert=require('assert');
   const funcs=[options,openVenuePhoto,card,openDetail,syncPhotoQuickbar,render,translateLanding,prioritizeConciergeOnMobile,translateImageLabels,translateChrome,translateEditorial,verifyEditorialPhotos];
   return {callable:funcs.every(f=>typeof f==='function'),languages:Object.keys(LANDING_COPY).sort(),visibleVenues:DATA.length,images:Object.keys(LICENSED_VENUE_PHOTOS).length,artwork:Object.keys(AI_VENUE_VISUALS).length,mobileQuery:typeof mobileConciergeMedia.matches==='boolean'};
  });
- assert.deepEqual(stage3Browser,{callable:true,languages:['en','ja','ko'],visibleVenues:131,images:89,artwork:50,mobileQuery:true},'Unchanged editorial and render functions work together on file and Pages');
+ assert.deepEqual(stage3Browser,{callable:true,languages:['en','ja','ko'],visibleVenues:141,images:89,artwork:50,mobileQuery:true},'Unchanged editorial and render functions work together on file and Pages');
 
  // Prove that cached category partitions are identical, in the same order,
  // to the old full-catalogue filter for each of the five tabs.
@@ -41,7 +41,7 @@ const assert=require('assert');
   });
   return {expected,allCategories:ROWS_BY_CATEGORY.size,total:[...ROWS_BY_CATEGORY.values()].reduce((n,rows)=>n+rows.length,0),languageKeys:Object.keys(I18N).sort()};
  });
- assert.deepEqual(categoriesMatch,{expected:true,allCategories:5,total:131,languageKeys:['en','ja','ko']},'Rendering category partitions and all three locale dictionaries preserve original site data');
+ assert.deepEqual(categoriesMatch,{expected:true,allCategories:5,total:141,languageKeys:['en','ja','ko']},'Rendering category partitions and all three locale dictionaries preserve original site data');
  // Every venue's new cached search string must be exactly identical to the
  // original uncached EN/JA/KO indexing formula (all 131 entries, original case
  // folding and aliases). This guards search behavior during modularization.
@@ -51,7 +51,7 @@ const assert=require('assert');
   const tokyo=searchText(DATA.find(r=>r.id==='a01'));
   return {same,cache,count:DATA.length,japanese:tokyo.includes("東京タワー"),korean:tokyo.includes("도쿄타워")};
  });
- assert.deepEqual(indexProof,{same:true,cache:true,count:131,japanese:true,korean:true},'Multilingual search index stays exactly compatible across every venue');
+ assert.deepEqual(indexProof,{same:true,cache:true,count:141,japanese:true,korean:true},'Multilingual search index stays exactly compatible across every venue');
  // Exact labels distinguish third-party references from official operator links.
  const seirinkan=page.locator('article.card').filter({has:page.locator('[data-detail="r06"]')});
  const sourceLink=seirinkan.locator('.actions a').filter({hasText:/^Reference website$/});

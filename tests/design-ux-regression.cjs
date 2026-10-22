@@ -77,7 +77,7 @@ async function auditCardImages(page,label){
    if(r.source==='licensed'&&!/^https?:/.test(r.src))assert(r.natural>0,label+': local approved photo decodes '+r.id);
   }
  }
- assert.equal(totals.cards,131,label+': all 131 venues rendered');
+ assert.equal(totals.cards,141,label+': all 141 venues rendered (131 original + 10 added 2026-10-22)');
  assert.equal(totals.licensed,89,label+': 89 approved photos still rendered');
  // Stock tier: Sushi Takeuchi shows its own labelled reference photo in all three languages; turning
  // off its owner approval (no file/content verification) withdraws it again to the SVG.

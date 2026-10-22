@@ -32,7 +32,9 @@ jobs:
       - name: Ensure missing-photo queue is current
         run: |
           node tests/photo-queue.cjs
-          git diff --exit-code -- audits/missing-photo-queue.csv
+          git diff --exit-code -- audits/missing-photo-queue.csv audits/missing-photo-queue-additions.csv
+      - name: Validate the 10 venues added after the 131 baseline
+        run: node tests/venue-additions.cjs
       - name: Audit permission inquiry routes for missing photos
         run: node tests/audit-photo-permission-queue.cjs
       - name: Audit 32 photo leads and 48 original image rightsholders

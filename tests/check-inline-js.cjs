@@ -14,7 +14,12 @@ for(const path of [paths.catalogue,paths.sources,paths.media]){
  new vm.Script(fs.readFileSync(path,'utf8'),{filename:path});
 }
 const scriptTags=[...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)];
-assert.equal(scriptTags.length,14,'Expected exactly fourteen source-controlled external classic JavaScript tags (13 original + image policy)');
+assert.equal(scriptTags.length,15,'Expected exactly fifteen source-controlled external classic JavaScript tags (13 original + image policy + venue additions)');
+// 2026-10-22 venue additions: after guidance (aliases/notes exist) and before state (shortlist hydration).
+const additionsTag='<script src="assets/atelier-catalog-additions.js?v=20261022-additions-10"></script>';
+assert(html.includes(additionsTag),'Versioned venue additions script present');
+assert(html.indexOf('<script src="assets/atelier-guidance.js?v=')<html.indexOf(additionsTag)&&html.indexOf(additionsTag)<html.indexOf('<script src="assets/atelier-state.js?v='),'Venue additions must load after guidance and before shortlist state');
+new vm.Script(fs.readFileSync('assets/atelier-catalog-additions.js','utf8'),{filename:'assets/atelier-catalog-additions.js'});
 assert(scriptTags.every(m=>/\bsrc="assets\/[\w-]+\.js\?v=[^"]+"/.test(m[1])&&!m[2].trim()),'No inline executable scripts or unknown script URL forms are permitted');
 
 const illustrationPath='assets/atelier-illustration.js';
