@@ -1,0 +1,60 @@
+name: AI Trinity Phase 1 (no-cost dry-run)
+
+on:
+  # The dry-run itself is manual-only. The input prevents stale-SHA execution.
+  workflow_dispatch:
+    inputs:
+      expected_sha:
+        description: 'Exact current main commit SHA (40 lowercase hex characters)'
+        required: true
+        type: string
+  # Only the unit-test job runs on the dedicated Draft PR.
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+    paths:
+      - '.github/workflows/ai-trinity-dry-run.yml'
+      - 'scripts/ai-trinity-preflight.mjs'
+      - 'config/ai-trinity-policy.json'
+      - 'tests/ai-trinity-preflight.cjs'
+      - 'docs/ai-trinity-operations.md'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ai-trinity-phase1-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  self-test:
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.head_ref == 'feat/ai-trinity-dry-run-20261023' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+      - run: node --test tests/ai-trinity-preflight.cjs
+
+  manual-preflight:
+    if: >-
+      github.event_name == 'workflow_dispatch' &&
+      github.repository == 'donghyeuk83-sudo/tokyo-concierge-atelier' &&
+      github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      AI_TRINITY_DRY_RUN: 'true'
+      AI_TRINITY_EXPECTED_SHA: ${{ inputs.expected_sha }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+      - run: node --test tests/ai-trinity-preflight.cjs
+      - run: node scripts/ai-trinity-preflight.mjs

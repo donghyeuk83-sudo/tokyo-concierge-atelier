@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "mode": "phase1-dry-run",
+  "repository": "donghyeuk83-sudo/tokyo-concierge-atelier",
+  "manual_event": "workflow_dispatch",
+  "manual_ref": "refs/heads/main",
+  "allow_external_ai": false,
+  "allow_repository_writes": false,
+  "allow_deployments": false,
+  "max_api_cost_usd": 0,
+  "allowed_change_paths": [
+    ".github/workflows/ai-trinity-dry-run.yml",
+    "scripts/ai-trinity-preflight.mjs",
+    "config/ai-trinity-policy.json",
+    "tests/ai-trinity-preflight.cjs",
+    "docs/ai-trinity-operations.md"
+  ]
+}
