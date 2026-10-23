@@ -1,0 +1,32 @@
+{
+  "schema_version": 2,
+  "mode": "offline-simulation-only",
+  "repository": "donghyeuk83-sudo/tokyo-concierge-atelier",
+  "providers": ["chatgpt", "claude", "gemini"],
+  "allow_external_ai": false,
+  "allow_repository_writes": false,
+  "allow_deployments": false,
+  "max_api_cost_usd": 0,
+  "routes": {
+    "code": {
+      "chatgpt": "scope-analysis",
+      "claude": "implementation-review",
+      "gemini": "independent-check"
+    },
+    "review": {
+      "chatgpt": "risk-analysis",
+      "claude": "code-review",
+      "gemini": "cross-check"
+    },
+    "research": {
+      "chatgpt": "synthesis",
+      "claude": "source-audit",
+      "gemini": "fact-check"
+    },
+    "general": {
+      "chatgpt": "coordination",
+      "claude": "alternative-view",
+      "gemini": "consistency-check"
+    }
+  }
+}
