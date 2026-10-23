@@ -4,6 +4,14 @@ const assert=require('assert');
  const browser=await chromium.launch({headless:true});
  const page=await browser.newPage({viewport:{width:1365,height:900},acceptDownloads:true});
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ // Deterministic external-image handling (repo mode). Third-party photo hosts are unreachable from sandboxes and can
+ // reject CI traffic; the renderer then correctly hides the failed photo block, which also hides its zoom button.
+ // Serve a local fixture for external image requests so the happy path is always exercised; real image failure is
+ // verified separately below. SMOKE_LIVE_IMAGES=1, or TEST_URL (deployed check), keeps the real hosts.
+ const mockExternalImages=!process.env.TEST_URL&&process.env.SMOKE_LIVE_IMAGES!=='1';
+ const externalRequest=/^https?:\/\/(?!127\.0\.0\.1|localhost)/;
+ const fixturePng=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==','base64');
+ if(mockExternalImages)await page.route(externalRequest,route=>route.request().resourceType()==='image'?route.fulfill({status:200,contentType:'image/png',body:fixturePng}):route.continue());
  const target=process.env.TEST_URL || ('file://'+process.cwd()+'/index.html');
  await page.goto(target,{waitUntil:'domcontentloaded',timeout:45000});
  assert((await page.title()).includes('Tokyo Concierge Atelier'),'site title');
@@ -18,7 +26,7 @@ const assert=require('assert');
    bootReady:typeof translate==='function'&&typeof feedback==='function'&&typeof render==='function',
    savedKey:'atelier-shortlist-v2'};
  });
- assert.deepEqual(stage4Boot,{count:16,noInline:true,csvLastTwo:['assets/atelier-export.js','assets/atelier-app.js'],csvReady:true,bootReady:true,savedKey:'atelier-shortlist-v2'},'Stage 4 file:// and published site must boot 16 external classic scripts (13 original + image policy + manual photos + venue additions) with original CSV and app handlers');
+ assert.deepEqual(stage4Boot,{count:17,noInline:true,csvLastTwo:['assets/atelier-export.js','assets/atelier-app.js'],csvReady:true,bootReady:true,savedKey:'atelier-shortlist-v2'},'Stage 4 file:// and published site must boot 17 external classic scripts (13 original + image policy + manual photos + venue additions + landing count sync) with original CSV and app handlers');
 
  assert((await page.locator('.card').count())>0,'catalogue cards render');
  assert.equal(await page.evaluate(()=>typeof illustration),'function','Separate illustrative renderer is initialized before catalogue cards');
@@ -652,6 +660,24 @@ const assert=require('assert');
  await broken.evaluate(el=>{el.dispatchEvent(new Event('error'));el.dispatchEvent(new Event('error'))});
  assert.equal(await brokenCard.locator('.card-art').count(),1,'Repeated photo errors never duplicate the fallback');
  assert.equal(await brokenCard.locator('.card-photo').evaluate(el=>getComputedStyle(el).display),'none','Broken photo is hidden');
+ // Real network failure, independent of the happy path above: every external photo request is refused.
+ {
+  const failPage=await browser.newPage({viewport:{width:1365,height:900}});
+  const failErrors=[];failPage.on('pageerror',e=>failErrors.push(e.message));
+  await failPage.route(externalRequest,route=>route.request().resourceType()==='image'?route.abort():route.continue());
+  await failPage.goto(target,{waitUntil:'domcontentloaded',timeout:45000});
+  await failPage.waitForSelector('.card');
+  await failPage.locator('#tabs [data-cat="attraction"]').click();
+  const failImg=failPage.locator('img[data-venue-photo="a01"]');
+  await failImg.evaluate(el=>{el.loading='eager';el.scrollIntoView()});
+  await failPage.waitForFunction(()=>{const i=document.querySelector('img[data-venue-photo="a01"]');return !!i&&i.classList.contains('photo-failed')},null,{timeout:15000});
+  const failCard=failPage.locator('.card').filter({has:failPage.locator('img[data-venue-photo="a01"]')});
+  assert.equal(await failCard.locator('.card-art').count(),1,'Network failure shows exactly one fallback illustration');
+  assert.equal(await failCard.locator('.card-photo').evaluate(el=>getComputedStyle(el).display),'none','Network-failed photo block is hidden');
+  assert.equal(await failCard.locator('[data-view-photo="a01"]').isVisible(),false,'No dead zoom trigger remains on a failed photo');
+  assert.equal(failErrors.length,0,'No JS errors on photo network failure: '+failErrors.join('; '));
+  await failPage.close();
+ }
 
  assert.equal(errors.length,0,'JS errors: '+errors.join('; '));
  console.log('PASS '+target+': render, search, no results, EN/JA/KO, shortlist, CSV, print invocation, detail, Korean search, mobile width, JS console');
