@@ -108,6 +108,12 @@ for(const lang of ['en','ja','ko']){
   if(A[id])assert(!html.includes(A[id].url),'Withdrawn AI file not referenced: '+id);
  }
 }
+// Provenance overlay (2026-10-23): neutral status is limited to a48/a49; every other stock record keeps its label path.
+assert.deepEqual(Object.entries(S).filter(([,v])=>v.locationStatus!==undefined).map(([k])=>k).sort(),['unsplash-a48-garden','unsplash-a49-market'],'Only a48/a49 carry locationStatus');
+for(const [k,v] of Object.entries(S))if(v.locationStatus!==undefined)assert(v.locationStatus==='unverified'&&v.isActualVenue===false,'locationStatus is only "unverified" and never with a place claim: '+k);
+for(const id of ['r16','r20'])for(const l of ['en','ja','ko'])assert(!/without further editing|追加編集なし|追加編集せず|추가 편집 없/.test(ctx.VENUE_PHOTO_CONTEXT[id][l]),'Unverified editing claim withdrawn: '+id+' '+l);
+assert(/one Oshiage/.test(ctx.VERIFIED_SOURCES.r37.en)&&!/TWO/.test(ctx.VERIFIED_SOURCES.r37.en),'r37 note matches the official single-store listing');
+for(const k of ['unsplash-a48-garden','unsplash-a49-market'])assert(!/Shinjuku|Gyoen|Tsukiji|pavilion|pond/i.test(S[k].alt),'Unverified location is not asserted in alt text: '+k);
 ctx.lang='en';
 assert.equal(ctx.venueImageRecord(r02).sourceType,'stock','Sushi Takeuchi shows its stock reference photo');
 
