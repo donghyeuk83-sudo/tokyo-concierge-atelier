@@ -1,0 +1,23 @@
+{
+  "schema_version": 4,
+  "mode": "offline-preflight-only",
+  "repository": "donghyeuk83-sudo/tokyo-concierge-atelier",
+  "providers": ["chatgpt", "claude", "gemini"],
+  "accepted_data_class": "public-metadata",
+  "allowed_metadata_type": "catalog-count",
+  "pricing_snapshot_date": "2026-10-23",
+  "illustrative_rates_usd_per_million": {
+    "chatgpt": { "model": "gpt-6-luna", "input": 0.10, "output": 0.50 },
+    "claude": { "model": "claude-haiku-5.5", "input": 0.10, "output": 0.50 },
+    "gemini": { "model": "gemini-3.5-flash-lite", "input": 0.30, "output": 2.50 }
+  },
+  "allow_external_ai": false,
+  "allow_network": false,
+  "allow_secret_loading": false,
+  "allow_data_export": false,
+  "allow_repository_writes": false,
+  "allow_deployments": false,
+  "auto_approval": false,
+  "max_api_cost_usd": 0,
+  "max_retries": 0
+}
