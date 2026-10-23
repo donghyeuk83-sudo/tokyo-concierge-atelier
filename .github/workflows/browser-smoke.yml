@@ -18,14 +18,14 @@ concurrency:
   cancel-in-progress: true
 jobs:
   browser-smoke:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
         with:
           node-version: '22'
-      - run: npm install --no-save playwright
+      - run: npm install --no-save playwright@1.62.1
       - run: npx playwright install --with-deps chromium webkit
       - name: Catch broken inline JavaScript before network and browser QA
         run: node tests/check-inline-js.cjs
