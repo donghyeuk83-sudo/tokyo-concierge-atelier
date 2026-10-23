@@ -644,7 +644,9 @@ const assert=require('assert');
    await page.mouse.wheel(0,600);
    await page.waitForTimeout(150);
    const afterWheel=await page.evaluate(()=>window.scrollY);
-   assert.equal(afterWheel,backgroundScroll,'Photo backdrop does not scroll the catalogue (scrollY '+backgroundScroll+' -> '+afterWheel+', '+language+')');
+   // A wheel of 600px that reached the page would move it by hundreds of pixels downward. Sub-pixel/few-pixel drift
+   // (content-visibility cards settling to their real height) is layout, not scrolling, and must not fail the check.
+   assert(afterWheel-backgroundScroll<40&&backgroundScroll-afterWheel<40,'Photo backdrop does not scroll the catalogue (scrollY '+backgroundScroll+' -> '+afterWheel+', '+language+')');
    if(language==='ja')await page.locator('#photoClose').click();else await page.keyboard.press('Escape');
    assert(!await page.locator('#photoDialog').evaluate(el=>el.open),'Photo viewer closes: '+language);
    assert(await trigger.evaluate(el=>el===document.activeElement),'Focus returns to photo button');
