@@ -1,0 +1,73 @@
+name: AI Trinity Phase 5 (free manual three-provider review)
+
+on:
+  pull_request:
+    branches:
+      - 'feat/ai-trinity-offline-orchestration-20261023'
+    types: [opened, synchronize, reopened]
+    paths:
+      - '.github/workflows/ai-trinity-phase5-manual.yml'
+      - 'config/ai-trinity-manual-policy.json'
+      - 'scripts/ai-trinity-manual.js'
+      - 'docs/ai-trinity-manual-preview.html'
+      - 'tests/ai-trinity-manual.cjs'
+      - 'tests/ai-trinity-manual-browser.cjs'
+      - 'docs/ai-trinity-phase5-manual.md'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ai-trinity-phase5-manual-preview
+  cancel-in-progress: true
+
+jobs:
+  manual-review-test:
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.head_ref == 'feat/ai-trinity-manual-review-zero-cost-20261023' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.base.ref == 'feat/ai-trinity-offline-orchestration-20261023'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+      - name: Phase 1-5 offline privacy, approval and zero-cost regression
+        run: node --test tests/ai-trinity-preflight.cjs tests/ai-trinity-router.cjs tests/ai-trinity-offline-adapters.cjs tests/ai-trinity-connection-preflight.cjs tests/ai-trinity-orchestrator.cjs tests/ai-trinity-manual.cjs
+      - name: Syntax verification of independent local-only preview
+        run: node --check scripts/ai-trinity-manual.js
+
+  browser-preview-regression:
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.head_ref == 'feat/ai-trinity-manual-review-zero-cost-20261023' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.base.ref == 'feat/ai-trinity-offline-orchestration-20261023'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [chromium, webkit]
+    env:
+      AI_TRINITY_TEST_BROWSER: ${{ matrix.engine }}
+      PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT: '45000'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+      - name: Install isolated Playwright test runner (no AI services)
+        run: npm install --no-save --no-package-lock playwright@1.62.1
+      - name: Install WebKit runtime only when needed
+        if: matrix.engine == 'webkit'
+        run: npx playwright install --with-deps webkit
+      - name: Verify local file preview, mobile layout, UI, privacy and no outbound requests
+        run: node tests/ai-trinity-manual-browser.cjs

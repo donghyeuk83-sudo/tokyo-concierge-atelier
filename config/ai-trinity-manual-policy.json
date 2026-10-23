@@ -1,0 +1,18 @@
+{
+  "phase": "5-manual-review",
+  "mode": "manual-paste-only",
+  "providers": ["chatgpt", "claude", "gemini"],
+  "allow_network": false,
+  "allow_real_api": false,
+  "allow_secret_loading": false,
+  "allow_auto_provider_navigation": false,
+  "allow_clipboard_read": false,
+  "allow_storage": false,
+  "allow_guest_data": false,
+  "allow_repository_writes": false,
+  "allow_deployments": false,
+  "allow_auto_approval": false,
+  "max_api_cost_usd": 0,
+  "max_prompt_characters": 500,
+  "max_response_characters": 12000
+}
