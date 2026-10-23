@@ -1,0 +1,19 @@
+{
+  "schema_version": 5,
+  "mode": "offline-orchestration-only",
+  "repository": "donghyeuk83-sudo/tokyo-concierge-atelier",
+  "providers": ["chatgpt", "claude", "gemini"],
+  "accepted_data_class": "public-metadata",
+  "required_mock_votes": 3,
+  "min_accept_votes": 3,
+  "allow_network": false,
+  "allow_real_ai": false,
+  "allow_secret_loading": false,
+  "allow_data_export": false,
+  "allow_repository_writes": false,
+  "allow_deployments": false,
+  "allow_auto_approval": false,
+  "allow_fallback": false,
+  "max_api_cost_usd": 0,
+  "max_retries": 0
+}
