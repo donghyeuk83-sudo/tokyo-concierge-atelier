@@ -635,11 +635,16 @@ const assert=require('assert');
    assert((await page.locator('#photoTitle').textContent()).trim(),'Enlarged photo has a title');
    assert((await page.locator('#photoDialog').boundingBox()).width<=390,'Photo viewer fits mobile');
    assert.equal(await page.locator('#photoLarge').evaluate(el=>getComputedStyle(el).objectFit),'contain','Enlarged photo keeps full frame');
+   // Let late lazy images / content-visibility cards finish shifting the layout, then sample the baseline right
+   // before the wheel so only scrolling caused by the wheel itself is counted (the check still fails if the backdrop scrolls).
+   await page.waitForLoadState('networkidle',{timeout:10000}).catch(()=>{});
+   await page.waitForTimeout(400);
    const backgroundScroll=await page.evaluate(()=>window.scrollY);
    await page.mouse.move(3,200);
    await page.mouse.wheel(0,600);
    await page.waitForTimeout(150);
-   assert.equal(await page.evaluate(()=>window.scrollY),backgroundScroll,'Photo backdrop does not scroll the catalogue');
+   const afterWheel=await page.evaluate(()=>window.scrollY);
+   assert.equal(afterWheel,backgroundScroll,'Photo backdrop does not scroll the catalogue (scrollY '+backgroundScroll+' -> '+afterWheel+', '+language+')');
    if(language==='ja')await page.locator('#photoClose').click();else await page.keyboard.press('Escape');
    assert(!await page.locator('#photoDialog').evaluate(el=>el.open),'Photo viewer closes: '+language);
    assert(await trigger.evaluate(el=>el===document.activeElement),'Focus returns to photo button');
