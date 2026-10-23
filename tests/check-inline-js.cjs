@@ -14,7 +14,7 @@ for(const path of [paths.catalogue,paths.sources,paths.media]){
  new vm.Script(fs.readFileSync(path,'utf8'),{filename:path});
 }
 const scriptTags=[...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)];
-assert.equal(scriptTags.length,16,'Expected exactly sixteen source-controlled external classic JavaScript tags (13 original + image policy + manual photos + venue additions)');
+assert.equal(scriptTags.length,17,'Expected exactly seventeen source-controlled external classic JavaScript tags (13 original + image policy + manual photos + venue additions + landing count sync)');
 // Manual photo registry: after the image policy, before the renderer that reads it.
 const manualTag='<script src="assets/atelier-manual-photos.js?v=20261022-manual-photos"></script>';
 assert(html.includes(manualTag),'Versioned manual photo registry present');
@@ -25,13 +25,21 @@ const additionsTag='<script src="assets/atelier-catalog-additions.js?v=20261022-
 assert(html.includes(additionsTag),'Versioned venue additions script present');
 assert(html.indexOf('<script src="assets/atelier-guidance.js?v=')<html.indexOf(additionsTag)&&html.indexOf(additionsTag)<html.indexOf('<script src="assets/atelier-state.js?v='),'Venue additions must load after guidance and before shortlist state');
 new vm.Script(fs.readFileSync('assets/atelier-catalog-additions.js','utf8'),{filename:'assets/atelier-catalog-additions.js'});
+// 2026-10-23 landing count sync: after the protected editorial copy it patches, before the renderer and the app's first translate().
+const countSyncTag='<script src="assets/atelier-count-sync.js?v=20261023-count-sync"></script>';
+assert(html.includes(countSyncTag),'Versioned landing count sync script present');
+assert(html.indexOf('<script src="assets/atelier-editorial.js?v=')<html.indexOf(countSyncTag)&&html.indexOf(countSyncTag)<html.indexOf('<script src="assets/atelier-render.js?v='),'Landing count sync must load after the editorial copy and before the renderer');
+const countSyncSource=fs.readFileSync('assets/atelier-count-sync.js','utf8');
+assert(countSyncSource.includes('DATA.length'),'Landing count must follow the live catalogue size, not a hard-coded number');
+assert(!/replace\(\/\\d\+\//.test(countSyncSource),'Count sync must not replace an arbitrary first number');
+new vm.Script(countSyncSource,{filename:'assets/atelier-count-sync.js'});
 assert(scriptTags.every(m=>/\bsrc="assets\/[\w-]+\.js\?v=[^"]+"/.test(m[1])&&!m[2].trim()),'No inline executable scripts or unknown script URL forms are permitted');
 
 const illustrationPath='assets/atelier-illustration.js';
 assert(html.includes('<script src="'+illustrationPath+'?v=20261022-manual-photos"></script>'),'Venue illustration renderer must load before catalogue inline script');
 // 2026-10-22 image policy: loads after the protected media registry and before the renderer.
 const policyPath='assets/atelier-image-policy.js';
-const policyTag='<script src="'+policyPath+'?v=20261022-manual-photos"></script>';
+const policyTag='<script src="'+policyPath+'?v=20261023-photo-status"></script>';
 const mediaTagPos=html.indexOf('<script src="assets/atelier-media.js?v=');
 assert(mediaTagPos>=0&&html.indexOf(policyTag)>mediaTagPos,'Image policy must load after the media registry');
 assert(html.indexOf(policyTag)<html.indexOf('<script src="'+illustrationPath+'?v='),'Image policy must load before the illustration renderer');

@@ -166,6 +166,9 @@ async function verify(browserType,label,dimensions,url){
    await page.locator('#language').selectOption(lang);
    assert.equal((await page.locator('.hero-cta').textContent()).trim(),cta,'Translated primary CTA '+lang);
    assert.equal((await page.locator('.magazine-lead strong').textContent()).trim(),title,'Translated mobile recommendation onboarding '+lang);
+   const venueTotal=await page.evaluate(()=>DATA.length),leadNote=await page.locator('.magazine-lead p').textContent();
+   const leadCount={en:/(\d+) places/,ja:/(\d+)件/,ko:/(\d+)개 장소/}[lang].exec(leadNote);
+   assert(leadCount&&Number(leadCount[1])===venueTotal,'Landing copy venue count equals real DATA.length ('+venueTotal+') '+lang+': '+leadNote);
    assert.equal(await page.locator('html').getAttribute('lang'),lang,'Correct screen-reader document language');
    assert.equal(await page.locator('.magazine-tile[aria-label]').count(),3,'All three quick category tiles accessible '+lang);
    assert((await page.locator('.source-explainer>strong').textContent()).trim().length>0,'Source safety label translated '+lang);
