@@ -1,0 +1,84 @@
+name: AI Trinity Phase 7 (zero-cost offline connection readiness)
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+    paths:
+      - '.github/workflows/ai-trinity-phase7-readiness.yml'
+      - 'config/ai-trinity-phase7-policy.json'
+      - 'scripts/ai-trinity-phase7-readiness.mjs'
+      - 'tests/ai-trinity-phase7-readiness.cjs'
+      - 'docs/ai-trinity-phase7-readiness.md'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ai-trinity-phase7-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  offline-policy-and-regression:
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.head_ref == 'feat/ai-trinity-phase7-readiness-20261024' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.draft == true
+    runs-on: ubuntu-24.04
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+      - name: Phase 1 through 7 offline privacy and zero-cost regression
+        run: node --test tests/ai-trinity-preflight.cjs tests/ai-trinity-router.cjs tests/ai-trinity-offline-adapters.cjs tests/ai-trinity-connection-preflight.cjs tests/ai-trinity-orchestrator.cjs tests/ai-trinity-manual.cjs tests/ai-trinity-phase6.cjs tests/ai-trinity-phase7-readiness.cjs
+      - name: Preserve original catalogue, photographs and 17 site scripts
+        run: |
+          node tests/check-inline-js.cjs
+          node tests/venue-additions.cjs
+          node tests/image-policy.cjs
+      - name: Offline-only readiness demo
+        run: node scripts/ai-trinity-phase7-readiness.mjs --offline-demo
+
+  browser-site-regression:
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.head_ref == 'feat/ai-trinity-phase7-readiness-20261024' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.draft == true
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [chromium, webkit]
+    env:
+      AI_TRINITY_TEST_BROWSER: ${{ matrix.engine }}
+      PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT: '45000'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+      - name: Install browser harness without AI SDKs
+        run: npm install --no-save --no-package-lock playwright@1.62.1
+      - name: Install selected browser only
+        run: npx playwright install --with-deps ${{ matrix.engine }}
+      - name: Existing manual privacy and EN/JA/KO preview regression
+        run: |
+          node tests/ai-trinity-manual-browser.cjs
+          node tests/ai-trinity-phase6-browser.cjs
+      - name: Chromium site, search, shortlist and CSV regression
+        if: matrix.engine == 'chromium'
+        run: |
+          node tests/smoke.cjs
+          node tests/state-regression.cjs
+      - name: WebKit iPhone Safari, local storage and CSV regression
+        if: matrix.engine == 'webkit'
+        run: node tests/webkit-mobile.cjs
