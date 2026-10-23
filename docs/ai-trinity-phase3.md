@@ -1,17 +1,18 @@
 # AI Trinity — Phase 3A Offline Adapter Contract
 
-## Stacked review and immutable parent
+## Review baseline and protected scope
 
-- **Parent:** Draft PR #78, HEAD `e0553a33429f4cd39fb07594011b2e656cdb7cea`.
+- **Phase 2 baseline:** PR #78 merged into `main`; source HEAD `e0553a33429f4cd39fb07594011b2e656cdb7cea`.
 - **Pilot branch:** `feat/ai-trinity-offline-adapters-20261023`.
-- **PR base:** `feat/ai-trinity-offline-router-20261023`, not `main`.
+- **PR base:** `main` (after the Phase 1 and Phase 2 merges); PR #79 remains Draft.
 - The five **new** Phase 3A files are `config/ai-trinity-adapter-policy.json`,
   `scripts/ai-trinity-offline-adapters.mjs`, `tests/ai-trinity-offline-adapters.cjs`,
   `.github/workflows/ai-trinity-phase3.yml`, and `docs/ai-trinity-phase3.md`.
 
-Do not modify PRs #76, #77, #78, their files, main, the application, catalog,
-photos, styles, languages, or live Pages. No merge, deployment, auto-merge,
-branch deletion, paid API use, or external AI transfer is approved.
+PRs #76, #77, and #78 have been merged. Do not modify their merged contents,
+`main`, the application, catalog, photos, styles, languages, or live Pages.
+PR #79 remains Draft; no merge, deployment, auto-merge, branch deletion,
+paid API use, or external AI transfer is approved.
 
 ## What is actually connected
 
@@ -59,8 +60,13 @@ AI_TRINITY_PHASE3_OFFLINE=true node scripts/ai-trinity-offline-adapters.mjs --de
 ```
 
 The Draft PR workflow uses pinned standard `ubuntu-latest` actions and
-`permissions: contents: read`, and only runs on the exact stacked PR branch.
-It has no secrets, upload steps, network/API commands, or mutation tasks.
+`permissions: contents: read`, and only runs for the exact Phase 3A head branch targeting `main`.
+It has no secrets, upload steps, external AI/API commands, or mutation tasks.
+
+Latest `main`-based PR checks (HEAD `6ac9591b`, before this documentation-only update):
+- Phase 1/2/3A safety gates and offline demo: **PASS**, Actions run `39934281775`.
+- Chromium, iPhone WebKit/CSV, image and venue regressions: **PASS**, Actions run `39934281820`.
+- Production Pages checks were intentionally skipped on the Draft PR; no deployment occurred.
 
 Before any live integration, obtain **separate** authorization for exact
 provider accounts, billing limits, allowed data, privacy terms, API secrets,
