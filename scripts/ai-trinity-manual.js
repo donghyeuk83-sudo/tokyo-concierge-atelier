@@ -51,6 +51,14 @@
     return result(identical ? 'TEXT_IDENTICAL' : 'TEXT_DIFFERENT',
       'HUMAN_FACT_CHECK_REQUIRED', 3, identical);
   }
+  function updateStatus(node, key, fallback, count) {
+    var translator = root && root.AITrinityPreviewI18n;
+    if (translator && typeof translator.setStatus === 'function') {
+      translator.setStatus(key, count);
+    } else {
+      node.textContent = fallback;
+    }
+  }
   function mount() {
     if (typeof document === 'undefined') return false;
     var form = document.getElementById('manual-trinity-form');
@@ -61,12 +69,12 @@
     if (!form || !status || !prompt || !select || !compare) return false;
     select.addEventListener('click', function () {
       if (!validText(prompt.value, MAX_PROMPT)) {
-        status.textContent = '공개 관광 질문만 입력하세요. 개인정보·예약번호·인증정보는 차단됩니다.';
+        updateStatus(status, 'invalidPrompt', '공개 관광 질문만 입력하세요. 개인정보·예약번호·인증정보는 차단됩니다.');
         return;
       }
       prompt.focus();
       prompt.select();
-      status.textContent = '질문을 선택했어요. 직접 복사해 각 AI 서비스에 붙여넣으세요.';
+      updateStatus(status, 'promptSelected', '질문을 선택했어요. 직접 복사해 각 AI 서비스에 붙여넣으세요.');
     });
     compare.addEventListener('click', function () {
       var answers = {};
@@ -75,17 +83,17 @@
       });
       var outcome = evaluate(prompt.value, answers);
       if (outcome.status === 'BLOCKED') {
-        status.textContent = '차단됨: 공개 관광 정보만 허용하며 개인정보는 입력할 수 없어요.';
+        updateStatus(status, 'blocked', '차단됨: 공개 관광 정보만 허용하며 개인정보는 입력할 수 없어요.');
       } else if (outcome.status === 'WAITING_FOR_MANUAL_PASTE') {
-        status.textContent = '응답 ' + outcome.provided + '/3개 입력됨. 세 응답을 직접 붙여넣으세요.';
+        updateStatus(status, 'waiting', '응답 ' + outcome.provided + '/3개 입력됨. 세 응답을 직접 붙여넣으세요.', outcome.provided);
       } else if (outcome.status === 'TEXT_IDENTICAL') {
-        status.textContent = '세 텍스트가 정규화 후 동일합니다. 사실 여부는 직접 검증해야 해요.';
+        updateStatus(status, 'identical', '세 텍스트가 정규화 후 동일합니다. 사실 여부는 직접 검증해야 해요.');
       } else {
-        status.textContent = '세 텍스트가 다릅니다. 출처·최신성·장소 정보를 직접 비교하세요.';
+        updateStatus(status, 'different', '세 텍스트가 다릅니다. 출처·최신성·장소 정보를 직접 비교하세요.');
       }
     });
     form.addEventListener('reset', function () {
-      status.textContent = '입력 초기화됨. 저장·전송된 내용은 없습니다.';
+      updateStatus(status, 'cleared', '입력 초기화됨. 저장·전송된 내용은 없습니다.');
     });
     return true;
   }
