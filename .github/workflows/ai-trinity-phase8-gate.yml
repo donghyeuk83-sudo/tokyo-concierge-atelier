@@ -1,0 +1,84 @@
+name: AI Trinity Phase 8 (offline secure provider gates)
+
+on:
+  pull_request:
+    branches: [feat/ai-trinity-phase7-readiness-20261024]
+    types: [opened, synchronize, reopened]
+    paths:
+      - '.github/workflows/ai-trinity-phase8-gate.yml'
+      - 'config/ai-trinity-phase8-policy.json'
+      - 'scripts/ai-trinity-phase8-gate.mjs'
+      - 'tests/ai-trinity-phase8-gate.cjs'
+      - 'docs/ai-trinity-phase8-gate.md'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ai-trinity-phase8-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  offline-policy-and-regression:
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.head_ref == 'feat/ai-trinity-phase8-secure-gates-20261025' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.draft == true
+    runs-on: ubuntu-24.04
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+      - name: Verify Phase 1 through 8 zero-cost offline policies
+        run: node --test tests/ai-trinity-preflight.cjs tests/ai-trinity-router.cjs tests/ai-trinity-offline-adapters.cjs tests/ai-trinity-connection-preflight.cjs tests/ai-trinity-orchestrator.cjs tests/ai-trinity-manual.cjs tests/ai-trinity-phase6.cjs tests/ai-trinity-phase7-readiness.cjs tests/ai-trinity-phase8-gate.cjs
+      - name: Guard 141 venue cards, photographs, site scripts and privacy
+        run: |
+          node tests/check-inline-js.cjs
+          node tests/venue-additions.cjs
+          node tests/image-policy.cjs
+      - name: Offline-only provider gate demonstration
+        run: node scripts/ai-trinity-phase8-gate.mjs --offline-demo
+
+  browser-regression:
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.head_ref == 'feat/ai-trinity-phase8-secure-gates-20261025' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.draft == true
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [chromium, webkit]
+    env:
+      AI_TRINITY_TEST_BROWSER: ${{ matrix.engine }}
+      PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT: '45000'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+      - name: Install browser harness without provider SDKs
+        run: npm install --no-save --no-package-lock playwright@1.62.1
+      - name: Install selected browser
+        run: npx playwright install --with-deps ${{ matrix.engine }}
+      - name: Offline AI preview, EN/JA/KO and privacy browser regression
+        run: |
+          node tests/ai-trinity-manual-browser.cjs
+          node tests/ai-trinity-phase6-browser.cjs
+      - name: Chromium site, shortlist, search and CSV regression
+        if: matrix.engine == 'chromium'
+        run: |
+          node tests/smoke.cjs
+          node tests/state-regression.cjs
+      - name: WebKit iPhone Safari, storage and CSV regression
+        if: matrix.engine == 'webkit'
+        run: node tests/webkit-mobile.cjs
