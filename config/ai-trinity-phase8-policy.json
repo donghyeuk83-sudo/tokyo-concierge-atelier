@@ -1,0 +1,48 @@
+{
+  "schema_version": 8,
+  "mode": "offline-provider-auth-gate-only",
+  "repository": "donghyeuk83-sudo/tokyo-concierge-atelier",
+  "parent_phase": 7,
+  "execution_target": "github-actions-public-standard-runner",
+  "providers": {
+    "chatgpt": {
+      "candidate_auth": "chatgpt-plan-oss-oauth",
+      "requirements": [
+        "oss_eligibility_unverified",
+        "stable_host_identity_unverified",
+        "runner_session_security_unverified",
+        "user_consent_missing"
+      ]
+    },
+    "claude": {
+      "candidate_auth": "claude-code-subscription-oauth",
+      "requirements": [
+        "subscription_eligibility_unverified",
+        "token_handling_review_missing",
+        "github_app_permissions_review_missing",
+        "user_consent_missing"
+      ]
+    },
+    "gemini": {
+      "candidate_auth": "gemini-api-unpaid-tier",
+      "requirements": [
+        "free_model_quota_unverified",
+        "billing_disabled_unverified",
+        "unpaid_data_terms_review_missing",
+        "user_consent_missing"
+      ]
+    }
+  },
+  "accepted_data_class": "public-metadata",
+  "allowed_metadata_type": "catalog-count",
+  "allow_network": false,
+  "allow_external_ai": false,
+  "allow_secret_loading": false,
+  "allow_browser_auth": false,
+  "allow_guest_data": false,
+  "allow_repository_writes": false,
+  "allow_deployments": false,
+  "allow_auto_approval": false,
+  "max_api_cost_usd": 0,
+  "max_retries": 0
+}
