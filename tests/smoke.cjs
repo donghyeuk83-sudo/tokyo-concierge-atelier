@@ -673,7 +673,10 @@ const assert=require('assert');
   const failErrors=[];failPage.on('pageerror',e=>failErrors.push(e.message));
   await failPage.route(externalRequest,route=>route.request().resourceType()==='image'?route.abort():route.continue());
   await failPage.goto(target,{waitUntil:'domcontentloaded',timeout:45000});
-  await failPage.waitForSelector('.card');
+  await failPage.waitForSelector('.card',{timeout:45000}).catch(async e=>{
+   const d=await failPage.evaluate(()=>({ready:document.readyState,cards:document.querySelectorAll('.card').length,visible:[...document.querySelectorAll('.card')].filter(c=>c.getClientRects().length).length,scripts:document.scripts.length,count:(document.getElementById('count')||{}).textContent})).catch(x=>({evalError:String(x)}));
+   throw new Error('Network-failure page rendered no visible card: '+JSON.stringify(d)+' / '+e.message.split('\n')[0]);
+  });
   await failPage.locator('#tabs [data-cat="attraction"]').click();
   const failImg=failPage.locator('img[data-venue-photo="a01"]');
   await failImg.evaluate(el=>{el.loading='eager';el.scrollIntoView()});
