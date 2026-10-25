@@ -37,7 +37,7 @@ const assert=require('assert');
   const funcs=[options,openVenuePhoto,card,openDetail,syncPhotoQuickbar,render,translateLanding,prioritizeConciergeOnMobile,translateImageLabels,translateChrome,translateEditorial,verifyEditorialPhotos];
   return {callable:funcs.every(f=>typeof f==='function'),languages:Object.keys(LANDING_COPY).sort(),visibleVenues:DATA.length,images:Object.keys(LICENSED_VENUE_PHOTOS).length,artwork:Object.keys(AI_VENUE_VISUALS).length,mobileQuery:typeof mobileConciergeMedia.matches==='boolean'};
  });
- assert.deepEqual(stage3Browser,{callable:true,languages:['en','ja','ko'],visibleVenues:180,images:89,artwork:50,mobileQuery:true},'Unchanged editorial and render functions work together on file and Pages');
+ assert.deepEqual(stage3Browser,{callable:true,languages:['en','ja','ko'],visibleVenues:182,images:89,artwork:50,mobileQuery:true},'Unchanged editorial and render functions work together on file and Pages');
 
  // Prove that cached category partitions are identical, in the same order,
  // to the old full-catalogue filter for each of the five tabs.
@@ -49,7 +49,7 @@ const assert=require('assert');
   });
   return {expected,allCategories:ROWS_BY_CATEGORY.size,total:[...ROWS_BY_CATEGORY.values()].reduce((n,rows)=>n+rows.length,0),languageKeys:Object.keys(I18N).sort()};
  });
- assert.deepEqual(categoriesMatch,{expected:true,allCategories:5,total:180,languageKeys:['en','ja','ko']},'Rendering category partitions and all three locale dictionaries preserve original site data');
+ assert.deepEqual(categoriesMatch,{expected:true,allCategories:5,total:182,languageKeys:['en','ja','ko']},'Rendering category partitions and all three locale dictionaries preserve original site data');
  // Every venue's new cached search string must be exactly identical to the
  // original uncached EN/JA/KO indexing formula (all 131 entries, original case
  // folding and aliases). This guards search behavior during modularization.
@@ -59,7 +59,7 @@ const assert=require('assert');
   const tokyo=searchText(DATA.find(r=>r.id==='a01'));
   return {same,cache,count:DATA.length,japanese:tokyo.includes("東京タワー"),korean:tokyo.includes("도쿄타워")};
  });
- assert.deepEqual(indexProof,{same:true,cache:true,count:180,japanese:true,korean:true},'Multilingual search index stays exactly compatible across every venue');
+ assert.deepEqual(indexProof,{same:true,cache:true,count:182,japanese:true,korean:true},'Multilingual search index stays exactly compatible across every venue');
  // Exact labels distinguish third-party references from official operator links.
  const seirinkan=page.locator('article.card').filter({has:page.locator('[data-detail="r06"]')});
  const sourceLink=seirinkan.locator('.actions a').filter({hasText:/^Reference website$/});
