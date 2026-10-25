@@ -271,7 +271,11 @@ function startLocalServer(){
   await blocked.locator('#cards .card').first().waitFor();
   assert.equal(await blocked.locator('#guide .guide-item').count(),0,'Isolated private Safari session starts empty');
   await blocked.locator('#cards .card button[data-id]').first().click();
-  assert((await blocked.locator('#interactionStatus').textContent()).includes('storage is blocked')|| (await blocked.locator('#interactionStatus').textContent()).includes('保存機能')|| (await blocked.locator('#interactionStatus').textContent()).includes('저장소'),'Safari blocked storage warning');
+  // The warning is written by the click handler; WebKit can lag behind the click on the 200+ card page, so poll
+  // for it instead of reading once, and report what the status line actually held if it never appears.
+  const blockedWarning=/storage is blocked|保存機能|저장소/;
+  const warned=await blocked.waitForFunction(re=>new RegExp(re).test(document.getElementById('interactionStatus').textContent),blockedWarning.source,{timeout:8000}).then(()=>true,()=>false);
+  assert(warned,'Safari blocked storage warning (status was: '+JSON.stringify(await blocked.locator('#interactionStatus').textContent())+', shortlist items: '+await blocked.locator('#guide .guide-item').count()+')');
   assert.equal(await blocked.locator('#guide .guide-item').count(),1,'Blocked storage still allows temporary shortlist in the independent session');
   assert.deepEqual(jsErrors,[],'No iPhone WebKit page errors: '+jsErrors);
   assert.deepEqual(blockedErrors,[],'No blocked-storage WebKit runtime errors: '+blockedErrors);
