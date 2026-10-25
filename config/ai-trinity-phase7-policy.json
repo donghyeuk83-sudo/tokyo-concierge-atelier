@@ -1,0 +1,36 @@
+{
+  "schema_version": 7,
+  "mode": "offline-connection-readiness-only",
+  "repository": "donghyeuk83-sudo/tokyo-concierge-atelier",
+  "execution_target": "github-actions-public-standard-runner",
+  "providers": {
+    "chatgpt": {
+      "auth_method": "chatgpt-plan-oss-oauth",
+      "eligibility": "unverified",
+      "github_runner_compatibility": "unverified"
+    },
+    "claude": {
+      "auth_method": "claude-code-subscription-oauth",
+      "eligibility": "subscription-and-consent-required",
+      "github_runner_compatibility": "documented"
+    },
+    "gemini": {
+      "auth_method": "gemini-api-unpaid-tier",
+      "eligibility": "free-model-and-quota-unverified",
+      "github_runner_compatibility": "documented"
+    }
+  },
+  "accepted_data_class": "public-metadata",
+  "allowed_metadata_type": "catalog-count",
+  "allow_network": false,
+  "allow_external_ai": false,
+  "allow_secret_loading": false,
+  "allow_browser_auth": false,
+  "allow_guest_data": false,
+  "allow_repository_writes": false,
+  "allow_deployments": false,
+  "allow_auto_approval": false,
+  "require_manual_provider_activation": true,
+  "max_api_cost_usd": 0,
+  "max_retries": 0
+}
