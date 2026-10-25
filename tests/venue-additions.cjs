@@ -8,7 +8,7 @@ const {verifyExtractedSnapshot,venueRows,additionRows}=require('./atelier-source
 
 // The original 131 records, photos and AI mappings stay byte-identical.
 assert.deepEqual(verifyExtractedSnapshot(),{places:131,licensed:89,ai:50,pending:42},'Protected baseline untouched');
-assert.equal(additionRows.length,10,'Exactly 10 venues added on 2026-10-22; update this pin when adding more');
+assert.equal(additionRows.length,49,'Exactly 49 venues added (10 on 2026-10-22 + 39 restaurants on 2026-10-25); update this pin when adding more');
 
 const original=new Set(venueRows.map(r=>r[0]));
 const prefix={restaurant:'r',attraction:'a',shopping:'s',wellness:'w',transport:'t'};
@@ -29,14 +29,14 @@ const before=ctx.DATA.slice(),beforeSources=Object.assign({},ctx.VERIFIED_SOURCE
 load('atelier-catalog-additions.js');
 const {DATA,ROWS_BY_CATEGORY,VERIFIED_SOURCES,SOURCE_SCOPE,PLACE_ALIASES,SEARCH_ALIASES,CONCIERGE_GUIDANCE}=ctx;
 
-assert.equal(DATA.length,141,'131 original + 10 added venues at runtime');
+assert.equal(DATA.length,180,'131 original + 49 added venues at runtime');
 before.forEach((r,i)=>assert.equal(DATA[i],r,'Original venue order/object unchanged: '+r.id));
 for(const [id,v] of Object.entries(beforeSources))assert.equal(VERIFIED_SOURCES[id],v,'Original source untouched: '+id);
 for(const [id,v] of Object.entries(beforeGuidance))assert.equal(CONCIERGE_GUIDANCE[id],v,'Original guidance untouched: '+id);
 for(const r of before)assert.equal(PLACE_ALIASES[r.id],beforeAliases[r.id],'Original alias untouched: '+r.id);
 for(const [cat,rows] of ROWS_BY_CATEGORY)assert.deepEqual(rows,DATA.filter(r=>r.category===cat),'Category cache matches DATA for '+cat);
 
-const today=new Date('2026-10-22');
+const today=new Date('2026-10-25');
 for(const [id] of additionRows){
  const r=DATA.find(x=>x.id===id),src=VERIFIED_SOURCES[id];
  assert(r&&r.status==='NEEDS_CONFIRMATION','Added venue present and flagged for confirmation: '+id);
@@ -70,4 +70,4 @@ for(const lang of ['en','ja','ko']){
 // Photo queue for additions is generated and current.
 const queue=fs.readFileSync('audits/missing-photo-queue-additions.csv','utf8').trim().split('\n').slice(1).map(l=>l.match(/^"([^"]+)"/)[1]);
 assert.deepEqual(queue,additionRows.map(r=>r[0]),'Additions photo queue lists every added venue (run tests/photo-queue.cjs)');
-console.log('PASS venue additions: '+additionRows.length+' added ('+additionRows.map(r=>r[0]).join(' ')+'), 141 at runtime, originals untouched');
+console.log('PASS venue additions: '+additionRows.length+' added ('+additionRows.map(r=>r[0]).join(' ')+'), 180 at runtime, originals untouched');
