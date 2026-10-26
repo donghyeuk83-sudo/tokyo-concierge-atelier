@@ -600,6 +600,13 @@ const assert=require('assert');
    assert(cat,'Photo references unknown catalogue venue');
    await page.locator('#tabs [data-cat="'+cat+'"]').click();
    for(const id of expectedPhotos.filter(id=>categoryById.get(id)===cat)){
+     // Photos the owner withdrew at runtime (WITHDRAWN_LICENSED_PHOTOS) stay in the protected registry file but must
+     // no longer render as an approved photo; the card shows its reference stock photo instead.
+     if(await page.evaluate(wid=>typeof WITHDRAWN_LICENSED_PHOTOS!=='undefined'&&Object.prototype.hasOwnProperty.call(WITHDRAWN_LICENSED_PHOTOS,wid),id)){
+       assert.equal(await page.locator('img[data-venue-photo="'+id+'"]').count(),0,'Withdrawn approved photo is not rendered: '+id);
+       assert.equal(await page.locator('#cards .card [data-image-source="stock"] img[data-stock-photo="'+id+'"]').count(),1,'Withdrawn venue shows its reference stock photo: '+id);
+       continue;
+     }
      const img=page.locator('img[data-venue-photo="'+id+'"]');
      assert.equal(await img.count(),1,'Photo element present in '+cat+': '+id);
      await img.locator('xpath=ancestor::article').scrollIntoViewIfNeeded();
