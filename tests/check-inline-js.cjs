@@ -39,7 +39,7 @@ const illustrationPath='assets/atelier-illustration.js';
 assert(html.includes('<script src="'+illustrationPath+'?v=20261022-manual-photos"></script>'),'Venue illustration renderer must load before catalogue inline script');
 // 2026-10-22 image policy: loads after the protected media registry and before the renderer.
 const policyPath='assets/atelier-image-policy.js';
-const policyTag='<script src="'+policyPath+'?v=20261027-stock-new-venues"></script>';
+const policyTag='<script src="'+policyPath+'?v=20261027-loft-stock"></script>';
 const mediaTagPos=html.indexOf('<script src="assets/atelier-media.js?v=');
 assert(mediaTagPos>=0&&html.indexOf(policyTag)>mediaTagPos,'Image policy must load after the media registry');
 assert(html.indexOf(policyTag)<html.indexOf('<script src="'+illustrationPath+'?v='),'Image policy must load before the illustration renderer');

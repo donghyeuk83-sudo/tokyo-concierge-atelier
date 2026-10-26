@@ -78,7 +78,7 @@ async function auditCardImages(page,label){
   }
  }
  assert.equal(totals.cards,209,label+': all 209 venues rendered (131 original + 78 added: 10 on 2026-10-22, 68 on 2026-10-25)');
- assert.equal(totals.licensed,89,label+': 89 approved photos still rendered');
+ assert.equal(totals.licensed,88,label+': 88 approved photos rendered (89 registered; Shibuya Loft exterior withdrawn 2026-10-27)');
  // Stock tier: Sushi Takeuchi shows its own labelled reference photo in all three languages; turning
  // off its owner approval (no file/content verification) withdraws it again to the SVG.
  await page.locator('#tabs [data-cat="restaurant"]').click();

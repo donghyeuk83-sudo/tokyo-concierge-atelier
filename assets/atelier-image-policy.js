@@ -132,14 +132,15 @@ const STOCK_IMAGE_LIBRARY={
 "unsplash-r112-french":{sourceType:"stock",provider:"Unsplash",imageUrl:"https://images.unsplash.com/photo-1621327017866-6fb07e6c96ea?w=640&q=70&fm=jpg&fit=crop",sourcePageUrl:"https://unsplash.com/photos/a-white-plate-topped-with-food-on-top-of-a-wooden-table-pn7dIk2kiYw",photographer:"Anima Visual",photographerUrl:"https://unsplash.com/@animavisual",license:"Unsplash License",licenseUrl:"https://unsplash.com/license",subject:"french",alt:"Plated prawn vol-au-vent (generic reference photo)",approvedForReuse:true,fileVerified:false,contentVerified:false,ownerApproved:"2026-10-27",isActualVenue:false,lastVerified:"2026-10-27"},
 "unsplash-r115-craft-beer":{sourceType:"stock",provider:"Unsplash",imageUrl:"https://images.unsplash.com/photo-1593887937265-2a09787dcc19?w=640&q=70&fm=jpg&fit=crop",sourcePageUrl:"https://unsplash.com/photos/rfOFRwKHtJM",photographer:"Dovlet Hojayev",photographerUrl:"https://unsplash.com/@dhojayev",license:"Unsplash License",licenseUrl:"https://unsplash.com/license",subject:"craft-beer",alt:"Row of beer taps on a bar (generic reference photo)",approvedForReuse:true,fileVerified:false,contentVerified:false,ownerApproved:"2026-10-27",isActualVenue:false,lastVerified:"2026-10-27"},
 "unsplash-r116-cocktail":{sourceType:"stock",provider:"Unsplash",imageUrl:"https://images.unsplash.com/photo-1547146598-0962d0d87c97?w=640&q=70&fm=jpg&fit=crop",sourcePageUrl:"https://unsplash.com/photos/three-liquor-bottles-and-cocktail-drink-on-bar-counter-swkwxyaBFto",photographer:"Ralph Darabos",photographerUrl:"https://unsplash.com/@darabosralph",license:"Unsplash License",licenseUrl:"https://unsplash.com/license",subject:"cocktail",alt:"Liquor bottles and a cocktail on a bar counter (generic reference photo)",approvedForReuse:true,fileVerified:false,contentVerified:false,ownerApproved:"2026-10-27",isActualVenue:false,lastVerified:"2026-10-27"},
-"unsplash-r121-vegan":{sourceType:"stock",provider:"Unsplash",imageUrl:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=640&q=70&fm=jpg&fit=crop",sourcePageUrl:"https://unsplash.com/photos/bowl-of-vegetable-salads-IGfIGP5ONV0",photographer:"Anna Pelzer",photographerUrl:"https://unsplash.com/@annapelzer",license:"Unsplash License",licenseUrl:"https://unsplash.com/license",subject:"vegan",alt:"Vegan salad bowl (generic reference photo)",approvedForReuse:true,fileVerified:false,contentVerified:false,ownerApproved:"2026-10-27",isActualVenue:false,lastVerified:"2026-10-27"}
+"unsplash-r121-vegan":{sourceType:"stock",provider:"Unsplash",imageUrl:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=640&q=70&fm=jpg&fit=crop",sourcePageUrl:"https://unsplash.com/photos/bowl-of-vegetable-salads-IGfIGP5ONV0",photographer:"Anna Pelzer",photographerUrl:"https://unsplash.com/@annapelzer",license:"Unsplash License",licenseUrl:"https://unsplash.com/license",subject:"vegan",alt:"Vegan salad bowl (generic reference photo)",approvedForReuse:true,fileVerified:false,contentVerified:false,ownerApproved:"2026-10-27",isActualVenue:false,lastVerified:"2026-10-27"},
+"unsplash-s09-lifestyle-store":{sourceType:"stock",provider:"Unsplash",imageUrl:"https://images.unsplash.com/photo-1576602976047-174e57a47881?w=640&q=70&fm=jpg&fit=crop",sourcePageUrl:"https://unsplash.com/photos/stationery-store-interior-with-greeting-cards-747NDboAWNY",photographer:"Nathaniel Yeo",photographerUrl:"https://unsplash.com/@nathanielyeo",license:"Unsplash License",licenseUrl:"https://unsplash.com/license",subject:"lifestyle-store",alt:"Stationery and lifestyle goods store interior (generic reference photo, not Shibuya Loft)",approvedForReuse:true,fileVerified:false,contentVerified:false,ownerApproved:"2026-10-27",isActualVenue:false,lastVerified:"2026-10-27"}
 };
 
 // Venue → its own stock photo. Never used for a venue with an approved registry photo.
 const VENUE_STOCK_IMAGES={
 r01:"unsplash-r01-sushi",r02:"unsplash-r02-sushi",r39:"unsplash-r39-sushi",r40:"unsplash-r40-sushi",r43:"unsplash-r43-sushi",r38:"unsplash-r38-sushi",r41:"unsplash-r41-sushi",r42:"unsplash-r42-sushi",r44:"unsplash-r44-sushi",r29:"unsplash-r29-sushi",r31:"unsplash-r31-sushi",r33:"unsplash-r33-sushi",r36:"unsplash-r36-sushi",r37:"unsplash-r37-sushi",r03:"unsplash-r03-tempura",r04:"unsplash-r04-tempura",r05:"unsplash-r05-tempura",r06:"unsplash-r06-pizza",r08:"unsplash-r08-pizza",r09:"unsplash-r09-italian",r11:"unsplash-r11-yakiniku",r52:"unsplash-r52-kaiseki",a26:"unsplash-a26-tea",a27:"unsplash-a27-tea",a39:"unsplash-a39-matcha",a37:"unsplash-a37-matcha",a31:"unsplash-a31-sake",a28:"unsplash-a28-indigo",a29:"unsplash-a29-ninja",
 r53:"unsplash-r53-yakitori",r54:"unsplash-r54-tonkatsu",r55:"unsplash-r55-ramen",a48:"unsplash-a48-garden",a49:"unsplash-a49-market",
-r57:"unsplash-r57-sushi",r58:"unsplash-r58-sushi",r62:"unsplash-r62-sushi",r78:"unsplash-r78-sashimi",r64:"unsplash-r64-steak",r65:"unsplash-r65-teppanyaki-beef",r70:"unsplash-r70-shabu-shabu",r79:"unsplash-r79-seafood-grill",r86:"unsplash-r86-kaiseki",r93:"unsplash-r93-yakiniku",r95:"unsplash-r95-katsu",r98:"unsplash-r98-soba",r101:"unsplash-r101-pizza",r104:"unsplash-r104-yakitori",r112:"unsplash-r112-french",r115:"unsplash-r115-craft-beer",r116:"unsplash-r116-cocktail",r121:"unsplash-r121-vegan"
+r57:"unsplash-r57-sushi",r58:"unsplash-r58-sushi",r62:"unsplash-r62-sushi",r78:"unsplash-r78-sashimi",r64:"unsplash-r64-steak",r65:"unsplash-r65-teppanyaki-beef",r70:"unsplash-r70-shabu-shabu",r79:"unsplash-r79-seafood-grill",r86:"unsplash-r86-kaiseki",r93:"unsplash-r93-yakiniku",r95:"unsplash-r95-katsu",r98:"unsplash-r98-soba",r101:"unsplash-r101-pizza",r104:"unsplash-r104-yakitori",r112:"unsplash-r112-french",r115:"unsplash-r115-craft-beer",r116:"unsplash-r116-cocktail",r121:"unsplash-r121-vegan",s09:"unsplash-s09-lifestyle-store"
 };
 
 const STOCK_IMAGE_HOSTS=["images.unsplash.com","images.pexels.com","cdn.pixabay.com","upload.wikimedia.org"];
@@ -246,4 +247,17 @@ function imageSourceLabel(kind,item){
   ja:"公式サイトは押上（スカイツリー前）駅前店（押上1-8-23）として1階・2階を別々に掲載しています。別店舗かは明記されていません。予約前に店舗詳細ページで階をご確認ください。",
   ko:"공식 사이트는 오시아게(스카이트리 앞) 역앞점(오시아게 1-8-23)을 1층·2층으로 나누어 게재합니다. 두 층이 별도 지점인지는 명시되어 있지 않습니다. 예약 전 매장 상세 페이지에서 층을 확인하세요."
  });
+})();
+
+// Approved photos withdrawn by the owner (2026-10-27). The protected registry in atelier-media.js stays byte-identical;
+// at load time the record is moved here, so the card falls through to the next tier (stock reference photo) and the
+// withdrawn record remains available for audit or reinstatement (delete the id below to restore it).
+const WITHDRAWN_LICENSED_PHOTOS={
+ s09:{withdrawnOn:"2026-10-27",reason:"Owner request: the Wikimedia photo is a building exterior; a lifestyle-store reference photo is shown instead.",record:null}
+};
+(function withdrawLicensedPhotos(){
+ if(typeof LICENSED_VENUE_PHOTOS==="undefined")return;
+ for(const id of Object.keys(WITHDRAWN_LICENSED_PHOTOS)){
+  if(LICENSED_VENUE_PHOTOS[id]){WITHDRAWN_LICENSED_PHOTOS[id].record=LICENSED_VENUE_PHOTOS[id];delete LICENSED_VENUE_PHOTOS[id]}
+ }
 })();

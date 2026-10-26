@@ -139,5 +139,11 @@ for(const [id,item] of Object.entries(VO)){
 const counts={official:0,licensed:0,stock:0,ai:0,svg:0};
 for(const r of DATA)counts[ctx.venueImageRecord(r).sourceType]++;
 assert.equal(Object.values(counts).reduce((a,b)=>a+b,0),131,'All 131 original venues resolved (additions load later and are covered by venue-additions.cjs)');
-assert.equal(counts.licensed,89,'89 approved photos untouched');
+// One approved photo (s09 Shibuya Loft, a building exterior) is withdrawn at runtime by owner request (2026-10-27);
+// the protected registry file still holds all 89 and the withdrawn record is kept for audit.
+assert.equal(counts.licensed,88,'88 approved photos live (89 in the protected registry minus the withdrawn Shibuya Loft exterior)');
+assert.deepEqual(Object.keys(ctx.WITHDRAWN_LICENSED_PHOTOS),['s09'],'Only Shibuya Loft is withdrawn');
+assert(/Shibuya-Loft\.jpg/.test(ctx.WITHDRAWN_LICENSED_PHOTOS.s09.record&&ctx.WITHDRAWN_LICENSED_PHOTOS.s09.record.url),'Withdrawn record preserved');
+assert.equal(ctx.venueImageRecord(ctx.DATA.find(r=>r.id==='s09')).sourceType,'stock','Shibuya Loft shows its reference stock photo');
+assert(/loft/i.test(fs.readFileSync('assets/atelier-media.js','utf8').match(/s09:\{[^}]+\}/)[0]),'Protected atelier-media.js still lists the original Shibuya Loft photo');
 console.log('PASS image policy: '+JSON.stringify(counts)+', quarantined AI '+Object.keys(Q).length+', stock candidates '+Object.keys(S).length+' (displayable '+Object.values(S).filter(ctx.isDisplayableStock).length+')');

@@ -37,7 +37,7 @@ const assert=require('assert');
   const funcs=[options,openVenuePhoto,card,openDetail,syncPhotoQuickbar,render,translateLanding,prioritizeConciergeOnMobile,translateImageLabels,translateChrome,translateEditorial,verifyEditorialPhotos];
   return {callable:funcs.every(f=>typeof f==='function'),languages:Object.keys(LANDING_COPY).sort(),visibleVenues:DATA.length,images:Object.keys(LICENSED_VENUE_PHOTOS).length,artwork:Object.keys(AI_VENUE_VISUALS).length,mobileQuery:typeof mobileConciergeMedia.matches==='boolean'};
  });
- assert.deepEqual(stage3Browser,{callable:true,languages:['en','ja','ko'],visibleVenues:209,images:89,artwork:50,mobileQuery:true},'Unchanged editorial and render functions work together on file and Pages');
+ assert.deepEqual(stage3Browser,{callable:true,languages:['en','ja','ko'],visibleVenues:209,images:88,artwork:50,mobileQuery:true},'Unchanged editorial and render functions work together on file and Pages');
 
  // Prove that cached category partitions are identical, in the same order,
  // to the old full-catalogue filter for each of the five tabs.
@@ -600,6 +600,13 @@ const assert=require('assert');
    assert(cat,'Photo references unknown catalogue venue');
    await page.locator('#tabs [data-cat="'+cat+'"]').click();
    for(const id of expectedPhotos.filter(id=>categoryById.get(id)===cat)){
+     // Photos the owner withdrew at runtime (WITHDRAWN_LICENSED_PHOTOS) stay in the protected registry file but must
+     // no longer render as an approved photo; the card shows its reference stock photo instead.
+     if(await page.evaluate(wid=>typeof WITHDRAWN_LICENSED_PHOTOS!=='undefined'&&Object.prototype.hasOwnProperty.call(WITHDRAWN_LICENSED_PHOTOS,wid),id)){
+       assert.equal(await page.locator('img[data-venue-photo="'+id+'"]').count(),0,'Withdrawn approved photo is not rendered: '+id);
+       assert.equal(await page.locator('#cards .card [data-image-source="stock"] img[data-stock-photo="'+id+'"]').count(),1,'Withdrawn venue shows its reference stock photo: '+id);
+       continue;
+     }
      const img=page.locator('img[data-venue-photo="'+id+'"]');
      assert.equal(await img.count(),1,'Photo element present in '+cat+': '+id);
      await img.locator('xpath=ancestor::article').scrollIntoViewIfNeeded();
