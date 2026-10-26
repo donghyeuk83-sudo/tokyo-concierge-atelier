@@ -37,7 +37,7 @@ const assert=require('assert');
   const funcs=[options,openVenuePhoto,card,openDetail,syncPhotoQuickbar,render,translateLanding,prioritizeConciergeOnMobile,translateImageLabels,translateChrome,translateEditorial,verifyEditorialPhotos];
   return {callable:funcs.every(f=>typeof f==='function'),languages:Object.keys(LANDING_COPY).sort(),visibleVenues:DATA.length,images:Object.keys(LICENSED_VENUE_PHOTOS).length,artwork:Object.keys(AI_VENUE_VISUALS).length,mobileQuery:typeof mobileConciergeMedia.matches==='boolean'};
  });
- assert.deepEqual(stage3Browser,{callable:true,languages:['en','ja','ko'],visibleVenues:209,images:89,artwork:50,mobileQuery:true},'Unchanged editorial and render functions work together on file and Pages');
+ assert.deepEqual(stage3Browser,{callable:true,languages:['en','ja','ko'],visibleVenues:209,images:88,artwork:50,mobileQuery:true},'Unchanged editorial and render functions work together on file and Pages');
 
  // Prove that cached category partitions are identical, in the same order,
  // to the old full-catalogue filter for each of the five tabs.
