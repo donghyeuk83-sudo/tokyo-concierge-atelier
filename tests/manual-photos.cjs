@@ -25,7 +25,7 @@ for(const rec of registry){
  assert(venueIds.has(rec.venueId),'Manual photo for unknown venue '+rec.venueId);
  assert(!licensed.has(rec.venueId),'Manual photo would be hidden behind an approved photo: '+rec.venueId);
  assert(ctx.isPublishableManualPhoto(rec,rec.venueId),'Manual photo record incomplete (credit, rights, source, date): '+rec.venueId);
- assert.deepEqual(ctx.MANUAL_VENUE_PHOTOS[rec.venueId],rec,'Browser registry matches registry.json: '+rec.venueId);
+ assert.deepEqual(JSON.parse(JSON.stringify(ctx.MANUAL_VENUE_PHOTOS[rec.venueId])),rec,'Browser registry matches registry.json: '+rec.venueId);
  const buf=fs.readFileSync(rec.file);
  assert(buf.length>1000&&buf.toString('ascii',0,4)==='RIFF'&&buf.toString('ascii',8,12)==='WEBP','Manual photo must be a WebP produced by the intake script: '+rec.file);
  if(rec.permissionUrl)assert(/^https:\/\//.test(rec.permissionUrl),'Permission link must be https: '+rec.venueId);

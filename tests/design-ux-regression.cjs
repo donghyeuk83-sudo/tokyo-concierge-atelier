@@ -62,7 +62,7 @@ async function auditCardImages(page,label){
    assert(!r.overlap,label+': caption and label do not overlap '+r.id);
    assert(r.imgCount<=1,label+': at most one image '+r.id);
    // r18/r21/r28 are quarantined but keep their approved registry photo, which always wins.
-   if(r.quarantined&&r.source!=='licensed')assert(['svg','stock'].includes(r.source),label+': quarantined venue shows SVG or a labelled stock photo '+r.id+' '+JSON.stringify(r));
+   if(r.quarantined&&r.source!=='licensed')assert(['svg','stock','manual'].includes(r.source),label+': quarantined venue shows SVG or a labelled stock photo '+r.id+' '+JSON.stringify(r));
    if(r.source==='stock'){
     assert.equal(r.imgCount,1,label+': one stock image '+r.id);
     assert(r.imgVisible!==r.svgVisible,label+': stock image and SVG fallback mutually exclusive '+r.id+' '+JSON.stringify(r));
