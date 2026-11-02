@@ -52,7 +52,7 @@ for(const r of DATA){
  const html=ctx.illustration(r);
  if(Q[r.id]){
   assert(!html.includes(A[r.id].url),'Quarantined AI file never referenced: '+r.id);
-  assert(!/<svg hidden/.test(html)||/data-image-source="stock"/.test(html),'SVG visible when no image: '+r.id);
+  assert(!/<svg hidden/.test(html)||/data-image-source="(stock|manual)"/.test(html),'SVG visible when no image: '+r.id);
   assert(!html.includes('art-caption'),'No caption over quarantined fallback: '+r.id);
  }
  assert.equal((html.match(/class="card-photo-label"/g)||[]).length,1,'Exactly one label: '+r.id);
@@ -98,7 +98,7 @@ assert.equal(new Set(Object.values(VS)).size,Object.keys(VS).length,'Each venue 
 const r02=DATA.find(r=>r.id==='r02');
 for(const lang of ['en','ja','ko']){
  ctx.lang=lang;
- for(const id of Object.keys(VS).filter(id=>ids.includes(id))){ // additions are rendered in venue-additions.cjs
+ for(const id of Object.keys(VS).filter(id=>ids.includes(id)&&!ctx.MANUAL_VENUE_PHOTOS[id])){ // additions are rendered in venue-additions.cjs
   const html=vm.runInContext('illustration(DATA.find(r=>r.id==="'+id+'"))',ctx),item=S[VS[id]];
   assert(html.includes('data-image-source="stock"')&&html.includes(item.imageUrl.replace(/&/g,'&amp;')),'Stock image rendered: '+id+' '+lang);
   assert(html.includes(ctx.IMAGE_SOURCE_LABELS.stock[lang]),'Reference-photo label: '+id+' '+lang);
@@ -136,7 +136,7 @@ for(const [id,item] of Object.entries(VO)){
 }
 
 // 9. Totals: every venue resolves to exactly one source type.
-const counts={official:0,licensed:0,stock:0,ai:0,svg:0};
+const counts={official:0,licensed:0,stock:0,ai:0,svg:0,manual:0};
 for(const r of DATA)counts[ctx.venueImageRecord(r).sourceType]++;
 assert.equal(Object.values(counts).reduce((a,b)=>a+b,0),131,'All 131 original venues resolved (additions load later and are covered by venue-additions.cjs)');
 // One approved photo (s09 Shibuya Loft, a building exterior) is withdrawn at runtime by owner request (2026-10-27);
