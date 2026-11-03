@@ -1,0 +1,73 @@
+name: AI Trinity Read-only Full QA (Chromium + WebKit)
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+    paths:
+      - '.github/workflows/ai-trinity-readonly-qa.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ai-trinity-readonly-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  secure-full-regression:
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.draft == true &&
+      github.head_ref == 'qa/ai-trinity-readonly-chromium-webkit-20261026' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    steps:
+      - name: Checkout without persistent credentials
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+      - name: Verify offline AI security and cost gates
+        run: |
+          node --test tests/ai-trinity-preflight.cjs tests/ai-trinity-router.cjs tests/ai-trinity-offline-adapters.cjs tests/ai-trinity-connection-preflight.cjs tests/ai-trinity-orchestrator.cjs tests/ai-trinity-manual.cjs tests/ai-trinity-phase6.cjs tests/ai-trinity-phase7-readiness.cjs tests/ai-trinity-phase8-gate.cjs
+          node scripts/ai-trinity-phase8-gate.mjs --offline-demo
+      - name: Protect catalog, privacy, images and share/CSV contracts
+        run: |
+          node tests/check-inline-js.cjs
+          node tests/venue-additions.cjs
+          node tests/image-policy.cjs
+          node tests/manual-photos.cjs
+          node tests/photo-queue.cjs
+          node tests/require-photo-clearance.cjs
+          node tests/link-exception-regression.cjs
+          node tests/audit-pipeline-safety.cjs
+      - name: Install pinned Playwright harness
+        run: npm install --no-save --no-package-lock playwright@1.62.1
+      - name: Install Chromium and WebKit for local-only browser QA
+        env:
+          PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT: '45000'
+        run: npx playwright install --with-deps chromium webkit
+      - name: Chromium catalogue, search, shortlist, share and CSV regressions
+        run: |
+          node tests/smoke.cjs
+          node tests/state-regression.cjs
+      - name: iPhone WebKit mobile, storage and CSV regression
+        run: node tests/webkit-mobile.cjs
+      - name: Cross-browser design, images and EN/JA/KO regression
+        run: node tests/design-ux-regression.cjs
+      - name: Chromium AI Trinity offline privacy and mobile preview
+        env:
+          AI_TRINITY_TEST_BROWSER: chromium
+        run: |
+          node tests/ai-trinity-manual-browser.cjs
+          node tests/ai-trinity-phase6-browser.cjs
+      - name: WebKit AI Trinity offline privacy and mobile preview
+        env:
+          AI_TRINITY_TEST_BROWSER: webkit
+        run: |
+          node tests/ai-trinity-manual-browser.cjs
+          node tests/ai-trinity-phase6-browser.cjs
