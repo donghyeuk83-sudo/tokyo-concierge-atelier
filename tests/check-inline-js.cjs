@@ -16,7 +16,7 @@ for(const path of [paths.catalogue,paths.sources,paths.media]){
 const scriptTags=[...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)];
 assert.equal(scriptTags.length,17,'Expected exactly seventeen source-controlled external classic JavaScript tags (13 original + image policy + manual photos + venue additions + landing count sync)');
 // Manual photo registry: after the image policy, before the renderer that reads it.
-const manualTag='<script src="assets/atelier-manual-photos.js?v=20261102-manual-r01"></script>';
+const manualTag='<script src="assets/atelier-manual-photos.js?v=20261111-manual-a30"></script>';
 assert(html.includes(manualTag),'Versioned manual photo registry present');
 assert(html.indexOf('<script src="assets/atelier-image-policy.js?v=')<html.indexOf(manualTag)&&html.indexOf(manualTag)<html.indexOf('<script src="assets/atelier-illustration.js?v='),'Manual photos load after the policy and before the renderer');
 new vm.Script(fs.readFileSync('assets/atelier-manual-photos.js','utf8'),{filename:'assets/atelier-manual-photos.js'});
@@ -36,7 +36,7 @@ new vm.Script(countSyncSource,{filename:'assets/atelier-count-sync.js'});
 assert(scriptTags.every(m=>/\bsrc="assets\/[\w-]+\.js\?v=[^"]+"/.test(m[1])&&!m[2].trim()),'No inline executable scripts or unknown script URL forms are permitted');
 
 const illustrationPath='assets/atelier-illustration.js';
-assert(html.includes('<script src="'+illustrationPath+'?v=20261102-manual-r01"></script>'),'Venue illustration renderer must load before catalogue inline script');
+assert(html.includes('<script src="'+illustrationPath+'?v=20261111-manual-a30"></script>'),'Venue illustration renderer must load before catalogue inline script');
 // 2026-10-22 image policy: loads after the protected media registry and before the renderer.
 const policyPath='assets/atelier-image-policy.js';
 const policyTag='<script src="'+policyPath+'?v=20261102-stock-batch2b"></script>';
@@ -48,7 +48,7 @@ const externalJS=fs.readFileSync(illustrationPath,'utf8');
 assert(externalJS.includes('function illustration(r){'),'Venue artwork function missing from extracted asset');
 new vm.Script(externalJS,{filename:illustrationPath});
 const searchPath='assets/atelier-search.js';
-const illustrationTag='<script src="'+illustrationPath+'?v=20261102-manual-r01"></script>';
+const illustrationTag='<script src="'+illustrationPath+'?v=20261111-manual-a30"></script>';
 assert(html.includes(illustrationTag),'Versioned illustration renderer tag present (order check below must not be vacuous)');
 const searchTag='<script src="'+searchPath+'?v=20261021-a"></script>';
 assert(html.includes(searchTag),'Versioned external multilingual search index missing');
