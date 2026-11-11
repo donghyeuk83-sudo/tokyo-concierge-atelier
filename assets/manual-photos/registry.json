@@ -14,6 +14,18 @@
       "height": 510
     },
     {
+      "venueId": "a32",
+      "file": "assets/manual-photos/a32.webp",
+      "sourceType": "owner",
+      "credit": "Kimono Photo Studio WA (photo provided by site owner)",
+      "rightsBasis": "2026-11-11 사이트 운영자가 Kimono Photo Studio WA 사진 사용을 허락함",
+      "isActualVenue": true,
+      "alt": "Kimono Photo Studio WA",
+      "addedOn": "2026-11-11",
+      "width": 637,
+      "height": 510
+    },
+    {
       "venueId": "r01",
       "file": "assets/manual-photos/r01.webp",
       "sourceType": "owner",
